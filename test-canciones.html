@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  
+  <link rel="icon" href="/images/logo-schoenstatt-png.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" type="text/css" href="css/cancionero.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <title>Test de Canciones</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    select, button {
+      margin: 10px 5px;
+      padding: 6px 10px;
+      font-size: 1rem;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+    li {
+      margin: 4px 0;
+      line-height: 1.4;
+    }
+    a {
+      text-decoration: none;
+      color: #003;
+    }
+    a.ok { color: green; }
+    a.error { color: red; }
+    .contador {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .barra {
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .progreso {
+      height: 10px;
+      background: #06c;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    #visor-container {
+      display: none;
+      margin-top: 30px;
+      border-top: 2px solid #ccc;
+      padding-top: 20px;
+    }
+    iframe {
+      width: 100%;
+      height: 80vh;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="nav-placeholder"></div>
+  <script>
+    $(function(){
+      $("#nav-placeholder").load("navbar.html");
+    });
+  </script> 
+
+  
+  <h1>Prueba de Canciones</h1>
+
+  <label for="seccion">Elige una sección:</label>
+  <select id="seccion">
+    <option value="">-- Seleccionar --</option>
+  </select>
+  <button id="verificar">Verificar sección</button>
+  <button id="verificarTodo">Verificar todas las secciones</button>
+
+  <div class="barra"><div class="progreso" id="progreso"></div></div>
+  <p id="estado"></p>
+  <ul id="lista"></ul>
+  <p class="contador" id="resumen"></p>
+
+  <h2>Vista previa</h2>
+  <div id="visor-container">
+    <button id="anterior">⬅️ Anterior</button>
+    <button id="siguiente">Siguiente ➡️</button>
+    <p id="titulo-cancion" style="font-weight:bold; margin:10px 0;"></p>
+    <iframe id="visor"></iframe>
+  </div>
+
+  <script src="scripts/canciones.js"></script>
+  <script>
+    const select = document.getElementById('seccion');
+    const lista = document.getElementById('lista');
+    const boton = document.getElementById('verificar');
+    const botonTodo = document.getElementById('verificarTodo');
+    const progreso = document.getElementById('progreso');
+    const estado = document.getElementById('estado');
+    const resumen = document.getElementById('resumen');
+
+    const visorContainer = document.getElementById('visor-container');
+    const visor = document.getElementById('visor');
+    const tituloCancion = document.getElementById('titulo-cancion');
+    const btnAnt = document.getElementById('anterior');
+    const btnSig = document.getElementById('siguiente');
+
+    let cancionesActuales = [];
+    let indice = 0;
+
+    // --- Cargar secciones ---
+    for (const seccion in canciones) {
+      const opt = document.createElement('option');
+      opt.value = seccion;
+      opt.textContent = seccion;
+      select.appendChild(opt);
+    }
+
+    // --- Mostrar canciones de una sección ---
+    function mostrarSeccion(seccion) {
+      lista.innerHTML = '';
+      cancionesActuales = [];
+      if (!seccion) {
+        visorContainer.style.display = 'none';
+        return;
+      }
+      for (const nombre in canciones[seccion]) {
+        const datos = canciones[seccion][nombre];
+        cancionesActuales.push({ nombre, ...datos });
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = datos.ruta;
+        link.target = '_blank';
+        link.textContent = nombre + ' (' + datos.tono + ')';
+        li.appendChild(link);
+        lista.appendChild(li);
+      }
+
+      if (cancionesActuales.length > 0) {
+        indice = 0;
+        mostrarCancionActual();
+        visorContainer.style.display = 'block';
+      } else {
+        visorContainer.style.display = 'none';
+      }
+    }
+
+    select.addEventListener('change', () => mostrarSeccion(select.value));
+
+    // --- Mostrar canción en visor ---
+    function mostrarCancionActual() {
+      if (!cancionesActuales.length) return;
+      const c = cancionesActuales[indice];
+      tituloCancion.textContent = `${indice + 1}/${cancionesActuales.length} — ${c.nombre}`;
+      visor.src = c.ruta;
+    }
+
+    btnAnt.addEventListener('click', () => {
+      if (indice > 0) {
+        indice--;
+        mostrarCancionActual();
+      }
+    });
+    btnSig.addEventListener('click', () => {
+      if (indice < cancionesActuales.length - 1) {
+        indice++;
+        mostrarCancionActual();
+      }
+    });
+
+    // --- Verificar lista actual ---
+    async function verificarLista(enlaces) {
+      const inicio = performance.now();
+      let ok = 0, error = 0;
+      let total = enlaces.length;
+
+      for (let i = 0; i < total; i++) {
+        const a = enlaces[i];
+        progreso.style.width = ((i / total) * 100).toFixed(1) + '%';
+        estado.textContent = `Verificando ${i + 1} de ${total}...`;
+
+        try {
+          const resp = await fetch(a.href, { method: 'HEAD' });
+          if (resp.ok) {
+            a.classList.add('ok');
+            ok++;
+          } else {
+            a.classList.add('error');
+            a.textContent += ` ❌ (${resp.status})`;
+            error++;
+          }
+        } catch (e) {
+          a.classList.add('error');
+          a.textContent += ' ❌ (no responde)';
+          error++;
+        }
+      }
+
+      progreso.style.width = '100%';
+      const duracion = ((performance.now() - inicio) / 1000).toFixed(1);
+      estado.textContent = 'Completado.';
+      resumen.textContent = `✔️ Correctas: ${ok} | ❌ Errores: ${error} | Total: ${total} | ⏱️ ${duracion}s`;
+    }
+
+    boton.addEventListener('click', async () => {
+      resumen.textContent = '';
+      progreso.style.width = '0%';
+      estado.textContent = '';
+      const enlaces = lista.querySelectorAll('a');
+      if (enlaces.length === 0) {
+        alert('Primero elige una sección.');
+        return;
+      }
+      await verificarLista(enlaces);
+    });
+
+    // --- Verificar todas las secciones ---
+    botonTodo.addEventListener('click', async () => {
+      lista.innerHTML = '';
+      resumen.textContent = '';
+      progreso.style.width = '0%';
+      estado.textContent = 'Preparando verificación global...';
+      
+      const todas = [];
+      for (const seccion in canciones) {
+        for (const nombre in canciones[seccion]) {
+          const datos = canciones[seccion][nombre];
+          todas.push({
+            seccion,
+            nombre,
+            tono: datos.tono,
+            ruta: datos.ruta
+          });
+        }
+      }
+
+      const total = todas.length;
+      const inicio = performance.now();
+      let ok = 0, error = 0;
+
+      for (let i = 0; i < total; i++) {
+        const c = todas[i];
+        progreso.style.width = ((i / total) * 100).toFixed(1) + '%';
+        estado.textContent = `(${i + 1}/${total}) ${c.seccion}: ${c.nombre}`;
+        try {
+          const resp = await fetch(c.ruta, { method: 'HEAD' });
+          if (resp.ok) {
+            ok++;
+          } else {
+            error++;
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="error">${c.seccion} – ${c.nombre} ❌ (${resp.status})</span>`;
+            lista.appendChild(li);
+          }
+        } catch {
+          error++;
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="error">${c.seccion} – ${c.nombre} ❌ (no responde)</span>`;
+          lista.appendChild(li);
+        }
+      }
+
+      progreso.style.width = '100%';
+      const duracion = ((performance.now() - inicio) / 1000).toFixed(1);
+      estado.textContent = 'Verificación global completada.';
+      resumen.textContent = `✔️ Correctas: ${ok} | ❌ Errores: ${error} | Total: ${total} | ⏱️ ${duracion}s`;
+    });
+  </script>
+</body>
+</html>
