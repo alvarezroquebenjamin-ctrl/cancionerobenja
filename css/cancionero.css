@@ -529,3 +529,37 @@ audio{
     background-color: white;
     box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
 }
+/* ========================================= */
+/* ESTILO DE LA CAJA FLOTANTE DEL BUSCADOR   */
+/* ========================================= */
+
+/* 1. El "Envoltorio" (La caja celeste) */
+#listaGlobal {
+    display: none;                /* Oculto al inicio */
+    background-color: #e3f2fd;    /* <--- EL COLOR CELESTE DE FONDO */
+    border: 2px solid #1565c0;    /* Un borde azul más oscuro para resaltar */
+    padding: 10px;                /* Relleno para que se vea el celeste alrededor */
+    border-radius: 0 0 15px 15px; /* Redondear solo las esquinas de abajo */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Sombra fuerte para que "flote" */
+    max-height: 60vh;             /* Que no ocupe más del 60% de la pantalla */
+    overflow-y: auto;             /* Scroll si hay muchos resultados */
+}
+
+/* 2. Las canciones adentro (para que queden prolijas) */
+#listaGlobal .list-group-item {
+    background-color: rgba(255, 255, 255, 0.8); /* Blanco semitransparente */
+    border: none;                 /* Sacamos los bordes feos de la lista */
+    margin-bottom: 4px;           /* Un poquito de espacio entre canciones */
+    border-radius: 8px;           /* Redondeamos cada canción */
+    color: #0A2846;               /* Texto azul oscuro */
+    font-weight: 500;
+}
+
+/* 3. Efecto al pasar el mouse/dedo */
+#listaGlobal .list-group-item:hover,
+#listaGlobal .list-group-item:focus {
+    background-color: #ffffff;    /* Se pone blanco puro */
+    color: #1565c0;               /* Texto celeste fuerte */
+    transform: scale(1.01);       /* Se agranda un poquitito (efecto 3D) */
+    transition: all 0.2s ease;
+}
