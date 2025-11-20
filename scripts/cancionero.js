@@ -535,10 +535,14 @@ function filtrarGlobal() {
     }
 }
 // ==================================================
-// AUTO-ENFOQUE ROBUSTO (Funciona con Navbar dinámica)
+// CERRAR BUSCADOR AL HACER CLIC AFUERA
 // ==================================================
-// Usamos jQuery (document).on para detectar el evento
-// aunque la ventana del buscador se cargue más tarde.
-$(document).on('shown.bs.modal', '#modalBuscador', function () {
-    $('#inputGlobal').focus();
+document.addEventListener('click', function(event) {
+    var contenedor = document.getElementById('listaGlobal');
+    var input = document.getElementById('inputGlobal');
+    
+    // Si el clic NO fue en el input Y NO fue en la lista
+    if (event.target !== input && event.target !== contenedor) {
+        contenedor.style.display = 'none'; // Ocultar lista
+    }
 });

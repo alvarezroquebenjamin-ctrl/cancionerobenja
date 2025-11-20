@@ -513,7 +513,19 @@ audio{
 @media (min-width: 992px) and (max-width: 1199.98px){html {font-size: 1.4vw}}
 @media (min-width: 1200px){html {font-size: 14px}}
 
-/* Ocultar la lista del buscador global hasta que se escriba algo */
+/* Estilo para la lista flotante del buscador */
 #listaGlobal {
-    display: none;
+    display: none; /* Oculto al inicio */
+    background-color: white; /* Fondo blanco para que se lea */
+    border: 1px solid rgba(0,0,0,0.15);
+}
+
+/* Ajuste para que el input se vea bien en la barra azul */
+#inputGlobal {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+}
+#inputGlobal:focus {
+    background-color: white;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
 }
