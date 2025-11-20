@@ -425,7 +425,10 @@ document.addEventListener("DOMContentLoaded", function() {
         window.focus();
 
         // 3. Velocidad
-        const delay = 50 - (speedLevel * 4); 
+        // CÁLCULO ESTILO CIFRA CLUB:
+        // Nivel 1: ~200ms (1px cada 0.2s) -> Muy lento, ideal para baladas/aprender.
+        // Nivel 10: 20ms (1px cada 0.02s) -> Rápido, límite fluido de iPhone.
+        const delay = 220 - (speedLevel * 20);
 
         scrollInterval = setInterval(() => {
             // Detectamos posición actual
