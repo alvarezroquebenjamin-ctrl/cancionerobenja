@@ -411,30 +411,65 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-// --- 6. Lógica de Scroll (CORREGIDA PARA MÓVIL) ---
-function startScroll() {
-    clearInterval(scrollInterval);
-    const delay = getDelay();
-    
-    scrollInterval = setInterval(() => {
-        // Usamos documentElement.scrollHeight que es más preciso en móviles
-        const totalHeight = document.documentElement.scrollHeight;
+// --- 6. Lógica de Scroll (OPTIMIZADA CON requestAnimationFrame) ---
+    let animationFrameId;
+    let lastTime = 0;
+    let accumulatedScroll = 0; // Para guardar decimales de movimiento
+
+    function startScroll() {
+        // 1. Limpiamos cualquier animación previa
+        cancelAnimationFrame(animationFrameId);
+        isScrolling = true;
+        lastTime = performance.now();
         
-        // Usamos Math.ceil para redondear los decimales del scroll en celular
+        // Pequeño retraso para asegurar que el dedo ya no toca la pantalla
+        // (Los celulares bloquean el scroll si detectan un dedo)
+        setTimeout(() => {
+            if(isScrolling) animationFrameId = requestAnimationFrame(step);
+        }, 100);
+    }
+
+    function step(currentTime) {
+        if (!isScrolling) return;
+
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        // CÁLCULO DE VELOCIDAD:
+        // Ajustamos para que coincida más o menos con tus niveles anteriores.
+        // Multiplicamos el nivel por un valor base (ej: 6). 
+        // Nivel 1 = Lento, Nivel 10 = Rápido.
+        const pixelsPerSecond = speedLevel * 6; 
+        
+        // Calculamos cuánto movernos en este frame (puede ser 0.5px, 1.2px, etc)
+        const amountToMove = (pixelsPerSecond * deltaTime) / 1000;
+        
+        accumulatedScroll += amountToMove;
+
+        // Solo ejecutamos el scroll si hemos acumulado al menos 1 pixel entero
+        // Esto evita el "tembleque" en pantallas de alta definición
+        if (accumulatedScroll >= 1) {
+            const pixels = Math.floor(accumulatedScroll);
+            window.scrollBy(0, pixels);
+            accumulatedScroll -= pixels; // Guardamos el resto decimal para la próxima
+        }
+
+        // Chequeo de final de página (versión mejorada)
+        // Usamos document.documentElement.scrollHeight para mayor compatibilidad móvil
+        const totalHeight = document.documentElement.scrollHeight;
         const currentPosition = window.innerHeight + Math.ceil(window.scrollY);
 
-        // Le damos un margen de error de 5 píxeles (-5) para que no se trabe al final
-        if (currentPosition >= totalHeight - 5) {
+        if (currentPosition >= totalHeight - 2) {
             stopScroll();
         } else {
-            window.scrollBy(0, 1);
+            // Pedimos el siguiente cuadro de animación
+            animationFrameId = requestAnimationFrame(step);
         }
-    }, delay);
-}
+    }
 
     function stopScroll() {
-        clearInterval(scrollInterval);
         isScrolling = false;
+        cancelAnimationFrame(animationFrameId);
         btnPlay.innerHTML = "▶";
         btnPlay.style.backgroundColor = "#f8f9fa";
         btnPlay.style.color = "#0A2846";
