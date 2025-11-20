@@ -321,59 +321,60 @@ function filtrarCanciones() {
 }
 
 // ==================================================
-// AUTOSCROLL CON NIVELES (SOLO EN CANCIONES)
+// AUTOSCROLL OPTIMIZADO PARA MÓVILES (NIVELES 1-10)
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", function() {
     
     // --- 0. CHEQUEO DE SEGURIDAD ---
-    // Si la página no tiene el elemento "letra", NO hacemos nada.
-    // Esto evita que aparezca en el índice.
     if (!document.getElementById("letra")) {
         return;
     }
 
     // --- 1. Variables de Estado ---
     let isScrolling = false;
-    let speedLevel = 5;    // Velocidad inicial (1 a 10)
+    let speedLevel = 3;    // Arranca en 3 para que se note el movimiento
     let scrollInterval;
 
-    // Función para calcular los milisegundos
+    // Función de velocidad ajustada para móviles (más rango)
+    // Nivel 1 = 80ms | Nivel 10 = 5ms
     function getDelay() {
-        return 110 - (speedLevel * 10);
+        // Fórmula ajustada para que el nivel 1 no sea taaan lento
+        return 90 - (speedLevel * 8); 
     }
 
     // --- 2. Crear la Barra de Herramientas ---
     const toolbar = document.createElement("div");
     Object.assign(toolbar.style, {
         position: "fixed",
-        bottom: "20px",
+        bottom: "80px", // <--- LA SUBÍ PARA QUE NO MOLESTE EN EL CELU
         right: "20px",
-        zIndex: "1000",
+        zIndex: "9999", // <--- Z-INDEX ALTO PARA ESTAR SIEMPRE ARRIBA
         display: "flex",
         alignItems: "center",
         gap: "8px",
-        backgroundColor: "#0A2846", // Azul oscuro
+        backgroundColor: "rgba(10, 40, 70, 0.95)", // Más opaco
         padding: "8px 12px",
         borderRadius: "50px",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
-        fontFamily: "sans-serif"
+        boxShadow: "0 4px 15px rgba(0,0,0,0.5)", // Más sombra
+        fontFamily: "sans-serif",
+        backdropFilter: "blur(4px)"
     });
 
     // --- 3. Estilos comunes para botones ---
     const btnStyle = {
-        backgroundColor: "rgba(255,255,255,0.1)",
-        border: "1px solid rgba(255,255,255,0.2)",
+        backgroundColor: "rgba(255,255,255,0.15)",
+        border: "1px solid rgba(255,255,255,0.3)",
         borderRadius: "50%",
-        width: "32px",
-        height: "32px",
-        fontSize: "18px",
+        width: "38px",   // <--- BOTONES MÁS GRANDES PARA EL DEDO
+        height: "38px",
+        fontSize: "20px",
         cursor: "pointer",
         color: "white",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        transition: "background 0.2s"
+        transition: "background 0.1s" // Reacción más rápida
     };
 
     // --- 4. Crear Elementos ---
@@ -384,7 +385,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const speedDisplay = document.createElement("span");
     speedDisplay.innerText = speedLevel;
     Object.assign(speedDisplay.style, {
-        color: "white", fontWeight: "bold", fontSize: "18px", minWidth: "25px", textAlign: "center"
+        color: "white", fontWeight: "bold", fontSize: "20px", minWidth: "30px", textAlign: "center"
     });
 
     const btnPlus = document.createElement("button");
@@ -393,14 +394,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const separator = document.createElement("div");
     Object.assign(separator.style, {
-        width: "1px", height: "25px", backgroundColor: "rgba(255,255,255,0.3)", margin: "0 5px"
+        width: "1px", height: "25px", backgroundColor: "rgba(255,255,255,0.3)", margin: "0 8px"
     });
 
     const btnPlay = document.createElement("button");
-    btnPlay.innerHTML = "▶";
+    btnPlay.innerHTML = "▶"; // Play
     Object.assign(btnPlay.style, btnStyle);
     Object.assign(btnPlay.style, {
-        backgroundColor: "#f8f9fa", color: "#0A2846", width: "42px", height: "42px", fontSize: "20px", marginLeft: "5px", border: "none"
+        backgroundColor: "#f8f9fa", color: "#0A2846", width: "48px", height: "48px", fontSize: "24px", marginLeft: "5px", border: "none"
     });
 
     // --- 5. Armar la barra ---
@@ -411,15 +412,22 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-    // --- 6. Lógica de Scroll ---
+    // --- 6. Lógica de Scroll (MEJORADA) ---
     function startScroll() {
         clearInterval(scrollInterval);
         const delay = getDelay();
+        
         scrollInterval = setInterval(() => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            // Usamos documentElement para mejor compatibilidad móvil
+            const totalHeight = document.documentElement.scrollHeight;
+            const currentScroll = window.innerHeight + window.scrollY;
+
+            if (currentScroll >= totalHeight - 1) { // -1 para margen de error
                 stopScroll();
             } else {
-                window.scrollBy(0, 1);
+                // <--- CAMBIO CLAVE: Bajar 2px en vez de 1px
+                // En pantallas retina (celulares) 1px es imperceptible.
+                window.scrollBy(0, 2); 
             }
         }, delay);
     }
@@ -437,19 +445,22 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // --- 7. Eventos ---
-    btnPlay.addEventListener("click", function() {
+    // Usamos 'click' (funciona bien en móviles modernos)
+    btnPlay.addEventListener("click", function(e) {
+        e.preventDefault(); // Evita comportamientos raros de touch
         if (isScrolling) {
             stopScroll();
         } else {
             isScrolling = true;
-            btnPlay.innerHTML = "⏸";
+            btnPlay.innerHTML = "⏸"; // Pausa
             btnPlay.style.backgroundColor = "#dc3545";
             btnPlay.style.color = "white";
             startScroll();
         }
     });
 
-    btnMinus.addEventListener("click", function() {
+    btnMinus.addEventListener("click", function(e) {
+        e.preventDefault();
         if (speedLevel > 1) {
             speedLevel--;
             updateSpeedDisplay();
@@ -457,7 +468,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    btnPlus.addEventListener("click", function() {
+    btnPlus.addEventListener("click", function(e) {
+        e.preventDefault();
         if (speedLevel < 10) {
             speedLevel++;
             updateSpeedDisplay();
