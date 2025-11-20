@@ -411,58 +411,48 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-// --- 6. Lógica de Scroll (SOLUCIÓN RECURSIVA IPHONE) ---
-
-    let scrollTimeout; // Usamos Timeout, no Interval
+// --- 6. Lógica de Scroll (SOLUCIÓN FUERZA BRUTA CSS) ---
 
     function startScroll() {
-        // 1. LIMPIEZA Y PREPARACIÓN CSS (CRUCIAL PARA IPHONE)
-        // Forzamos por código que el body sea scrolleable
-        document.body.style.height = "auto";
-        document.body.style.minHeight = "100%";
-        document.documentElement.style.height = "auto";
+        clearInterval(scrollInterval);
         
-        clearTimeout(scrollTimeout);
+        // 1. MATAMOS EL SCROLL SUAVE (El culpable del problema)
+        document.documentElement.style.scrollBehavior = "auto";
+        document.body.style.scrollBehavior = "auto";
         
-        // 2. Truco de foco para iOS
+        // 2. Trucos para iPhone
         if (btnPlay) btnPlay.blur();
         window.focus();
-        
-        // 3. Iniciamos el bucle
-        loopScroll();
-    }
 
-    function loopScroll() {
-        if (!isScrolling) return;
+        // 3. Velocidad
+        const delay = 50 - (speedLevel * 4); 
 
-        // CÁLCULO DE VELOCIDAD
-        // iPhone prefiere pasos un poco más grandes (1px o 2px) con pausas más largas
-        // que pasos pequeños (0.5px) muy rápidos.
-        // speedLevel 1 = espera 50ms, speedLevel 10 = espera 5ms
-        let waitTime = 55 - (speedLevel * 5); 
-        if (waitTime < 5) waitTime = 5;
+        scrollInterval = setInterval(() => {
+            // Detectamos posición actual
+            const currentY = window.pageYOffset || document.documentElement.scrollTop;
+            const totalHeight = document.documentElement.scrollHeight;
+            const windowHeight = window.innerHeight;
 
-        // HACER SCROLL
-        // Probamos mover la ventana. 
-        // Usamos 1 pixel entero para evitar problemas de sub-pixeles en pantallas retina
-        window.scrollBy(0, 1);
+            // Si llegamos al final
+            if ((windowHeight + currentY) >= totalHeight - 1) {
+                stopScroll();
+                return;
+            }
 
-        // VERIFICAR FINAL
-        // (window.scrollY puede dar decimales en iPhone, por eso Math.ceil)
-        if ((window.innerHeight + Math.ceil(window.scrollY)) >= document.body.offsetHeight - 2) {
-            stopScroll();
-            return;
-        }
-
-        // EL SECRETO: 
-        // En lugar de setInterval, programamos el siguiente paso
-        // solo cuando este haya terminado.
-        scrollTimeout = setTimeout(loopScroll, waitTime);
+            // MOVIMIENTO: Usamos scrollTo (absoluto) en lugar de scrollBy
+            // Forzamos 1px hacia abajo sumando a la posición actual
+            window.scrollTo(0, currentY + 1);
+            
+        }, delay);
     }
 
     function stopScroll() {
+        clearInterval(scrollInterval);
         isScrolling = false;
-        clearTimeout(scrollTimeout); // Detenemos el bucle
+        
+        // Opcional: Devolver el scroll suave si quieres (borrar si da problemas)
+        // document.documentElement.style.scrollBehavior = "smooth";
+        
         btnPlay.innerHTML = "▶";
         btnPlay.style.backgroundColor = "#f8f9fa";
         btnPlay.style.color = "#0A2846";
