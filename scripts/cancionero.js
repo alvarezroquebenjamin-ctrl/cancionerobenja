@@ -411,37 +411,58 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-// --- 6. Lógica de Scroll (VERSIÓN FINAL IPHONE) ---
-    
-    // Variables simples de nuevo
+// --- 6. Lógica de Scroll (SOLUCIÓN RECURSIVA IPHONE) ---
+
+    let scrollTimeout; // Usamos Timeout, no Interval
+
     function startScroll() {
-        clearInterval(scrollInterval); // Limpiamos por seguridad
+        // 1. LIMPIEZA Y PREPARACIÓN CSS (CRUCIAL PARA IPHONE)
+        // Forzamos por código que el body sea scrolleable
+        document.body.style.height = "auto";
+        document.body.style.minHeight = "100%";
+        document.documentElement.style.height = "auto";
         
-        // 1. TRUCO IPHONE: Quitamos el "foco" del botón Play
-        // Esto le dice al iPhone "el usuario ya dejó de tocar la pantalla"
-        if (btnPlay) btnPlay.blur(); 
-        window.focus(); 
+        clearTimeout(scrollTimeout);
+        
+        // 2. Truco de foco para iOS
+        if (btnPlay) btnPlay.blur();
+        window.focus();
+        
+        // 3. Iniciamos el bucle
+        loopScroll();
+    }
 
-        // 2. Configuración
-        const pixelStep = 1; // Mover 1px por tic
-        // Fórmula de velocidad ajustada para intervalo (más rápido = menos delay)
-        const delay = 50 - (speedLevel * 4); 
+    function loopScroll() {
+        if (!isScrolling) return;
 
-        scrollInterval = setInterval(() => {
-            // 3. Chequeo de fin de página (Compatible con height: auto)
-            // Si la posición actual + altura ventana >= altura total documento
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
-                stopScroll();
-            } else {
-                // 4. Scroll nativo (El que mejor funciona en iOS)
-                window.scrollBy(0, pixelStep);
-            }
-        }, delay);
+        // CÁLCULO DE VELOCIDAD
+        // iPhone prefiere pasos un poco más grandes (1px o 2px) con pausas más largas
+        // que pasos pequeños (0.5px) muy rápidos.
+        // speedLevel 1 = espera 50ms, speedLevel 10 = espera 5ms
+        let waitTime = 55 - (speedLevel * 5); 
+        if (waitTime < 5) waitTime = 5;
+
+        // HACER SCROLL
+        // Probamos mover la ventana. 
+        // Usamos 1 pixel entero para evitar problemas de sub-pixeles en pantallas retina
+        window.scrollBy(0, 1);
+
+        // VERIFICAR FINAL
+        // (window.scrollY puede dar decimales en iPhone, por eso Math.ceil)
+        if ((window.innerHeight + Math.ceil(window.scrollY)) >= document.body.offsetHeight - 2) {
+            stopScroll();
+            return;
+        }
+
+        // EL SECRETO: 
+        // En lugar de setInterval, programamos el siguiente paso
+        // solo cuando este haya terminado.
+        scrollTimeout = setTimeout(loopScroll, waitTime);
     }
 
     function stopScroll() {
-        clearInterval(scrollInterval); // Usamos clearInterval, no cancelAnimationFrame
         isScrolling = false;
+        clearTimeout(scrollTimeout); // Detenemos el bucle
         btnPlay.innerHTML = "▶";
         btnPlay.style.backgroundColor = "#f8f9fa";
         btnPlay.style.color = "#0A2846";
