@@ -18,7 +18,7 @@
     toggleChords();
   });
 
-  // --- 2. TRANSPOSICIÓN (CAMBIO DE TONO) ---
+  // --- 2. TRANSPOSICIÓN (Plugin jQuery) ---
   $.fn.transpose = function(options) {
     var opts = $.extend({}, $.fn.transpose.defaults, options);
     var currentKey = null;
@@ -142,14 +142,19 @@
       });
       
       $(this).before(keysHtml);
+
       var output = [];
       var lines = $(this).html().split("\n");
       var line;
+
       for (var i = 0; i < lines.length; i++) {
           line = lines[i];
-          if (isChordLine(line)) output.push("<span>" + wrapChords(line) + "</span>");
-          else output.push("<span>" + line + "</span>");
+          if (isChordLine(line))
+              output.push("<span>" + wrapChords(line) + "</span>");
+          else
+              output.push("<span>" + line + "</span>");
       };
+
       $(this).html(output.join("\n"));
     });
   };
@@ -163,43 +168,48 @@
         $(".btn").show();
         $("#letra").transpose();
     });    
+    
 })(jQuery);
 
 
 // ==================================================
-// 3. BUSCADOR GLOBAL (SIN TILDES NI MAYÚSCULAS)
+// 3. BUSCADOR GLOBAL (RESTAURADO)
 // ==================================================
 function filtrarGlobal() {
     var input = document.getElementById("inputGlobal");
     var contenedor = document.getElementById("listaGlobal");
     var enlaces = contenedor.getElementsByTagName("a");
     
+    // Normalizar
     var filtro = "";
-    if (input.value) {
+    if (input && input.value) {
         filtro = input.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
 
-    if (filtro.length === 0) {
-        contenedor.style.display = "none";
-        return;
-    } else {
-        contenedor.style.display = "block";
-    }
-
-    for (var i = 0; i < enlaces.length; i++) {
-        var texto = enlaces[i].textContent || enlaces[i].innerText;
-        var letra = enlaces[i].getAttribute("data-letra") || ""; 
-        var textoCompleto = texto + " " + letra;
-        var textoNormalizado = textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-        if (textoNormalizado.indexOf(filtro) > -1) {
-            enlaces[i].style.display = ""; 
+    if (contenedor) {
+        if (filtro.length === 0) {
+            contenedor.style.display = "none";
+            return;
         } else {
-            enlaces[i].style.display = "none"; 
+            contenedor.style.display = "block";
+        }
+
+        for (var i = 0; i < enlaces.length; i++) {
+            var texto = enlaces[i].textContent || enlaces[i].innerText;
+            var letra = enlaces[i].getAttribute("data-letra") || ""; 
+            var textoCompleto = texto + " " + letra;
+            var textoNormalizado = textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+            if (textoNormalizado.indexOf(filtro) > -1) {
+                enlaces[i].style.display = ""; 
+            } else {
+                enlaces[i].style.display = "none"; 
+            }
         }
     }
 }
 
+// CERRAR AL HACER CLIC AFUERA
 document.addEventListener('click', function(event) {
     var contenedor = document.getElementById('listaGlobal');
     var input = document.getElementById('inputGlobal');
@@ -212,10 +222,11 @@ document.addEventListener('click', function(event) {
 
 
 // ==================================================
-// 4. AUTOSCROLL ROBUSTO (SIN FRENADO AUTOMÁTICO)
+// 4. AUTOSCROLL (SIN FRENO AUTOMÁTICO PARA CELULAR)
 // ==================================================
 document.addEventListener("DOMContentLoaded", function() {
     
+    // Chequeo de seguridad
     if (!document.getElementById("letra")) { return; }
 
     let isScrolling = false;
@@ -236,7 +247,6 @@ document.addEventListener("DOMContentLoaded", function() {
         fontFamily: "sans-serif", backdropFilter: "blur(4px)"
     });
 
-    // Estilos botones
     const btnStyle = {
         backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)",
         borderRadius: "50%", width: "40px", height: "40px", fontSize: "20px",
@@ -244,7 +254,6 @@ document.addEventListener("DOMContentLoaded", function() {
         justifyContent: "center", userSelect: "none", webkitUserSelect: "none"
     };
 
-    // Elementos
     const btnMinus = document.createElement("button"); btnMinus.innerHTML = "−"; Object.assign(btnMinus.style, btnStyle);
     const speedDisplay = document.createElement("span"); speedDisplay.innerText = speedLevel;
     Object.assign(speedDisplay.style, { color: "white", fontWeight: "bold", fontSize: "20px", minWidth: "30px", textAlign: "center" });
@@ -258,15 +267,12 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(separator); toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-    // --- LOGICA DE SCROLL SIN PARADA AUTOMÁTICA ---
+    // Lógica de Scroll INFINITA (No para sola)
     function startScroll() {
         clearInterval(scrollInterval);
         const delay = getDelay();
-        
         scrollInterval = setInterval(() => {
-            // Solo bajamos. No chequeamos el final.
-            // El usuario debe pausar manualmente.
-            window.scrollBy(0, 1); 
+            window.scrollBy(0, 1); // Bajar 1px
         }, delay);
     }
 
@@ -280,38 +286,43 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updateSpeedDisplay() { speedDisplay.innerText = speedLevel; }
 
-    // --- EVENTOS ---
-    btnPlay.onclick = function(e) {
-        e.stopPropagation();
-        if (isScrolling) {
-            stopScroll();
-        } else {
+    // Eventos
+    function handlePlay(e) {
+        e.stopPropagation(); // Evita conflictos
+        if (isScrolling) { stopScroll(); } 
+        else {
             isScrolling = true;
             btnPlay.innerHTML = "⏸";
             btnPlay.style.backgroundColor = "#dc3545";
             btnPlay.style.color = "white";
             startScroll();
         }
-    };
+    }
 
-    btnMinus.onclick = function(e) {
+    function handleMinus(e) {
         e.stopPropagation();
         if (speedLevel > 1) {
             speedLevel--;
             updateSpeedDisplay();
             if (isScrolling) startScroll();
         }
-    };
+    }
 
-    btnPlus.onclick = function(e) {
+    function handlePlus(e) {
         e.stopPropagation();
         if (speedLevel < 10) {
             speedLevel++;
             updateSpeedDisplay();
             if (isScrolling) startScroll();
         }
-    };
+    }
 
+    // Usamos 'click' que es lo más compatible
+    btnPlay.addEventListener("click", handlePlay);
+    btnMinus.addEventListener("click", handleMinus);
+    btnPlus.addEventListener("click", handlePlus);
+
+    // Prevenir problemas de touch
     toolbar.addEventListener("touchmove", function(e) { e.preventDefault(); }, { passive: false });
 });
 
