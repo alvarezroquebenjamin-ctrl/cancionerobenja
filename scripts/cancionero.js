@@ -311,3 +311,200 @@ function filtrarCanciones() {
         }
     }
 }
+
+// ==================================================
+// AUTOSCROLL CON NIVELES (1-10)
+// ==================================================
+
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // --- 1. Variables de Estado ---
+    let isScrolling = false;
+    let speedLevel = 5;    // Velocidad inicial (1 a 10)
+    let scrollInterval;
+
+    // Función para calcular los milisegundos según el nivel (Matemática simple)
+    // Nivel 1 = 100ms (Lento) | Nivel 10 = 10ms (Rápido)
+    function getDelay() {
+        return 110 - (speedLevel * 10);
+    }
+
+    // --- 2. Crear la Barra de Herramientas ---
+    const toolbar = document.createElement("div");
+    Object.assign(toolbar.style, {
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        zIndex: "1000",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        backgroundColor: "#0A2846", // Azul oscuro
+        padding: "8px 12px",
+        borderRadius: "50px",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.4)",
+        fontFamily: "sans-serif"
+    });
+
+    // --- 3. Estilos comunes para botones ---
+    const btnStyle = {
+        backgroundColor: "rgba(255,255,255,0.1)", // Transparente clarito
+        border: "1px solid rgba(255,255,255,0.2)",
+        borderRadius: "50%",
+        width: "32px",
+        height: "32px",
+        fontSize: "18px",
+        cursor: "pointer",
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "background 0.2s"
+    };
+
+    // --- 4. Crear Elementos (Botones y Display) ---
+
+    // Botón Menos (-)
+    const btnMinus = document.createElement("button");
+    btnMinus.innerHTML = "−"; // Signo menos
+    Object.assign(btnMinus.style, btnStyle);
+
+    // Display del Número (1-10)
+    const speedDisplay = document.createElement("span");
+    speedDisplay.innerText = speedLevel;
+    Object.assign(speedDisplay.style, {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: "18px",
+        minWidth: "25px",
+        textAlign: "center"
+    });
+
+    // Botón Más (+)
+    const btnPlus = document.createElement("button");
+    btnPlus.innerHTML = "+";
+    Object.assign(btnPlus.style, btnStyle);
+
+    // Separador visual
+    const separator = document.createElement("div");
+    Object.assign(separator.style, {
+        width: "1px",
+        height: "25px",
+        backgroundColor: "rgba(255,255,255,0.3)",
+        margin: "0 5px"
+    });
+
+    // Botón PLAY / PAUSA (Más grande y destacado)
+    const btnPlay = document.createElement("button");
+    btnPlay.innerHTML = "▶";
+    Object.assign(btnPlay.style, btnStyle);
+    // Sobrescribimos estilos específicos para el Play
+    Object.assign(btnPlay.style, {
+        backgroundColor: "#f8f9fa", // Blanco
+        color: "#0A2846", // Icono azul
+        width: "42px",
+        height: "42px",
+        fontSize: "20px",
+        marginLeft: "5px",
+        border: "none"
+    });
+
+    // --- 5. Armar la barra ---
+    toolbar.appendChild(btnMinus);
+    toolbar.appendChild(speedDisplay);
+    toolbar.appendChild(btnPlus);
+    toolbar.appendChild(separator);
+    toolbar.appendChild(btnPlay);
+    document.body.appendChild(toolbar);
+
+    // --- 6. Lógica de Scroll ---
+
+    function startScroll() {
+        clearInterval(scrollInterval); // Limpiar anterior
+        const delay = getDelay();
+        
+        scrollInterval = setInterval(() => {
+            // Check si llegamos al final
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                stopScroll();
+            } else {
+                window.scrollBy(0, 1); // Baja 1 pixel
+            }
+        }, delay);
+    }
+
+    function stopScroll() {
+        clearInterval(scrollInterval);
+        isScrolling = false;
+        btnPlay.innerHTML = "▶";
+        btnPlay.style.backgroundColor = "#f8f9fa"; // Blanco
+        btnPlay.style.color = "#0A2846"; // Azul
+    }
+
+    function updateSpeedDisplay() {
+        speedDisplay.innerText = speedLevel;
+    }
+
+    // --- 7. Eventos (Clics) ---
+
+    // Botón Play
+    btnPlay.addEventListener("click", function() {
+        if (isScrolling) {
+            stopScroll();
+        } else {
+            isScrolling = true;
+            btnPlay.innerHTML = "⏸";
+            btnPlay.style.backgroundColor = "#dc3545"; // Rojo
+            btnPlay.style.color = "white";
+            startScroll();
+        }
+    });
+
+    // Botón Menos
+    btnMinus.addEventListener("click", function() {
+        if (speedLevel > 1) {
+            speedLevel--;
+            updateSpeedDisplay();
+            if (isScrolling) startScroll(); // Actualizar velocidad en vivo
+        }
+    });
+
+    // Botón Más
+    btnPlus.addEventListener("click", function() {
+        if (speedLevel < 10) {
+            speedLevel++;
+            updateSpeedDisplay();
+            if (isScrolling) startScroll(); // Actualizar velocidad en vivo
+        }
+    });
+});
+
+// ==================================================
+// WAKE LOCK (EVITAR QUE SE APAGUE LA PANTALLA)
+// ==================================================
+document.addEventListener("DOMContentLoaded", async function() {
+    if ('wakeLock' in navigator) {
+        try {
+            let wakeLock = null;
+            const requestWakeLock = async () => {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Pantalla mantenida encendida');
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            };
+            // Solicitar bloqueo al cargar
+            await requestWakeLock();
+            
+            // Si te vas de la app y volvés, solicitar de nuevo
+            document.addEventListener('visibilitychange', async () => {
+                if (wakeLock !== null && document.visibilityState === 'visible') {
+                    await requestWakeLock();
+                }
+            });
+        } catch (err) {
+            console.log("El navegador no soporta Wake Lock");
+        }
+    }
+});
