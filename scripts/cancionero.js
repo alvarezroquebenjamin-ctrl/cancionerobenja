@@ -1,166 +1,91 @@
 (function($) {
 
-  // Función para determinar si una línea es de acordes
+  // --- 1. DETECTOR DE ACORDES ---
   var isChordLine = function(line) {
     return /(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b#]?/.test(line);
   };
 
-  // Función para ocultar/mostrar acordes
   function toggleChords() {
     $('#letra span').each(function() {
       var lineText = $(this).text();
       if (isChordLine(lineText)) {
-        $(this).toggle(); // Alterna la visibilidad del elemento
+        $(this).toggle(); 
       }
     });
   }
 
-  // Asociar la función al evento de clic del botón
   $('#toggleChordsButton').click(function() {
     toggleChords();
   });
 
+  // --- 2. TRANSPOSICIÓN (CAMBIO DE TONO) ---
   $.fn.transpose = function(options) {
     var opts = $.extend({}, $.fn.transpose.defaults, options);
-    
     var currentKey = null;
     
     var keys = [
-      { name: 'LAb',  value: 0,   type: 'F' },
-      { name: 'LA',   value: 1,   type: 'N' },
-      { name: 'LA#',  value: 2,   type: 'S' },
-      { name: 'SIb',  value: 2,   type: 'F' },
-      { name: 'SI',   value: 3,   type: 'N' },
-      { name: 'DO',   value: 4,   type: 'N' },
-      { name: 'DO#',  value: 5,   type: 'S' },
-      { name: 'REb',  value: 5,   type: 'F' },
-      { name: 'RE',   value: 6,   type: 'N' },
-      { name: 'RE#',  value: 7,   type: 'S' },
-      { name: 'MIb',  value: 7,   type: 'F' },
-      { name: 'MI',   value: 8,   type: 'N' },
-      { name: 'FA',   value: 9,   type: 'N' },
-      { name: 'FA#',  value: 10,  type: 'S' },
-      { name: 'SOLb',  value: 10,  type: 'F' },
-      { name: 'SOL',   value: 11,  type: 'N' },
-      { name: 'SOL#',  value: 0,   type: 'S' }
+      { name: 'LAb',  value: 0,   type: 'F' }, { name: 'LA',   value: 1,   type: 'N' },
+      { name: 'LA#',  value: 2,   type: 'S' }, { name: 'SIb',  value: 2,   type: 'F' },
+      { name: 'SI',   value: 3,   type: 'N' }, { name: 'DO',   value: 4,   type: 'N' },
+      { name: 'DO#',  value: 5,   type: 'S' }, { name: 'REb',  value: 5,   type: 'F' },
+      { name: 'RE',   value: 6,   type: 'N' }, { name: 'RE#',  value: 7,   type: 'S' },
+      { name: 'MIb',  value: 7,   type: 'F' }, { name: 'MI',   value: 8,   type: 'N' },
+      { name: 'FA',   value: 9,   type: 'N' }, { name: 'FA#',  value: 10,  type: 'S' },
+      { name: 'SOLb', value: 10,  type: 'F' }, { name: 'SOL',  value: 11,  type: 'N' },
+      { name: 'SOL#', value: 0,   type: 'S' }
     ];
   
     var getKeyByName = function (name) {
-        if (name.charAt(name.length-1) == "m") {
-          name = name.substring(0, name.length-1);
-        }
-        for (var i = 0; i < keys.length; i++) {
-            if (name == keys[i].name) {
-                return keys[i];
-            }
-        }
+        if (name.charAt(name.length-1) == "m") { name = name.substring(0, name.length-1); }
+        for (var i = 0; i < keys.length; i++) { if (name == keys[i].name) { return keys[i]; } }
     };
 
     var getChordRoot = function (input) {
         var ind = 2;
-        console.log("getChordRoot: "+input);
-        if(input.substring(0,2)=="SO"){
-            ind=3;}
+        if(input.substring(0,2)=="SO"){ ind=3; }
         if (input.length > ind && (input.charAt(ind) == "b" || input.charAt(ind) == "#"))
             return input.substr(0, ind+1);
-        else
-            return input.substr(0, ind);
+        else return input.substr(0, ind);
     };
 
     var getNewKey = function (oldKey, delta, targetKey) {
-        console.log("oldKey: "+oldKey + " - delta: " + delta);
         var keyValue = getKeyByName(oldKey).value + delta;
-        console.log(keyValue);
-        if (keyValue > 11) {
-            keyValue -= 12;
-        } else if (keyValue < 0) {
-            keyValue += 12;
-        }
+        if (keyValue > 11) { keyValue -= 12; } else if (keyValue < 0) { keyValue += 12; }
         
         var i=0;
         if (keyValue == 0 || keyValue == 2 || keyValue == 5 || keyValue == 7 || keyValue == 10) {
-            // Return the Flat or Sharp Key
             switch(targetKey.name) {
-              case "LA":
-              case "LA#":
-              case "SI":
-              case "DO":
-              case "DO#":
-              case "RE":
-              case "RE#":
-              case "MI":
-              case "FA#":
-              case "SOL":
-              case "SOL#":
-                  for (;i<keys.length;i++) {
-                    if (keys[i].value == keyValue && keys[i].type == "S") {
-                      return keys[i];
-                    }
-                  }
+              case "LA": case "LA#": case "SI": case "DO": case "DO#": case "RE": 
+              case "RE#": case "MI": case "FA#": case "SOL": case "SOL#":
+                  for (;i<keys.length;i++) { if (keys[i].value == keyValue && keys[i].type == "S") { return keys[i]; } }
               default:
-                  for (;i<keys.length;i++) {
-                    if (keys[i].value == keyValue && keys[i].type == "F") {
-                      return keys[i];
-                    }
-                  }
+                  for (;i<keys.length;i++) { if (keys[i].value == keyValue && keys[i].type == "F") { return keys[i]; } }
             }
-        }
-        else {
-            // Return the Natural Key
-            for (;i<keys.length;i++) {
-              if (keys[i].value == keyValue) {
-                return keys[i];
-              }
-            }
-        }
-    };
-
-    var getChordType = function (key) {
-        switch (key.charAt(key.length - 1)) {
-            case "b":
-                return "F";
-            case "#":
-                return "S";
-            default:
-              return "N";
+        } else {
+            for (;i<keys.length;i++) { if (keys[i].value == keyValue) { return keys[i]; } }
         }
     };
 
     var getDelta = function (oldIndex, newIndex) {
-        if (oldIndex > newIndex)
-            return 0 - (oldIndex - newIndex);
-        else if (oldIndex < newIndex)
-            return 0 + (newIndex - oldIndex);
-        else
-            return 0;
+        if (oldIndex > newIndex) return 0 - (oldIndex - newIndex);
+        else if (oldIndex < newIndex) return 0 + (newIndex - oldIndex);
+        else return 0;
     };
 
     var transposeSong = function (target, key) {
         var newKey = getKeyByName(key);
-
-        if (currentKey.name == newKey.name) {
-          return;
-        }
-
+        if (currentKey.name == newKey.name) return;
         var delta = getDelta(currentKey.value, newKey.value);
-        
-        $("span.c", target).each(function (i, el) {
-            transposeChord(el, delta, newKey);
-        });
-        
+        $("span.c", target).each(function (i, el) { transposeChord(el, delta, newKey); });
         currentKey = newKey;
     };
 
-    // ---- ESPACIADO INTELIGENTE SOLO EN LA FUNCIÓN DE TRANSPOSICIÓN ----
     var transposeChord = function (selector, delta, targetKey) {
         var el = $(selector);
-
-        // Guardar longitud original del acorde + espacios a la derecha
         if (!el.data("orig-block-len")) {
-            // Calcula cuántos espacios siguen al acorde en la línea original
             var next = el[0].nextSibling;
             var spaces = 0;
-            if (next && next.nodeType === 3) { // nodo de texto
+            if (next && next.nodeType === 3) {
                 var m = next.nodeValue.match(/^(\s+)/);
                 if (m) spaces = m[1].length;
             }
@@ -173,41 +98,17 @@
         var newChordRoot = getNewKey(oldChordRoot, delta, targetKey);
         var newChord = newChordRoot.name + oldChord.substr(oldChordRoot.length);
 
-        // Calcular cuántos espacios se necesitan a la derecha
         var spacesNeeded = originalBlockLen - newChord.length;
         if (spacesNeeded < 0) spacesNeeded = 0;
 
-        // Modificar el texto del acorde y los espacios a la derecha (en el nodo de texto siguiente)
         el.text(newChord);
 
         var next = el[0].nextSibling;
         if (next && next.nodeType === 3) {
-            // Reemplaza los espacios por los nuevos
             next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^\s+/, "");
         } else if (spacesNeeded > 0) {
-            // Si no hay nodo de texto, agrégalo
             el.after(document.createTextNode(" ".repeat(spacesNeeded)));
         }
-    };
-
-    var getNewWhiteSpaceLength = function (a, b, c) {
-        if (a > b)
-            return (c + (a - b));
-        else if (a < b)
-            return (c - (b - a));
-        else
-            return c;
-    };
-
-    var makeString = function (s, repeat) {
-        var o = [];
-        for (var i = 0; i < repeat; i++) o.push(s);
-        return o.join("");
-    }
-    
-    // Función para determinar si una línea es de acordes
-    var isChordLine = function(line) {
-        return /(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b#]?/.test(line);
     };
 
     var wrapChords = function (input) {
@@ -215,20 +116,12 @@
     };
     
     return $(this).each(function() {
-    
       var startKey = $(this).attr("data-key");
-      if (!startKey || $.trim(startKey) == "") {
-        startKey = opts.key;
-      }
-
-      if (!startKey || $.trim(startKey) == "") {
-        throw("Starting key not defined.");
-        return this;
-      }
+      if (!startKey || $.trim(startKey) == "") { startKey = opts.key; }
+      if (!startKey || $.trim(startKey) == "") { return this; }
       
       currentKey = getKeyByName(startKey);
 
-      // Build tranpose links ===========================================
       var keyLinks = [];
       $(keys).each(function(i, key) {
           if (currentKey.name == key.name)
@@ -249,186 +142,131 @@
       });
       
       $(this).before(keysHtml);
-
       var output = [];
       var lines = $(this).html().split("\n");
-      var line, tmp = "";
-
+      var line;
       for (var i = 0; i < lines.length; i++) {
           line = lines[i];
-
-          if (isChordLine(line))
-              output.push("<span>" + wrapChords(line) + "</span>");
-          else
-              output.push("<span>" + line + "</span>");
+          if (isChordLine(line)) output.push("<span>" + wrapChords(line) + "</span>");
+          else output.push("<span>" + line + "</span>");
       };
-
       $(this).html(output.join("\n"));
     });
   };
-
-
 
   $.fn.transpose.defaults = {
     chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4)*(\/[A-G][b\#]*)*$/,
     chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4)*)/g
   };
 
-
-$(function() {
+  $(function() {
         $(".btn").show();
         $("#letra").transpose();
-        
     });    
-    
 })(jQuery);
 
-// ==================================================
-// BUSCADOR INTERNO (OCULTA LETRAS AL BUSCAR)
-// ==================================================
-function filtrarCanciones() {
-    var input = document.getElementById("searchInput");
-    var filtro = input.value.toUpperCase();
-    var contenedor = document.getElementById("lista-canciones");
-    
-    // Obtenemos botones (canciones) y títulos (letras A, B, C...)
-    var botones = contenedor.getElementsByTagName("a");
-    var titulos = contenedor.getElementsByClassName("titulo");
 
-    // --- LOGICA PARA LAS LETRAS (TITULOS) ---
-    // Si hay algo escrito en el buscador, ocultamos TODAS las letras
-    if (filtro.length > 0) {
-        for (var j = 0; j < titulos.length; j++) {
-            titulos[j].style.display = "none";
-        }
-    } else {
-        // Si el buscador está vacío, mostramos las letras de nuevo
-        for (var j = 0; j < titulos.length; j++) {
-            titulos[j].style.display = "";
-        }
+// ==================================================
+// 3. BUSCADOR GLOBAL (SIN TILDES NI MAYÚSCULAS)
+// ==================================================
+function filtrarGlobal() {
+    var input = document.getElementById("inputGlobal");
+    var contenedor = document.getElementById("listaGlobal");
+    var enlaces = contenedor.getElementsByTagName("a");
+    
+    var filtro = "";
+    if (input.value) {
+        filtro = input.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
 
-    // --- LOGICA PARA LAS CANCIONES ---
-    for (var i = 0; i < botones.length; i++) {
-        var textoCancion = botones[i].textContent || botones[i].innerText;
-        
-        if (textoCancion.toUpperCase().indexOf(filtro) > -1) {
-            botones[i].style.display = ""; // Mostrar
+    if (filtro.length === 0) {
+        contenedor.style.display = "none";
+        return;
+    } else {
+        contenedor.style.display = "block";
+    }
+
+    for (var i = 0; i < enlaces.length; i++) {
+        var texto = enlaces[i].textContent || enlaces[i].innerText;
+        var letra = enlaces[i].getAttribute("data-letra") || ""; 
+        var textoCompleto = texto + " " + letra;
+        var textoNormalizado = textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+        if (textoNormalizado.indexOf(filtro) > -1) {
+            enlaces[i].style.display = ""; 
         } else {
-            botones[i].style.display = "none"; // Ocultar
+            enlaces[i].style.display = "none"; 
         }
     }
 }
 
-// ==================================================
-// AUTOSCROLL "TODOTERRENO" (FIX PARA CELULARES)
-// ==================================================
+document.addEventListener('click', function(event) {
+    var contenedor = document.getElementById('listaGlobal');
+    var input = document.getElementById('inputGlobal');
+    if (contenedor && input) {
+        if (event.target !== input && event.target !== contenedor && !contenedor.contains(event.target)) {
+            contenedor.style.display = 'none';
+        }
+    }
+});
 
+
+// ==================================================
+// 4. AUTOSCROLL ROBUSTO (SIN FRENADO AUTOMÁTICO)
+// ==================================================
 document.addEventListener("DOMContentLoaded", function() {
     
-    // --- 0. CHEQUEO DE SEGURIDAD ---
-    if (!document.getElementById("letra")) {
-        return;
-    }
+    if (!document.getElementById("letra")) { return; }
 
-    // --- 1. Variables de Estado ---
     let isScrolling = false;
     let speedLevel = 3; 
     let scrollInterval;
 
-    // Función de velocidad
     function getDelay() {
         return 90 - (speedLevel * 8); 
     }
 
-    // --- 2. Crear la Barra ---
+    // Barra
     const toolbar = document.createElement("div");
     Object.assign(toolbar.style, {
-        position: "fixed",
-        bottom: "80px", // Bien arriba para esquivar menús
-        right: "20px",
-        zIndex: "9999",
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        backgroundColor: "rgba(10, 40, 70, 0.95)",
-        padding: "8px 12px",
-        borderRadius: "50px",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
-        fontFamily: "sans-serif",
-        backdropFilter: "blur(4px)"
+        position: "fixed", bottom: "80px", right: "20px", zIndex: "9999",
+        display: "flex", alignItems: "center", gap: "8px",
+        backgroundColor: "rgba(10, 40, 70, 0.95)", padding: "8px 12px",
+        borderRadius: "50px", boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
+        fontFamily: "sans-serif", backdropFilter: "blur(4px)"
     });
 
-    // --- 3. Estilos de botones ---
+    // Estilos botones
     const btnStyle = {
-        backgroundColor: "rgba(255,255,255,0.15)",
-        border: "1px solid rgba(255,255,255,0.3)",
-        borderRadius: "50%",
-        width: "40px",   
-        height: "40px",
-        fontSize: "20px",
-        cursor: "pointer",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        userSelect: "none", // Evita que se seleccione texto al tocar
-        -webkitUserSelect: "none"
+        backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)",
+        borderRadius: "50%", width: "40px", height: "40px", fontSize: "20px",
+        cursor: "pointer", color: "white", display: "flex", alignItems: "center",
+        justifyContent: "center", userSelect: "none", webkitUserSelect: "none"
     };
 
-    // --- 4. Crear Elementos ---
-    const btnMinus = document.createElement("button");
-    btnMinus.innerHTML = "−";
-    Object.assign(btnMinus.style, btnStyle);
-
-    const speedDisplay = document.createElement("span");
-    speedDisplay.innerText = speedLevel;
-    Object.assign(speedDisplay.style, {
-        color: "white", fontWeight: "bold", fontSize: "20px", minWidth: "30px", textAlign: "center"
-    });
-
-    const btnPlus = document.createElement("button");
-    btnPlus.innerHTML = "+";
-    Object.assign(btnPlus.style, btnStyle);
-
-    const separator = document.createElement("div");
-    Object.assign(separator.style, {
-        width: "1px", height: "25px", backgroundColor: "rgba(255,255,255,0.3)", margin: "0 8px"
-    });
-
-    const btnPlay = document.createElement("button");
-    btnPlay.innerHTML = "▶"; 
+    // Elementos
+    const btnMinus = document.createElement("button"); btnMinus.innerHTML = "−"; Object.assign(btnMinus.style, btnStyle);
+    const speedDisplay = document.createElement("span"); speedDisplay.innerText = speedLevel;
+    Object.assign(speedDisplay.style, { color: "white", fontWeight: "bold", fontSize: "20px", minWidth: "30px", textAlign: "center" });
+    const btnPlus = document.createElement("button"); btnPlus.innerHTML = "+"; Object.assign(btnPlus.style, btnStyle);
+    const separator = document.createElement("div"); Object.assign(separator.style, { width: "1px", height: "25px", backgroundColor: "rgba(255,255,255,0.3)", margin: "0 8px" });
+    const btnPlay = document.createElement("button"); btnPlay.innerHTML = "▶"; 
     Object.assign(btnPlay.style, btnStyle);
-    Object.assign(btnPlay.style, {
-        backgroundColor: "#f8f9fa", color: "#0A2846", width: "50px", height: "50px", fontSize: "24px", marginLeft: "5px", border: "none"
-    });
+    Object.assign(btnPlay.style, { backgroundColor: "#f8f9fa", color: "#0A2846", width: "50px", height: "50px", fontSize: "24px", marginLeft: "5px", border: "none" });
 
-    // --- 5. Armar la barra ---
-    toolbar.appendChild(btnMinus);
-    toolbar.appendChild(speedDisplay);
-    toolbar.appendChild(btnPlus);
-    toolbar.appendChild(separator);
-    toolbar.appendChild(btnPlay);
+    toolbar.appendChild(btnMinus); toolbar.appendChild(speedDisplay); toolbar.appendChild(btnPlus);
+    toolbar.appendChild(separator); toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-    // --- 6. Lógica de Scroll (CORREGIDA) ---
+    // --- LOGICA DE SCROLL SIN PARADA AUTOMÁTICA ---
     function startScroll() {
         clearInterval(scrollInterval);
         const delay = getDelay();
         
         scrollInterval = setInterval(() => {
-            // Cálculo "A prueba de balas" para el final de página
-            const scrollPosition = window.scrollY + window.innerHeight;
-            const pageHeight = document.documentElement.scrollHeight;
-            
-            // Margen de error de 50px (Buffer)
-            // Si estamos a 50px del final, paramos.
-            if (scrollPosition >= pageHeight - 50) { 
-                stopScroll();
-            } else {
-                // Bajar 1px (más suave)
-                window.scrollBy(0, 1); 
-            }
+            // Solo bajamos. No chequeamos el final.
+            // El usuario debe pausar manualmente.
+            window.scrollBy(0, 1); 
         }, delay);
     }
 
@@ -440,17 +278,11 @@ document.addEventListener("DOMContentLoaded", function() {
         btnPlay.style.color = "#0A2846";
     }
 
-    function updateSpeedDisplay() {
-        speedDisplay.innerText = speedLevel;
-    }
+    function updateSpeedDisplay() { speedDisplay.innerText = speedLevel; }
 
-    // --- 7. Manejador de Eventos (Soporte Touch) ---
-    
-    // Función genérica para manejar Click y Touch sin duplicar
-    function handlePlay(e) {
-        if (e.cancelable) e.preventDefault(); // Evita comportamientos extraños
-        e.stopPropagation(); // Evita que el clic pase al fondo
-        
+    // --- EVENTOS ---
+    btnPlay.onclick = function(e) {
+        e.stopPropagation();
         if (isScrolling) {
             stopScroll();
         } else {
@@ -460,117 +292,44 @@ document.addEventListener("DOMContentLoaded", function() {
             btnPlay.style.color = "white";
             startScroll();
         }
-    }
+    };
 
-    function handleMinus(e) {
-        if (e.cancelable) e.preventDefault();
+    btnMinus.onclick = function(e) {
         e.stopPropagation();
         if (speedLevel > 1) {
             speedLevel--;
             updateSpeedDisplay();
             if (isScrolling) startScroll();
         }
-    }
+    };
 
-    function handlePlus(e) {
-        if (e.cancelable) e.preventDefault();
+    btnPlus.onclick = function(e) {
         e.stopPropagation();
         if (speedLevel < 10) {
             speedLevel++;
             updateSpeedDisplay();
             if (isScrolling) startScroll();
         }
-    }
+    };
 
-    // Asignamos eventos (usamos 'click' que es más seguro hoy en día)
-    // Si tenés problemas de "doble tap", avisame y ponemos 'touchstart'
-    btnPlay.addEventListener("click", handlePlay);
-    btnMinus.addEventListener("click", handleMinus);
-    btnPlus.addEventListener("click", handlePlus);
-
-    // Prevenir que tocar la barra mueva la pantalla
-    toolbar.addEventListener("touchmove", function(e) {
-        e.preventDefault();
-    }, { passive: false });
+    toolbar.addEventListener("touchmove", function(e) { e.preventDefault(); }, { passive: false });
 });
 
+
 // ==================================================
-// WAKE LOCK (EVITAR QUE SE APAGUE LA PANTALLA)
+// 5. WAKE LOCK
 // ==================================================
 document.addEventListener("DOMContentLoaded", async function() {
     if ('wakeLock' in navigator) {
         try {
             let wakeLock = null;
             const requestWakeLock = async () => {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Pantalla mantenida encendida');
-                } catch (err) {
-                    console.error(`${err.name}, ${err.message}`);
-                }
+                try { wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {}
             };
-            // Solicitar bloqueo al cargar
             await requestWakeLock();
-            
-            // Si te vas de la app y volvés, solicitar de nuevo
             document.addEventListener('visibilitychange', async () => {
-                if (wakeLock !== null && document.visibilityState === 'visible') {
-                    await requestWakeLock();
-                }
+                if (wakeLock !== null && document.visibilityState === 'visible') { await requestWakeLock(); }
             });
-        } catch (err) {
-            console.log("El navegador no soporta Wake Lock");
-        }
-    }
-});
-// ==================================================
-// BUSCADOR GLOBAL (SIN TILDES NI MAYÚSCULAS)
-// ==================================================
-function filtrarGlobal() {
-    var input = document.getElementById("inputGlobal");
-    var contenedor = document.getElementById("listaGlobal");
-    var enlaces = contenedor.getElementsByTagName("a");
-
-    // 1. Limpiamos lo que escribió el usuario:
-    // - .normalize("NFD")... : Descompone la "á" en "a" + "tilde"
-    // - .replace(...) : Borra la marca de la tilde
-    // - .toLowerCase() : Pasa todo a minúsculas
-    var filtro = input.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-    // Si está vacío, ocultar lista
-    if (filtro.length === 0) {
-        contenedor.style.display = "none";
-        return;
-    } else {
-        contenedor.style.display = "block";
-    }
-
-    // Recorrer y filtrar
-    for (var i = 0; i < enlaces.length; i++) {
-        var texto = enlaces[i].textContent || enlaces[i].innerText;
-        var letra = enlaces[i].getAttribute("data-letra") || ""; 
-        var textoCompleto = texto + " " + letra;
-
-        // 2. Limpiamos también el texto de la canción de la misma forma
-        var textoNormalizado = textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-        // Comparar las dos versiones "limpias"
-        if (textoNormalizado.indexOf(filtro) > -1) {
-            enlaces[i].style.display = ""; 
-        } else {
-            enlaces[i].style.display = "none"; 
-        }
-    }
-}
-// ==================================================
-// CERRAR BUSCADOR AL HACER CLIC AFUERA
-// ==================================================
-document.addEventListener('click', function(event) {
-    var contenedor = document.getElementById('listaGlobal');
-    var input = document.getElementById('inputGlobal');
-    
-    // Si el clic NO fue en el input Y NO fue en la lista
-    if (event.target !== input && event.target !== contenedor) {
-        contenedor.style.display = 'none'; // Ocultar lista
+        } catch (err) {}
     }
 });
