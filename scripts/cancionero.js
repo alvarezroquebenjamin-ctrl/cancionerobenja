@@ -411,65 +411,37 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-// --- 6. Lógica de Scroll (OPTIMIZADA CON requestAnimationFrame) ---
-    let animationFrameId;
-    let lastTime = 0;
-    let accumulatedScroll = 0; // Para guardar decimales de movimiento
-
+// --- 6. Lógica de Scroll (VERSIÓN FINAL IPHONE) ---
+    
+    // Variables simples de nuevo
     function startScroll() {
-        // 1. Limpiamos cualquier animación previa
-        cancelAnimationFrame(animationFrameId);
-        isScrolling = true;
-        lastTime = performance.now();
+        clearInterval(scrollInterval); // Limpiamos por seguridad
         
-        // Pequeño retraso para asegurar que el dedo ya no toca la pantalla
-        // (Los celulares bloquean el scroll si detectan un dedo)
-        setTimeout(() => {
-            if(isScrolling) animationFrameId = requestAnimationFrame(step);
-        }, 100);
-    }
+        // 1. TRUCO IPHONE: Quitamos el "foco" del botón Play
+        // Esto le dice al iPhone "el usuario ya dejó de tocar la pantalla"
+        if (btnPlay) btnPlay.blur(); 
+        window.focus(); 
 
-    function step(currentTime) {
-        if (!isScrolling) return;
+        // 2. Configuración
+        const pixelStep = 1; // Mover 1px por tic
+        // Fórmula de velocidad ajustada para intervalo (más rápido = menos delay)
+        const delay = 50 - (speedLevel * 4); 
 
-        const deltaTime = currentTime - lastTime;
-        lastTime = currentTime;
-
-        // CÁLCULO DE VELOCIDAD:
-        // Ajustamos para que coincida más o menos con tus niveles anteriores.
-        // Multiplicamos el nivel por un valor base (ej: 6). 
-        // Nivel 1 = Lento, Nivel 10 = Rápido.
-        const pixelsPerSecond = speedLevel * 6; 
-        
-        // Calculamos cuánto movernos en este frame (puede ser 0.5px, 1.2px, etc)
-        const amountToMove = (pixelsPerSecond * deltaTime) / 1000;
-        
-        accumulatedScroll += amountToMove;
-
-        // Solo ejecutamos el scroll si hemos acumulado al menos 1 pixel entero
-        // Esto evita el "tembleque" en pantallas de alta definición
-        if (accumulatedScroll >= 1) {
-            const pixels = Math.floor(accumulatedScroll);
-            window.scrollBy(0, pixels);
-            accumulatedScroll -= pixels; // Guardamos el resto decimal para la próxima
-        }
-
-        // Chequeo de final de página (versión mejorada)
-        // Usamos document.documentElement.scrollHeight para mayor compatibilidad móvil
-        const totalHeight = document.documentElement.scrollHeight;
-        const currentPosition = window.innerHeight + Math.ceil(window.scrollY);
-
-        if (currentPosition >= totalHeight - 2) {
-            stopScroll();
-        } else {
-            // Pedimos el siguiente cuadro de animación
-            animationFrameId = requestAnimationFrame(step);
-        }
+        scrollInterval = setInterval(() => {
+            // 3. Chequeo de fin de página (Compatible con height: auto)
+            // Si la posición actual + altura ventana >= altura total documento
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
+                stopScroll();
+            } else {
+                // 4. Scroll nativo (El que mejor funciona en iOS)
+                window.scrollBy(0, pixelStep);
+            }
+        }, delay);
     }
 
     function stopScroll() {
+        clearInterval(scrollInterval); // Usamos clearInterval, no cancelAnimationFrame
         isScrolling = false;
-        cancelAnimationFrame(animationFrameId);
         btnPlay.innerHTML = "▶";
         btnPlay.style.backgroundColor = "#f8f9fa";
         btnPlay.style.color = "#0A2846";

@@ -563,3 +563,10 @@ audio{
     transform: scale(1.01);       /* Se agranda un poquitito (efecto 3D) */
     transition: all 0.2s ease;
 }
+
+/* Agrega esto a tu CSS */
+html, body {
+    height: auto !important; 
+    min-height: 100%;
+    -webkit-overflow-scrolling: touch; /* Magia para iOS */
+}
