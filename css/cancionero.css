@@ -512,3 +512,8 @@ audio{
 @media (min-width: 768px) and (max-width: 991.98px){html {font-size: 2vw}}
 @media (min-width: 992px) and (max-width: 1199.98px){html {font-size: 1.4vw}}
 @media (min-width: 1200px){html {font-size: 14px}}
+
+/* Ocultar la lista del buscador global hasta que se escriba algo */
+#listaGlobal {
+    display: none;
+}

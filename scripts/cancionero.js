@@ -283,48 +283,62 @@ $(function() {
     
 })(jQuery);
 
-// Función que se llama cada vez que se presiona una tecla en el buscador
+// ==================================================
+// BUSCADOR INTERNO (OCULTA LETRAS AL BUSCAR)
+// ==================================================
 function filtrarCanciones() {
-    // 1. Tomar lo que escribió el usuario en el cuadro de búsqueda
-    let input = document.getElementById("searchInput");
-    let filtro = input.value.toUpperCase(); // Lo ponemos en mayúsculas para no distinguir entre mayús/minús
+    var input = document.getElementById("searchInput");
+    var filtro = input.value.toUpperCase();
+    var contenedor = document.getElementById("lista-canciones");
+    
+    // Obtenemos botones (canciones) y títulos (letras A, B, C...)
+    var botones = contenedor.getElementsByTagName("a");
+    var titulos = contenedor.getElementsByClassName("titulo");
 
-    // 2. Localizar la lista de canciones
-    let ul = document.getElementById("lista-canciones");
+    // --- LOGICA PARA LAS LETRAS (TITULOS) ---
+    // Si hay algo escrito en el buscador, ocultamos TODAS las letras
+    if (filtro.length > 0) {
+        for (var j = 0; j < titulos.length; j++) {
+            titulos[j].style.display = "none";
+        }
+    } else {
+        // Si el buscador está vacío, mostramos las letras de nuevo
+        for (var j = 0; j < titulos.length; j++) {
+            titulos[j].style.display = "";
+        }
+    }
 
-    // 3. Obtener todos los elementos de la lista (cada canción)
-    let li = ul.getElementsByTagName("li");
-
-    // 4. Recorrer la lista, canción por canción
-    for (let i = 0; i < li.length; i++) {
+    // --- LOGICA PARA LAS CANCIONES ---
+    for (var i = 0; i < botones.length; i++) {
+        var textoCancion = botones[i].textContent || botones[i].innerText;
         
-        // Obtener el nombre de la canción (el texto dentro del enlace <a>)
-        let a = li[i].getElementsByTagName("a")[0];
-        
-        // Verificar si el nombre de la canción contiene lo que el usuario escribió
-        if (a.innerHTML.toUpperCase().indexOf(filtro) > -1) {
-            // Si sí lo contiene, mostrar la canción
-            li[i].style.display = ""; 
+        if (textoCancion.toUpperCase().indexOf(filtro) > -1) {
+            botones[i].style.display = ""; // Mostrar
         } else {
-            // Si no lo contiene, ocultar la canción
-            li[i].style.display = "none";
+            botones[i].style.display = "none"; // Ocultar
         }
     }
 }
 
 // ==================================================
-// AUTOSCROLL CON NIVELES (1-10)
+// AUTOSCROLL CON NIVELES (SOLO EN CANCIONES)
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", function() {
     
+    // --- 0. CHEQUEO DE SEGURIDAD ---
+    // Si la página no tiene el elemento "letra", NO hacemos nada.
+    // Esto evita que aparezca en el índice.
+    if (!document.getElementById("letra")) {
+        return;
+    }
+
     // --- 1. Variables de Estado ---
     let isScrolling = false;
     let speedLevel = 5;    // Velocidad inicial (1 a 10)
     let scrollInterval;
 
-    // Función para calcular los milisegundos según el nivel (Matemática simple)
-    // Nivel 1 = 100ms (Lento) | Nivel 10 = 10ms (Rápido)
+    // Función para calcular los milisegundos
     function getDelay() {
         return 110 - (speedLevel * 10);
     }
@@ -348,7 +362,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // --- 3. Estilos comunes para botones ---
     const btnStyle = {
-        backgroundColor: "rgba(255,255,255,0.1)", // Transparente clarito
+        backgroundColor: "rgba(255,255,255,0.1)",
         border: "1px solid rgba(255,255,255,0.2)",
         borderRadius: "50%",
         width: "32px",
@@ -362,51 +376,31 @@ document.addEventListener("DOMContentLoaded", function() {
         transition: "background 0.2s"
     };
 
-    // --- 4. Crear Elementos (Botones y Display) ---
-
-    // Botón Menos (-)
+    // --- 4. Crear Elementos ---
     const btnMinus = document.createElement("button");
-    btnMinus.innerHTML = "−"; // Signo menos
+    btnMinus.innerHTML = "−";
     Object.assign(btnMinus.style, btnStyle);
 
-    // Display del Número (1-10)
     const speedDisplay = document.createElement("span");
     speedDisplay.innerText = speedLevel;
     Object.assign(speedDisplay.style, {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: "18px",
-        minWidth: "25px",
-        textAlign: "center"
+        color: "white", fontWeight: "bold", fontSize: "18px", minWidth: "25px", textAlign: "center"
     });
 
-    // Botón Más (+)
     const btnPlus = document.createElement("button");
     btnPlus.innerHTML = "+";
     Object.assign(btnPlus.style, btnStyle);
 
-    // Separador visual
     const separator = document.createElement("div");
     Object.assign(separator.style, {
-        width: "1px",
-        height: "25px",
-        backgroundColor: "rgba(255,255,255,0.3)",
-        margin: "0 5px"
+        width: "1px", height: "25px", backgroundColor: "rgba(255,255,255,0.3)", margin: "0 5px"
     });
 
-    // Botón PLAY / PAUSA (Más grande y destacado)
     const btnPlay = document.createElement("button");
     btnPlay.innerHTML = "▶";
     Object.assign(btnPlay.style, btnStyle);
-    // Sobrescribimos estilos específicos para el Play
     Object.assign(btnPlay.style, {
-        backgroundColor: "#f8f9fa", // Blanco
-        color: "#0A2846", // Icono azul
-        width: "42px",
-        height: "42px",
-        fontSize: "20px",
-        marginLeft: "5px",
-        border: "none"
+        backgroundColor: "#f8f9fa", color: "#0A2846", width: "42px", height: "42px", fontSize: "20px", marginLeft: "5px", border: "none"
     });
 
     // --- 5. Armar la barra ---
@@ -418,17 +412,14 @@ document.addEventListener("DOMContentLoaded", function() {
     document.body.appendChild(toolbar);
 
     // --- 6. Lógica de Scroll ---
-
     function startScroll() {
-        clearInterval(scrollInterval); // Limpiar anterior
+        clearInterval(scrollInterval);
         const delay = getDelay();
-        
         scrollInterval = setInterval(() => {
-            // Check si llegamos al final
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
                 stopScroll();
             } else {
-                window.scrollBy(0, 1); // Baja 1 pixel
+                window.scrollBy(0, 1);
             }
         }, delay);
     }
@@ -437,44 +428,40 @@ document.addEventListener("DOMContentLoaded", function() {
         clearInterval(scrollInterval);
         isScrolling = false;
         btnPlay.innerHTML = "▶";
-        btnPlay.style.backgroundColor = "#f8f9fa"; // Blanco
-        btnPlay.style.color = "#0A2846"; // Azul
+        btnPlay.style.backgroundColor = "#f8f9fa";
+        btnPlay.style.color = "#0A2846";
     }
 
     function updateSpeedDisplay() {
         speedDisplay.innerText = speedLevel;
     }
 
-    // --- 7. Eventos (Clics) ---
-
-    // Botón Play
+    // --- 7. Eventos ---
     btnPlay.addEventListener("click", function() {
         if (isScrolling) {
             stopScroll();
         } else {
             isScrolling = true;
             btnPlay.innerHTML = "⏸";
-            btnPlay.style.backgroundColor = "#dc3545"; // Rojo
+            btnPlay.style.backgroundColor = "#dc3545";
             btnPlay.style.color = "white";
             startScroll();
         }
     });
 
-    // Botón Menos
     btnMinus.addEventListener("click", function() {
         if (speedLevel > 1) {
             speedLevel--;
             updateSpeedDisplay();
-            if (isScrolling) startScroll(); // Actualizar velocidad en vivo
+            if (isScrolling) startScroll();
         }
     });
 
-    // Botón Más
     btnPlus.addEventListener("click", function() {
         if (speedLevel < 10) {
             speedLevel++;
             updateSpeedDisplay();
-            if (isScrolling) startScroll(); // Actualizar velocidad en vivo
+            if (isScrolling) startScroll();
         }
     });
 });
@@ -507,4 +494,51 @@ document.addEventListener("DOMContentLoaded", async function() {
             console.log("El navegador no soporta Wake Lock");
         }
     }
+});
+// ==================================================
+// BUSCADOR GLOBAL (SIN TILDES NI MAYÚSCULAS)
+// ==================================================
+function filtrarGlobal() {
+    var input = document.getElementById("inputGlobal");
+    var contenedor = document.getElementById("listaGlobal");
+    var enlaces = contenedor.getElementsByTagName("a");
+
+    // 1. Limpiamos lo que escribió el usuario:
+    // - .normalize("NFD")... : Descompone la "á" en "a" + "tilde"
+    // - .replace(...) : Borra la marca de la tilde
+    // - .toLowerCase() : Pasa todo a minúsculas
+    var filtro = input.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+    // Si está vacío, ocultar lista
+    if (filtro.length === 0) {
+        contenedor.style.display = "none";
+        return;
+    } else {
+        contenedor.style.display = "block";
+    }
+
+    // Recorrer y filtrar
+    for (var i = 0; i < enlaces.length; i++) {
+        var texto = enlaces[i].textContent || enlaces[i].innerText;
+        var letra = enlaces[i].getAttribute("data-letra") || ""; 
+        var textoCompleto = texto + " " + letra;
+
+        // 2. Limpiamos también el texto de la canción de la misma forma
+        var textoNormalizado = textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+        // Comparar las dos versiones "limpias"
+        if (textoNormalizado.indexOf(filtro) > -1) {
+            enlaces[i].style.display = ""; 
+        } else {
+            enlaces[i].style.display = "none"; 
+        }
+    }
+}
+// ==================================================
+// AUTO-ENFOQUE ROBUSTO (Funciona con Navbar dinámica)
+// ==================================================
+// Usamos jQuery (document).on para detectar el evento
+// aunque la ventana del buscador se cargue más tarde.
+$(document).on('shown.bs.modal', '#modalBuscador', function () {
+    $('#inputGlobal').focus();
 });
