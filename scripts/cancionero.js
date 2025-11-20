@@ -321,7 +321,7 @@ function filtrarCanciones() {
 }
 
 // ==================================================
-// AUTOSCROLL OPTIMIZADO PARA MÓVILES (NIVELES 1-10)
+// AUTOSCROLL "TODOTERRENO" (FIX PARA CELULARES)
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -333,48 +333,47 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // --- 1. Variables de Estado ---
     let isScrolling = false;
-    let speedLevel = 3;    // Arranca en 3 para que se note el movimiento
+    let speedLevel = 3; 
     let scrollInterval;
 
-    // Función de velocidad ajustada para móviles (más rango)
-    // Nivel 1 = 80ms | Nivel 10 = 5ms
+    // Función de velocidad
     function getDelay() {
-        // Fórmula ajustada para que el nivel 1 no sea taaan lento
         return 90 - (speedLevel * 8); 
     }
 
-    // --- 2. Crear la Barra de Herramientas ---
+    // --- 2. Crear la Barra ---
     const toolbar = document.createElement("div");
     Object.assign(toolbar.style, {
         position: "fixed",
-        bottom: "80px", // <--- LA SUBÍ PARA QUE NO MOLESTE EN EL CELU
+        bottom: "80px", // Bien arriba para esquivar menús
         right: "20px",
-        zIndex: "9999", // <--- Z-INDEX ALTO PARA ESTAR SIEMPRE ARRIBA
+        zIndex: "9999",
         display: "flex",
         alignItems: "center",
         gap: "8px",
-        backgroundColor: "rgba(10, 40, 70, 0.95)", // Más opaco
+        backgroundColor: "rgba(10, 40, 70, 0.95)",
         padding: "8px 12px",
         borderRadius: "50px",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.5)", // Más sombra
+        boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
         fontFamily: "sans-serif",
         backdropFilter: "blur(4px)"
     });
 
-    // --- 3. Estilos comunes para botones ---
+    // --- 3. Estilos de botones ---
     const btnStyle = {
         backgroundColor: "rgba(255,255,255,0.15)",
         border: "1px solid rgba(255,255,255,0.3)",
         borderRadius: "50%",
-        width: "38px",   // <--- BOTONES MÁS GRANDES PARA EL DEDO
-        height: "38px",
+        width: "40px",   
+        height: "40px",
         fontSize: "20px",
         cursor: "pointer",
         color: "white",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        transition: "background 0.1s" // Reacción más rápida
+        userSelect: "none", // Evita que se seleccione texto al tocar
+        -webkitUserSelect: "none"
     };
 
     // --- 4. Crear Elementos ---
@@ -398,10 +397,10 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const btnPlay = document.createElement("button");
-    btnPlay.innerHTML = "▶"; // Play
+    btnPlay.innerHTML = "▶"; 
     Object.assign(btnPlay.style, btnStyle);
     Object.assign(btnPlay.style, {
-        backgroundColor: "#f8f9fa", color: "#0A2846", width: "48px", height: "48px", fontSize: "24px", marginLeft: "5px", border: "none"
+        backgroundColor: "#f8f9fa", color: "#0A2846", width: "50px", height: "50px", fontSize: "24px", marginLeft: "5px", border: "none"
     });
 
     // --- 5. Armar la barra ---
@@ -412,22 +411,23 @@ document.addEventListener("DOMContentLoaded", function() {
     toolbar.appendChild(btnPlay);
     document.body.appendChild(toolbar);
 
-    // --- 6. Lógica de Scroll (MEJORADA) ---
+    // --- 6. Lógica de Scroll (CORREGIDA) ---
     function startScroll() {
         clearInterval(scrollInterval);
         const delay = getDelay();
         
         scrollInterval = setInterval(() => {
-            // Usamos documentElement para mejor compatibilidad móvil
-            const totalHeight = document.documentElement.scrollHeight;
-            const currentScroll = window.innerHeight + window.scrollY;
-
-            if (currentScroll >= totalHeight - 1) { // -1 para margen de error
+            // Cálculo "A prueba de balas" para el final de página
+            const scrollPosition = window.scrollY + window.innerHeight;
+            const pageHeight = document.documentElement.scrollHeight;
+            
+            // Margen de error de 50px (Buffer)
+            // Si estamos a 50px del final, paramos.
+            if (scrollPosition >= pageHeight - 50) { 
                 stopScroll();
             } else {
-                // <--- CAMBIO CLAVE: Bajar 2px en vez de 1px
-                // En pantallas retina (celulares) 1px es imperceptible.
-                window.scrollBy(0, 2); 
+                // Bajar 1px (más suave)
+                window.scrollBy(0, 1); 
             }
         }, delay);
     }
@@ -444,38 +444,54 @@ document.addEventListener("DOMContentLoaded", function() {
         speedDisplay.innerText = speedLevel;
     }
 
-    // --- 7. Eventos ---
-    // Usamos 'click' (funciona bien en móviles modernos)
-    btnPlay.addEventListener("click", function(e) {
-        e.preventDefault(); // Evita comportamientos raros de touch
+    // --- 7. Manejador de Eventos (Soporte Touch) ---
+    
+    // Función genérica para manejar Click y Touch sin duplicar
+    function handlePlay(e) {
+        if (e.cancelable) e.preventDefault(); // Evita comportamientos extraños
+        e.stopPropagation(); // Evita que el clic pase al fondo
+        
         if (isScrolling) {
             stopScroll();
         } else {
             isScrolling = true;
-            btnPlay.innerHTML = "⏸"; // Pausa
+            btnPlay.innerHTML = "⏸";
             btnPlay.style.backgroundColor = "#dc3545";
             btnPlay.style.color = "white";
             startScroll();
         }
-    });
+    }
 
-    btnMinus.addEventListener("click", function(e) {
-        e.preventDefault();
+    function handleMinus(e) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
         if (speedLevel > 1) {
             speedLevel--;
             updateSpeedDisplay();
             if (isScrolling) startScroll();
         }
-    });
+    }
 
-    btnPlus.addEventListener("click", function(e) {
-        e.preventDefault();
+    function handlePlus(e) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
         if (speedLevel < 10) {
             speedLevel++;
             updateSpeedDisplay();
             if (isScrolling) startScroll();
         }
-    });
+    }
+
+    // Asignamos eventos (usamos 'click' que es más seguro hoy en día)
+    // Si tenés problemas de "doble tap", avisame y ponemos 'touchstart'
+    btnPlay.addEventListener("click", handlePlay);
+    btnMinus.addEventListener("click", handleMinus);
+    btnPlus.addEventListener("click", handlePlus);
+
+    // Prevenir que tocar la barra mueva la pantalla
+    toolbar.addEventListener("touchmove", function(e) {
+        e.preventDefault();
+    }, { passive: false });
 });
 
 // ==================================================
