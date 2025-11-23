@@ -151,7 +151,7 @@
 
 
 // =============================================================================
-// 2. SÚPER MENÚ FLOTANTE Y ESTILOS GLOBALES (CSS INYECTADO)
+// 2. SÚPER MENÚ FLOTANTE Y ESTILOS GLOBALES
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -161,10 +161,7 @@ document.addEventListener("DOMContentLoaded", function() {
            1. AJUSTES NAVBAR MÓVIL
            ======================================================= */
         @media (max-width: 768px) {
-            /* Ocultar el botón de 3 rayitas (Hamburguesa del Navbar) */
             .navbar-toggler { display: none !important; }
-
-            /* Forzar que el contenido se muestre en fila (sin colapsar) */
             .navbar-collapse, .collapse {
                 display: flex !important;
                 flex-basis: auto !important;
@@ -172,57 +169,44 @@ document.addEventListener("DOMContentLoaded", function() {
                 width: 100% !important;
                 justify-content: space-between !important;
             }
-
-            /* Alinear menú y buscador horizontalmente */
             .navbar-nav {
                 flex-direction: row !important;
                 gap: 5px;
             }
-
-            /* Achicar botón de secciones para que entre */
             .nav-item, .dropdown, .nav-link, .dropdown-toggle {
                 font-size: 13px !important;
                 padding-left: 5px !important;
                 padding-right: 5px !important;
             }
-
-            /* Achicar el buscador para que entre */
             #inputGlobal, .form-control {
                 width: 110px !important; 
                 font-size: 13px !important;
                 height: 30px !important;
                 padding: 2px 5px !important;
             }
-            
-            /* Reducir padding del contenedor general */
             .container, .container-fluid, .navbar {
                 padding-left: 5px !important;
                 padding-right: 5px !important;
             }
-
-            /* --- SOLUCIÓN AL PROBLEMA DE LA BARRA QUE SE AGRANDA --- */
-            /* Forzamos al menú desplegable a ser ABSOLUTO y FLOTAR sobre el contenido */
             .navbar-nav .dropdown-menu {
                 position: absolute !important; 
                 float: none !important;
-                top: 100% !important; /* Justo debajo de la barra */
+                top: 100% !important;
                 left: 0 !important;
                 margin-top: 5px !important;
-                background-color: white; /* Asegurar fondo blanco (o negro en modo oscuro) */
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Sombra para que destaque */
+                background-color: white;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
                 width: auto !important;
-                min-width: 180px; /* Ancho mínimo razonable */
-                z-index: 10000 !important; /* Asegurar que esté por encima de todo */
+                min-width: 180px;
+                z-index: 10000 !important;
             }
-            
-            /* Asegurar que la barra azul no oculte lo que sale de ella */
             .navbar, .navbar-collapse {
                 overflow: visible !important;
             }
         }
 
         /* =======================================================
-           2. ESTILOS MENÚ FLOTANTE (INFERIOR DERECHA)
+           2. ESTILOS MENÚ FLOTANTE
            ======================================================= */
         #super-menu-container {
             position: fixed;
@@ -267,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function() {
             display: none;
             flex-direction: column;
             gap: 10px;
-            min-width: 180px;
+            min-width: 200px; /* Un poco más ancho para Favoritos */
             border: 1px solid #eee;
         }
         #menu-content.activo { display: flex; }
@@ -295,16 +279,53 @@ document.addEventListener("DOMContentLoaded", function() {
         .mini-btn.active { background: #0A2846; color: white; border-color: #0A2846; }
 
         /* =======================================================
-           3. ESTILOS MODO NOCHE
+           3. ESTILOS MODAL DE FAVORITOS
+           ======================================================= */
+        #fav-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            background: white;
+            z-index: 2147483648;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            padding: 20px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+        #fav-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2147483647;
+        }
+        .fav-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .fav-item a { text-decoration: none; font-weight: bold; color: #333; }
+        .fav-delete { color: red; cursor: pointer; font-weight: bold; padding: 5px; }
+
+        /* =======================================================
+           4. ESTILOS MODO NOCHE
            ======================================================= */
         
         body.modo-oscuro { background-color: #121212 !important; color: #e0e0e0 !important; }
         
-        /* ENLACES COMUNES (Celeste) */
+        /* ENLACES */
         body.modo-oscuro a,
         body.modo-oscuro a:visited { color: #90caf9 !important; } 
 
-        /* NAVBAR SIEMPRE BLANCO (Links del nav) */
+        /* NAVBAR BLANCO */
         body.modo-oscuro nav a,
         body.modo-oscuro .navbar a,
         body.modo-oscuro .nav-link,
@@ -313,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #ffffff !important;
         }
         
-        /* BOTONES Y TARJETAS (TEXTO BLANCO) */
+        /* BOTONES Y TARJETAS */
         body.modo-oscuro .card,
         body.modo-oscuro .list-group-item,
         body.modo-oscuro .btn,
@@ -322,25 +343,23 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #ffffff !important;
         }
 
-        /* FONDOS OSCUROS (Recuadros) */
+        /* FONDOS OSCUROS */
         body.modo-oscuro .card,
         body.modo-oscuro .list-group-item {
             background-color: #1e1e1e !important; 
             border-color: #333 !important;
         }
         
-        /* Botones negros (excepto azules) */
         body.modo-oscuro .btn:not(.btn-primary):not(.azul) {
             background-color: #1e1e1e !important;
             border-color: #333 !important;
         }
         
-        /* Botones azules se mantienen con texto blanco */
         body.modo-oscuro .btn-primary, body.modo-oscuro .azul {
              color: #ffffff !important;
         }
 
-        /* INPUTS OSCUROS */
+        /* INPUTS */
         body.modo-oscuro input,
         body.modo-oscuro .form-control {
             background-color: #222 !important;
@@ -349,14 +368,17 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         body.modo-oscuro input::placeholder { color: #888 !important; }
 
-        /* LISTAS Y MENÚS DESPLEGABLES OSCUROS */
+        /* LISTAS, MENÚS Y MODAL FAVORITOS */
         body.modo-oscuro #listaGlobal, 
-        body.modo-oscuro .dropdown-menu {
+        body.modo-oscuro .dropdown-menu,
+        body.modo-oscuro #fav-modal {
             background-color: #222 !important;
             border: 1px solid #444 !important;
+            color: #fff !important;
         }
         body.modo-oscuro #listaGlobal a,
-        body.modo-oscuro .dropdown-item {
+        body.modo-oscuro .dropdown-item,
+        body.modo-oscuro .fav-item a {
             border-bottom: 1px solid #333 !important;
             color: #e0e0e0 !important;
         }
@@ -373,13 +395,13 @@ document.addEventListener("DOMContentLoaded", function() {
             font-weight: bold;
         }
 
-        /* MENÚ FLOTANTE OSCURO */
+        /* MENÚ FLOTANTE */
         body.modo-oscuro #menu-content { background: #222; border-color: #444; }
         body.modo-oscuro .menu-label { color: #ccc; }
         body.modo-oscuro .mini-btn { background: #333; border-color: #555; color: #fff; }
         body.modo-oscuro #menu-trigger { background: #fff; color: #000; }
         
-        /* TRANSPOSICIÓN OSCURA */
+        /* TRANSPOSICIÓN */
         body.modo-oscuro .transpose-keys a {
             background-color: #000 !important;
             color: #fff !important;
@@ -392,11 +414,19 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.head.appendChild(style);
 
-    // --- C. HTML DEL MENÚ ---
+    // --- B. HTML DEL MENÚ Y MODAL ---
     const menuHTML = `
         <div id="super-menu-container">
             <div id="menu-content">
                 
+                <div class="menu-row">
+                    <span class="menu-label">Favoritos</span>
+                    <div style="display:flex; gap:5px;">
+                        <button class="mini-btn" id="fav-toggle" title="Guardar/Quitar">🤍</button>
+                        <button class="mini-btn" id="fav-view" title="Ver Lista">📂</button>
+                    </div>
+                </div>
+
                 <div class="menu-row">
                     <span class="menu-label">AutoScroll</span>
                     <div style="display:flex; gap:5px; align-items:center;">
@@ -423,13 +453,22 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
             <button id="menu-trigger">☰</button>
         </div>
+
+        <div id="fav-overlay"></div>
+        <div id="fav-modal">
+            <h3 style="margin-top:0;">Mis Favoritos ❤️</h3>
+            <div id="fav-list-container">
+                <p>No tienes canciones guardadas.</p>
+            </div>
+            <button class="mini-btn" id="fav-close" style="margin-top:15px; width:100%;">Cerrar</button>
+        </div>
     `;
 
     const divWrapper = document.createElement('div');
     divWrapper.innerHTML = menuHTML;
     document.body.appendChild(divWrapper);
 
-    // --- D. LÓGICA ---
+    // --- C. LÓGICA ---
 
     // 1. MENU
     const menuTrigger = document.getElementById("menu-trigger");
@@ -439,7 +478,94 @@ document.addEventListener("DOMContentLoaded", function() {
         menuTrigger.innerHTML = menuContent.classList.contains("activo") ? "✖" : "☰";
     });
 
-    // 2. AUTOSCROLL
+    // 2. FAVORITOS (LÓGICA NUEVA)
+    const favToggle = document.getElementById("fav-toggle");
+    const favView = document.getElementById("fav-view");
+    const favModal = document.getElementById("fav-modal");
+    const favOverlay = document.getElementById("fav-overlay");
+    const favClose = document.getElementById("fav-close");
+    const favListContainer = document.getElementById("fav-list-container");
+
+    // Leer favoritos del almacenamiento
+    let favorites = JSON.parse(localStorage.getItem('cancionero_favoritos')) || [];
+    
+    // Datos de la canción actual
+    const currentUrl = window.location.pathname;
+    const currentTitle = document.title.split("-")[0].trim(); // Intenta limpiar el título
+
+    // Verificar si la actual ya es favorita
+    function checkFavStatus() {
+        if (!document.getElementById("letra")) {
+            favToggle.disabled = true; // Desactivar si no es canción
+            return;
+        }
+        const exists = favorites.some(fav => fav.u === currentUrl);
+        favToggle.innerHTML = exists ? "❤️" : "🤍";
+    }
+    checkFavStatus();
+
+    // Botón Corazón
+    favToggle.onclick = () => {
+        const existsIndex = favorites.findIndex(fav => fav.u === currentUrl);
+        
+        if (existsIndex > -1) {
+            favorites.splice(existsIndex, 1); // Quitar
+        } else {
+            favorites.push({ t: currentTitle, u: currentUrl }); // Agregar
+        }
+        
+        localStorage.setItem('cancionero_favoritos', JSON.stringify(favorites));
+        checkFavStatus();
+    };
+
+    // Botón Ver Lista (Carpeta)
+    favView.onclick = () => {
+        renderFavList();
+        favModal.style.display = "block";
+        favOverlay.style.display = "block";
+        // Cerrar menú flotante
+        menuContent.classList.remove("activo");
+        menuTrigger.innerHTML = "☰";
+    };
+
+    // Cerrar Modal
+    const closeFavModal = () => {
+        favModal.style.display = "none";
+        favOverlay.style.display = "none";
+    };
+    favClose.onclick = closeFavModal;
+    favOverlay.onclick = closeFavModal;
+
+    // Renderizar lista en el modal
+    function renderFavList() {
+        favorites = JSON.parse(localStorage.getItem('cancionero_favoritos')) || [];
+        if (favorites.length === 0) {
+            favListContainer.innerHTML = "<p>No tienes canciones guardadas.</p>";
+            return;
+        }
+        
+        let html = "";
+        favorites.forEach((fav, index) => {
+            html += `
+                <div class="fav-item">
+                    <a href="${fav.u}">${fav.t}</a>
+                    <span class="fav-delete" onclick="eliminarFav(${index})">🗑️</span>
+                </div>
+            `;
+        });
+        favListContainer.innerHTML = html;
+    }
+
+    // Función global para borrar desde la lista
+    window.eliminarFav = (index) => {
+        favorites.splice(index, 1);
+        localStorage.setItem('cancionero_favoritos', JSON.stringify(favorites));
+        renderFavList(); // Actualizar lista visible
+        checkFavStatus(); // Actualizar corazón si estamos en esa canción
+    };
+
+
+    // 3. AUTOSCROLL
     let scrollSpeed = 3;
     let isScrolling = false;
     let scrollInterval;
@@ -473,7 +599,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed < 10) { scrollSpeed++; scrollDisplay.innerText = scrollSpeed; if(isScrolling) startScroll(); }};
     document.getElementById("scroll-minus").onclick = () => { if(scrollSpeed > 1) { scrollSpeed--; scrollDisplay.innerText = scrollSpeed; if(isScrolling) startScroll(); }};
 
-    // 3. TAMAÑO DE LETRA (SIN GUARDAR)
+    // 4. TAMAÑO DE LETRA (SIN GUARDAR)
     const letraDiv = document.getElementById("letra");
     let fontSizePercent = 100; 
     
@@ -495,7 +621,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("font-plus").onclick = () => updateFont(10);
     document.getElementById("font-minus").onclick = () => updateFont(-10);
 
-    // 4. MODO OSCURO
+    // 5. MODO OSCURO
     const btnTheme = document.getElementById("toggle-theme");
     const isDark = localStorage.getItem("cancionero_darkmode") === "true";
     
@@ -516,7 +642,7 @@ document.addEventListener("DOMContentLoaded", function() {
         applyTheme(!currentDark);
     };
 
-    // 5. REACTIVAR TU BOTÓN ORIGINAL DE ACORDES
+    // 6. REACTIVAR TU BOTÓN ORIGINAL DE ACORDES
     const oldBtn = document.getElementById("toggleChordsButton");
     if(oldBtn) {
         oldBtn.onclick = function() {
