@@ -387,5 +387,9 @@ const canciones = {
         "Puer et Pater": { ruta: "meditacion/puer-et-pater.html", tono: "RE" },
         "Somos JM, somos iglesia": { ruta: "comunion/somos-jm-somos-iglesia.html", tono: "SOL" },
         "Stabat": { ruta: "meditacion/stabat.html", tono: "LA" }
+    },
+    "JF":{
+        "Generación fundadora": {ruta:"jf/generacion-fundadora.html", tono: "SOL"},
+        "Talita Kum": {ruta:"jf/talita-kum.html", tono: "DO"}
     }
 }
