@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // --- 1. Variables de Estado ---
     let isScrolling = false;
-    let speedLevel = 5;    // Velocidad inicial (1 a 10)
+    let speedLevel = 3;    // Velocidad inicial (1 a 10)
     let scrollInterval;
 
     // Función para calcular los milisegundos
