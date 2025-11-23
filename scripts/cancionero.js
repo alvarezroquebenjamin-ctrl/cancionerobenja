@@ -151,14 +151,79 @@
 
 
 // =============================================================================
-// 2. SÚPER MENÚ FLOTANTE (GLOBAL Y ADAPTABLE)
+// 2. SÚPER MENÚ FLOTANTE Y ESTILOS GLOBALES (CSS INYECTADO)
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- A. CREAR ESTILOS DEL MENÚ Y MODO NOCHE ---
     const style = document.createElement('style');
     style.innerHTML = `
-        /* Contenedor principal */
+        /* =======================================================
+           1. AJUSTES NAVBAR MÓVIL
+           ======================================================= */
+        @media (max-width: 768px) {
+            /* Ocultar el botón de 3 rayitas (Hamburguesa del Navbar) */
+            .navbar-toggler { display: none !important; }
+
+            /* Forzar que el contenido se muestre en fila (sin colapsar) */
+            .navbar-collapse, .collapse {
+                display: flex !important;
+                flex-basis: auto !important;
+                align-items: center !important;
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+
+            /* Alinear menú y buscador horizontalmente */
+            .navbar-nav {
+                flex-direction: row !important;
+                gap: 5px;
+            }
+
+            /* Achicar botón de secciones para que entre */
+            .nav-item, .dropdown, .nav-link, .dropdown-toggle {
+                font-size: 13px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            /* Achicar el buscador para que entre */
+            #inputGlobal, .form-control {
+                width: 110px !important; 
+                font-size: 13px !important;
+                height: 30px !important;
+                padding: 2px 5px !important;
+            }
+            
+            /* Reducir padding del contenedor general */
+            .container, .container-fluid, .navbar {
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            /* --- SOLUCIÓN AL PROBLEMA DE LA BARRA QUE SE AGRANDA --- */
+            /* Forzamos al menú desplegable a ser ABSOLUTO y FLOTAR sobre el contenido */
+            .navbar-nav .dropdown-menu {
+                position: absolute !important; 
+                float: none !important;
+                top: 100% !important; /* Justo debajo de la barra */
+                left: 0 !important;
+                margin-top: 5px !important;
+                background-color: white; /* Asegurar fondo blanco (o negro en modo oscuro) */
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Sombra para que destaque */
+                width: auto !important;
+                min-width: 180px; /* Ancho mínimo razonable */
+                z-index: 10000 !important; /* Asegurar que esté por encima de todo */
+            }
+            
+            /* Asegurar que la barra azul no oculte lo que sale de ella */
+            .navbar, .navbar-collapse {
+                overflow: visible !important;
+            }
+        }
+
+        /* =======================================================
+           2. ESTILOS MENÚ FLOTANTE (INFERIOR DERECHA)
+           ======================================================= */
         #super-menu-container {
             position: fixed;
             bottom: 30px;
@@ -171,13 +236,11 @@ document.addEventListener("DOMContentLoaded", function() {
             align-items: flex-end;
         }
 
-        /* Ajuste para celular */
         @media (max-width: 768px) {
             #super-menu-container { bottom: 80px; right: 15px; }
             #menu-trigger { width: 55px; height: 55px; }
         }
 
-        /* Botón Hamburguesa */
         #menu-trigger {
             width: 50px;
             height: 50px;
@@ -195,7 +258,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         #menu-trigger:active { transform: scale(0.95); }
 
-        /* Menú Desplegable */
         #menu-content {
             background: white;
             border-radius: 12px;
@@ -232,27 +294,26 @@ document.addEventListener("DOMContentLoaded", function() {
         .mini-btn:hover { background: #e0e0e0; }
         .mini-btn.active { background: #0A2846; color: white; border-color: #0A2846; }
 
-        /* --- ESTILOS MODO NOCHE --- */
+        /* =======================================================
+           3. ESTILOS MODO NOCHE
+           ======================================================= */
         
-        /* 1. Fondo general */
         body.modo-oscuro { background-color: #121212 !important; color: #e0e0e0 !important; }
         
-        /* 2. Enlaces comunes (Celeste) */
+        /* ENLACES COMUNES (Celeste) */
         body.modo-oscuro a,
-        body.modo-oscuro a:visited { 
-            color: #90caf9 !important; 
-        } 
+        body.modo-oscuro a:visited { color: #90caf9 !important; } 
 
-        /* 3. NAVBAR Y MENÚS DE NAVEGACIÓN (FIX ÍNDICE BLANCO) */
-        /* Todo enlace dentro de nav o navbar se fuerza a blanco */
+        /* NAVBAR SIEMPRE BLANCO (Links del nav) */
         body.modo-oscuro nav a,
         body.modo-oscuro .navbar a,
         body.modo-oscuro .nav-link,
-        body.modo-oscuro .navbar-brand {
+        body.modo-oscuro .navbar-brand,
+        body.modo-oscuro .dropdown-toggle {
             color: #ffffff !important;
         }
         
-        /* 4. BOTONES Y TARJETAS (TEXTO BLANCO SIEMPRE) */
+        /* BOTONES Y TARJETAS (TEXTO BLANCO) */
         body.modo-oscuro .card,
         body.modo-oscuro .list-group-item,
         body.modo-oscuro .btn,
@@ -261,23 +322,25 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #ffffff !important;
         }
 
-        /* 5. Fondos oscuros para recuadros */
+        /* FONDOS OSCUROS (Recuadros) */
         body.modo-oscuro .card,
         body.modo-oscuro .list-group-item {
             background-color: #1e1e1e !important; 
             border-color: #333 !important;
         }
         
+        /* Botones negros (excepto azules) */
         body.modo-oscuro .btn:not(.btn-primary):not(.azul) {
             background-color: #1e1e1e !important;
             border-color: #333 !important;
         }
         
+        /* Botones azules se mantienen con texto blanco */
         body.modo-oscuro .btn-primary, body.modo-oscuro .azul {
              color: #ffffff !important;
         }
 
-        /* 6. INPUTS */
+        /* INPUTS OSCUROS */
         body.modo-oscuro input,
         body.modo-oscuro .form-control {
             background-color: #222 !important;
@@ -286,7 +349,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         body.modo-oscuro input::placeholder { color: #888 !important; }
 
-        /* 7. LISTAS Y MENÚS */
+        /* LISTAS Y MENÚS DESPLEGABLES OSCUROS */
         body.modo-oscuro #listaGlobal, 
         body.modo-oscuro .dropdown-menu {
             background-color: #222 !important;
@@ -303,20 +366,20 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #fff !important;
         }
 
-        /* 8. Acordes ROJOS */
+        /* ACORDES ROJOS */
         body.modo-oscuro span.c, 
         body.modo-oscuro .c { 
             color: red !important; 
             font-weight: bold;
         }
 
-        /* 9. Menú Flotante */
+        /* MENÚ FLOTANTE OSCURO */
         body.modo-oscuro #menu-content { background: #222; border-color: #444; }
         body.modo-oscuro .menu-label { color: #ccc; }
         body.modo-oscuro .mini-btn { background: #333; border-color: #555; color: #fff; }
         body.modo-oscuro #menu-trigger { background: #fff; color: #000; }
         
-        /* 10. Transposición */
+        /* TRANSPOSICIÓN OSCURA */
         body.modo-oscuro .transpose-keys a {
             background-color: #000 !important;
             color: #fff !important;
@@ -329,7 +392,7 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.head.appendChild(style);
 
-    // --- B. HTML DEL MENÚ ---
+    // --- C. HTML DEL MENÚ ---
     const menuHTML = `
         <div id="super-menu-container">
             <div id="menu-content">
@@ -366,7 +429,7 @@ document.addEventListener("DOMContentLoaded", function() {
     divWrapper.innerHTML = menuHTML;
     document.body.appendChild(divWrapper);
 
-    // --- C. LÓGICA ---
+    // --- D. LÓGICA ---
 
     // 1. MENU
     const menuTrigger = document.getElementById("menu-trigger");
