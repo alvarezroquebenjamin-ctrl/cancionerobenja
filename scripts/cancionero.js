@@ -161,14 +161,20 @@ document.addEventListener("DOMContentLoaded", function() {
         /* Contenedor principal */
         #super-menu-container {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             right: 20px;
-            z-index: 9999;
+            z-index: 2147483647;
             font-family: sans-serif;
             font-size: 16px !important;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+        }
+
+        /* Ajuste para celular */
+        @media (max-width: 768px) {
+            #super-menu-container { bottom: 80px; right: 15px; }
+            #menu-trigger { width: 55px; height: 55px; }
         }
 
         /* Botón Hamburguesa */
@@ -179,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function() {
             background-color: #0A2846;
             color: white;
             border: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             font-size: 24px;
             cursor: pointer;
             display: flex;
@@ -218,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function() {
             background: #f4f4f4;
             border: 1px solid #ddd;
             border-radius: 5px;
-            padding: 5px 12px;
+            padding: 8px 14px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
@@ -232,11 +238,21 @@ document.addEventListener("DOMContentLoaded", function() {
         body.modo-oscuro { background-color: #121212 !important; color: #e0e0e0 !important; }
         
         /* 2. Enlaces comunes (Celeste) */
-        body.modo-oscuro a { color: #90caf9; } 
-        body.modo-oscuro a:visited { color: #ce93d8; } 
+        body.modo-oscuro a,
+        body.modo-oscuro a:visited { 
+            color: #90caf9 !important; 
+        } 
+
+        /* 3. NAVBAR Y MENÚS DE NAVEGACIÓN (FIX ÍNDICE BLANCO) */
+        /* Todo enlace dentro de nav o navbar se fuerza a blanco */
+        body.modo-oscuro nav a,
+        body.modo-oscuro .navbar a,
+        body.modo-oscuro .nav-link,
+        body.modo-oscuro .navbar-brand {
+            color: #ffffff !important;
+        }
         
-        /* 3. BOTONES Y TARJETAS (ARREGLO TEXTO BLANCO) */
-        /* Forzamos que CUALQUIER botón o tarjeta tenga texto blanco, anulando el celeste */
+        /* 4. BOTONES Y TARJETAS (TEXTO BLANCO SIEMPRE) */
         body.modo-oscuro .card,
         body.modo-oscuro .list-group-item,
         body.modo-oscuro .btn,
@@ -245,25 +261,23 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #ffffff !important;
         }
 
-        /* 4. Colores de Fondo de Recuadros */
-        /* Tarjetas y listas a gris oscuro */
+        /* 5. Fondos oscuros para recuadros */
         body.modo-oscuro .card,
         body.modo-oscuro .list-group-item {
             background-color: #1e1e1e !important; 
             border-color: #333 !important;
         }
         
-        /* Botones estándar a negro, PERO respetando los AZULES (primary) */
         body.modo-oscuro .btn:not(.btn-primary):not(.azul) {
             background-color: #1e1e1e !important;
             border-color: #333 !important;
         }
-        /* Si tienes botones azules, asegúrate que se mantengan azules pero con texto blanco */
+        
         body.modo-oscuro .btn-primary, body.modo-oscuro .azul {
              color: #ffffff !important;
         }
 
-        /* 5. BUSCADOR E INPUTS */
+        /* 6. INPUTS */
         body.modo-oscuro input,
         body.modo-oscuro .form-control {
             background-color: #222 !important;
@@ -272,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         body.modo-oscuro input::placeholder { color: #888 !important; }
 
-        /* 6. LISTA DE RESULTADOS Y MENÚS */
+        /* 7. LISTAS Y MENÚS */
         body.modo-oscuro #listaGlobal, 
         body.modo-oscuro .dropdown-menu {
             background-color: #222 !important;
@@ -289,20 +303,20 @@ document.addEventListener("DOMContentLoaded", function() {
             color: #fff !important;
         }
 
-        /* 7. Acordes SIEMPRE ROJOS */
+        /* 8. Acordes ROJOS */
         body.modo-oscuro span.c, 
         body.modo-oscuro .c { 
             color: red !important; 
             font-weight: bold;
         }
 
-        /* 8. Menú Flotante */
+        /* 9. Menú Flotante */
         body.modo-oscuro #menu-content { background: #222; border-color: #444; }
         body.modo-oscuro .menu-label { color: #ccc; }
         body.modo-oscuro .mini-btn { background: #333; border-color: #555; color: #fff; }
         body.modo-oscuro #menu-trigger { background: #fff; color: #000; }
         
-        /* 9. Transposición */
+        /* 10. Transposición */
         body.modo-oscuro .transpose-keys a {
             background-color: #000 !important;
             color: #fff !important;
@@ -396,7 +410,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed < 10) { scrollSpeed++; scrollDisplay.innerText = scrollSpeed; if(isScrolling) startScroll(); }};
     document.getElementById("scroll-minus").onclick = () => { if(scrollSpeed > 1) { scrollSpeed--; scrollDisplay.innerText = scrollSpeed; if(isScrolling) startScroll(); }};
 
-    // 3. TAMAÑO DE LETRA
+    // 3. TAMAÑO DE LETRA (SIN GUARDAR)
     const letraDiv = document.getElementById("letra");
     let fontSizePercent = 100; 
     
