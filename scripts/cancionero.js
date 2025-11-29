@@ -583,7 +583,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function startScroll() {
         clearInterval(scrollInterval);
         document.documentElement.style.scrollBehavior = "auto";
-        const delay = 220 - (scrollSpeed * 20);
+        const delay = 300 - (scrollSpeed * 20);
         scrollInterval = setInterval(() => {
              const currentY = window.pageYOffset || document.documentElement.scrollTop;
              const totalHeight = document.documentElement.scrollHeight;
