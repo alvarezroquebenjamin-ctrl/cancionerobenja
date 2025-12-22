@@ -18,6 +18,18 @@
   <meta property="og:image" content="images/logo-schoenstatt-png.png">
   <link rel="stylesheet" type="text/css" href="css/cancionero.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+  <link rel="manifest" href="manifest.json">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker registrado', reg))
+        .catch(err => console.log('Error al registrar SW', err));
+    });
+  }
+</script>
 </head>
 
 <body>
@@ -56,6 +68,7 @@
    <a class="btn btn-outline-primary btn-sm" href="comunion/alza-mi-paz.html">Alza mi paz</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/alzar-banderas.html">Alzar banderas</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/amanecer.html">Amanecer</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/amigo.html">Amigo</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/apareces.html">Apareces</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/apostol-de-jesucristo.html">Apóstol de Jesucristo</a>
    <a class="btn btn-outline-primary btn-sm" href="salida/avanza-reina.html">Avanza Reina</a>
@@ -95,6 +108,7 @@
    <a class="btn btn-outline-primary btn-sm" href="comunion/ego-paulus.html">Ego Paulus</a>
    <a class="btn btn-outline-primary btn-sm" href="marianos/el-diario-de-maria.html">El diario de María</a>
    <a class="btn btn-outline-primary btn-sm" href="entrada/el-dios-de-la-vida.html">El Dios de la vida</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/el-mismo-huerto.html">El mismo huerto</a>
    <a class="btn btn-outline-primary btn-sm" href="entrada/el-pulso-de-dios.html">El pulso de Dios</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/el-que-muere-por-mi.html">El que muere por mi</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/el-sale-a-tu-encuentro.html">El sale a tu encuentro</a>
@@ -106,6 +120,8 @@
    <a class="btn btn-outline-primary btn-sm" href="meditacion/en-tu-misericordia.html">En tu misericordia</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/en-tus-ojos.html">En tus ojos</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/enciende-nuestra-mision.html">Enciende nuestra misión</a>
+   <a class="btn btn-outline-primary btn-sm" href="comunion/es-aqui.html">Es aquí</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/esa-flor-siempre-de-pie.html">Esa flor siempre de pie</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/escuchame-dios.html">Escuchame Dios</a>
    <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/espiritu-santo.html">Espíritu Santo</a>
    <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/espiritu-desciende.html">Espíritu desciende</a>
@@ -127,9 +143,11 @@
    <a class="btn btn-outline-primary btn-sm" href="salida/hay-un-rio-de-vida.html">Hay un río de vida</a>
    <a class="btn btn-outline-primary btn-sm" href="jm/herencia.html">Herencia (José Engling)</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/hijo-amado.html">Hijo amado</a>
+   <a class="btn btn-outline-primary btn-sm" href="comunion/hoy-vivo.html">Hoy vivo</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/huracan.html">Huracán</a>
    <a class="btn btn-outline-primary btn-sm" href="salida/ignis-mariae.html">Ignis Mariae</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/jesus.html">Jesús</a>
+   <a class="btn btn-outline-primary btn-sm" href="comunion/jesus-y-pedro.html">Jesús y Pedro</a>
    <a class="btn btn-outline-primary btn-sm" href="salida/junto-a-ti-maria.html">Junto a ti María</a>
    <a class="btn btn-outline-primary btn-sm" href="ofertorio/juntos-nos-acercamos.html">Juntos nos acercamos</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/juremos-con-gloria-morir.html">Juremos con gloria morir</a>
@@ -161,6 +179,7 @@
    <a class="btn btn-outline-primary btn-sm" href="meditacion/no-mueras-hermano.html">No mueras hermano</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/no-os-preocupeis.html">No os preocupeis</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/no-temas.html">No temas</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/no-tienen-vino.html">No tienen vino</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/noche.html">Noche</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/nuestra-alianza.html">Nuestra alianza</a>
    <a class="btn btn-outline-primary btn-sm" href="ofertorio/nuestra-fe-en-tu-amor.html">Nuestra fe en tu amor</a>
@@ -193,6 +212,7 @@
    <a class="btn btn-outline-primary btn-sm" href="salmos/salmo-18.html">Salmo 18</a>
    <a class="btn btn-outline-primary btn-sm" href="salmos/salmo-28.html">Salmo 28</a>
    <a class="btn btn-outline-primary btn-sm" href="salmos/salmo-34.html">Salmo 34</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/saname.html">Sáname</a>
    <a class="btn btn-outline-primary btn-sm" href="santo/santo1.html">Santo 1 (Hacia el Padre)</a>
    <a class="btn btn-outline-primary btn-sm" href="santo/santo2.html">Santo 2 (Hosanna)</a>
    <a class="btn btn-outline-primary btn-sm" href="santo/santo3.html">Santo 3 (Clásico)</a>
@@ -211,6 +231,7 @@
    <a class="btn btn-outline-primary btn-sm" href="meditacion/silencio-fecundo.html">Silencio fecundo</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/sin-fronteras.html">Sin fronteras</a>
    <a class="btn btn-outline-primary btn-sm" href="salida/sobre-el-mar.html">Sobre el mar</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/solo-por-hoy.html">Solo por hoy</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/somos-jm-somos-iglesia.html">Somos JM, somos iglesia</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/soñar.html">Soñar</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/sopla.html">Sopla</a>
@@ -235,14 +256,19 @@
    <a class="btn btn-outline-primary btn-sm" href="meditacion/tu-voluntad.html">Tu voluntad</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/tu-voluntad-servus.html">Tu voluntad (Servus Mariae)</a>
    <a class="btn btn-outline-primary btn-sm" href="entrada/un-nuevo-sol.html">Un nuevo sol</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/una-cuerda-menos.html">Una cuerda menos</a>
    <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/ven-espiritu-de-amor.html">Ven Espíritu de amor</a>
    <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/ven-espiritu-divino.html">Ven Espíritu divino</a>
+   <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/ven-espiritu-santo.html">Ven Espíritu Santo</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/ven-jesus-de-nazareth.html">Ven Jesús de Nazareth</a>
+   <a class="btn btn-outline-primary btn-sm" href="comunion/ven-pastor.html">Ven Pastor</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/ven-y-sigueme.html">Ven y sígueme</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/ven-y-veras.html">Ven y verás</a>
+   <a class="btn btn-outline-primary btn-sm" href="comunion/vengan-y-coman.html">Vengan y coman</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/vengo-a-adorarte.html">Vengo a adorarte</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/veras-cosas-mayores.html">Verás cosas mayores</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/vida-en-abundancia.html">Vida en abundancia</a>
+   <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/viento-de-dios.html">Viento de Dios</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/vivir-amando.html">Vivir amando</a>
    <a class="btn btn-outline-primary btn-sm" href="espiritu-santo/voces-de-esperanza.html">Voces de esperanza</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/vuelve-a-mi.html">Vuelve a mí</a>
