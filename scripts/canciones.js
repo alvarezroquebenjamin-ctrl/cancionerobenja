@@ -122,6 +122,7 @@ const canciones = {
         "Somos JM, somos iglesia": { ruta: "comunion/somos-jm-somos-iglesia.html", tono: "SOL" },
         "Soñar": { ruta: "comunion/soñar.html", tono: "MI" },
         "Tu amor": { ruta: "comunion/tu-amor.html", tono: "LA" },
+        "Una gota de agua": { ruta: "comunion/una-gota-de-agua.html", tono: "SOL" },
         "Ven Jesús de Nazareth": { ruta: "comunion/ven-jesus-de-nazareth.html", tono: "RE" },
         "Ven Pastor": { ruta: "comunion/ven-pastor.html", tono: "RE" },
         "Vengan y coman": { ruta: "comunion/vengan-y-coman.html", tono: "SOL" },
@@ -130,6 +131,7 @@ const canciones = {
     },
     "Meditación": {
         "A Él la Gloria": { ruta: "meditacion/a-el-la-gloria.html", tono: "SOL" },
+        "Abramos": { ruta: "meditacion/abramos.html", tono: "RE" },
         "Al servicio de aquel": { ruta: "comunion/al-servicio-de-aquel.html", tono: "SOL" },
         "Alábenlo": { ruta: "meditacion/alabenlo.html", tono: "LA" },
         "Algo de paz": { ruta: "meditacion/algo-de-paz.html", tono: "RE" },
