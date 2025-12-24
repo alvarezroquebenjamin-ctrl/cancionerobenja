@@ -125,7 +125,7 @@ const canciones = {
         "Una gota de agua": { ruta: "comunion/una-gota-de-agua.html", tono: "SOL" },
         "Ven Jesús de Nazareth": { ruta: "comunion/ven-jesus-de-nazareth.html", tono: "RE" },
         "Ven Pastor": { ruta: "comunion/ven-pastor.html", tono: "RE" },
-        "Vengan y coman": { ruta: "comunion/vengan-y-coman.html", tono: "SOL" },
+        "Vengan y coman": { ruta: "comunion/vengan-y-coman.html", tono: "RE" },
         "Vida en abundancia": { ruta: "comunion/vida-en-abundancia.html", tono: "MI" },
         "Yo soy el mar": { ruta: "comunion/yo-soy-el-mar.html", tono: "SOL" }
     },
