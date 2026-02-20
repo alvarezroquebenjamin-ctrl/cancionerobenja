@@ -47,7 +47,7 @@
     });
   }
 
-  // --- Cargar y obtener title + contenido del <pre id="letra"> (sin modificar) ---
+  // --- Cargar y obtener title + contenido del <pre id="letra" data-capo="0"> (sin modificar) ---
   async function fetchCancionData(ruta) {
     const res = await fetch(ruta);
     if (!res.ok) throw new Error('Error al cargar ' + ruta);
@@ -61,7 +61,7 @@
 
     // Pre con id="letra" (extraemos su innerHTML y su data-key)
     const pre = doc.querySelector('pre#letra');
-    if (!pre) throw new Error('No se encontró <pre id="letra"> en ' + ruta);
+    if (!pre) throw new Error('No se encontró <pre id="letra" data-capo="0"> en ' + ruta);
 
     const preInner = pre.innerHTML;
     const dataKey = pre.getAttribute('data-key') || '';

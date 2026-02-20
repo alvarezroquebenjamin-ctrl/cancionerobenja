@@ -2,19 +2,47 @@
 <html lang="es">
 <head>
   <base href="/cancionerobenja/">
- 
- 
- 
-  
- 
-  
   <link rel="icon" href="images/logo-schoenstatt-png.png" type="image/png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-YES9XTRYX6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YES9XTRYX6');
+  </script>
   <meta charset="utf-8">
-  <title>Programa con Acordes - Cancionero Católico</title>
+  <title>Lista de Canciones (Con Acordes)</title>
   <meta name="robots" content="noindex">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" type="text/css" href="css/cancionero.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <style>
+  /* La caja que envuelve todo (acordes, capo y botones) */
+  .cancion-en-lista {
+    max-width: 500px !important; 
+    margin: 0 auto !important; 
+    display: block !important; 
+  }
+
+  /* Asegura que los botones y el capo ocupen todo el renglón y se centren */
+  .transpose-keys, .capo-selector-div {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    clear: both !important; /* Evita que nada se ponga a los costados */
+  }
+
+  /* LA MAGIA: Obliga a la letra a ir abajo y alinea todas las canciones igual */
+  pre[id^="letra-lista"] {
+    display: block !important; /* Fuerza a ir a un renglón nuevo (abajo del capo) */
+    width: 100% !important; /* Todas las canciones ocupan el mismo ancho */
+    text-align: left !important; /* El texto se alinea a la izquierda de la caja */
+    white-space: pre-wrap !important; 
+    padding: 0 10px !important;
+    margin: 0 !important;
+  }
+</style>
 </head>
 
 <body>
@@ -23,149 +51,114 @@
     $(function(){
       $("#nav-placeholder").load("navbar.html");
     });
-  </script>
+  </script> 
 
-  <div id="programa-acordes-container" class="d-flex flex-column mt-5"></div>
+  <div id="programa-container" class="container" style="max-width: 700px; margin: 0 auto; padding-top: 20px;"></div>
 
-  <script>
-  // --- Lee el programa desde localStorage ---
+<script>
   const programa = JSON.parse(localStorage.getItem('programaMisa'));
   if (!programa || programa.length === 0) {
     alert('No hay un programa de misa guardado.');
     window.location.href = 'crear-programa.html';
   }
 
-  // --- Helper: cargar un script solo una vez ---
-  function cargarScript(src) {
-    return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${src}"]`)) return resolve();
-      const s = document.createElement("script");
-      s.src = src;
-      s.onload = resolve;
-      s.onerror = () => reject(new Error('Error cargando ' + src));
-      document.head.appendChild(s);
+  const container = document.getElementById('programa-container');
+
+  async function cargarTodo() {
+    for (let i = 0; i < programa.length; i++) {
+      const item = programa[i];
+      try {
+        const response = await fetch(item.cancion);
+        if (!response.ok) continue;
+        
+        const contenido = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(contenido, 'text/html');
+        
+        // Título de la canción, forzado al centro
+        const tituloHTML = `<h3 class="mt-4 mb-3 text-center" style="color:#0A2846; font-weight:bold;">${item.nombre}</h3>`;
+        
+        const letraPre = doc.querySelector('#letra');
+        
+        if (letraPre) {
+          letraPre.id = `letra-lista-${i}`;
+          
+          const divCancion = document.createElement('div');
+          // LE QUITAMOS EL FLEXBOX A ESTE CONTENEDOR
+          divCancion.className = 'cancion-en-lista mb-5 pb-5 border-bottom'; 
+          
+          // EL TRUCO ESTÁ ACÁ: Envolvemos la letra en un div centrado (`text-align: center`), y como el `<pre>` es `inline-block`, se va a centrar como si fuera una imagen, pero manteniendo su texto interno a la izquierda.
+          divCancion.innerHTML = tituloHTML + `<div style="text-align: center; width: 100%;">${letraPre.outerHTML}</div>`;
+          
+          container.appendChild(divCancion);
+
+          setTimeout(() => { aplicarTonoYCapo(item, i); }, 50);
+        }
+      } catch (error) {
+        console.error(`Error al cargar ${item.cancion}:`, error);
+      }
+    }
+  }
+
+  function aplicarTonoYCapo(item, index) {
+    const $pre = $(`#letra-lista-${index}`);
+    if ($pre.length === 0) return;
+
+    // Transponer la canción
+    if (typeof $ !== 'undefined' && typeof $.fn.transpose === 'function') {
+      $pre.transpose();
+    }
+
+    // Aplicar tono
+    if (item.tono) {
+      const claveObjetivo = item.tono.replace(/m$/i, '');
+      const $link = $pre.prev('.transpose-keys').find('a').filter(function () {
+        return $(this).text().toUpperCase() === claveObjetivo.toUpperCase();
+      }).first();
+      if ($link.length) $link.trigger('click');
+    }
+
+    // Dibujar Capo
+    const keysDiv = $pre.prev('.transpose-keys');
+    let capoDiv = $pre.prev('.capo-selector-div'); 
+    
+    if (capoDiv.length === 0) {
+        let opciones = "";
+        for(let i = 0; i <= 12; i++) {
+            let texto = i === 0 ? "Sin Capo" : "Capo " + i;
+            opciones += `<option value="${i}">${texto}</option>`;
+        }
+        
+        const capoHTML = `
+            <div class="capo-selector-div" style="text-align:center; margin-top: 10px; margin-bottom: 25px;">
+                <label style="font-size:15px; margin-right: 5px;">🎸 Capo: </label>
+                <select class="form-select form-select-sm d-inline-block capo-dropdown-repertorio" style="width: auto; cursor:pointer;" data-index="${index}">
+                    ${opciones}
+                </select>
+            </div>
+        `;
+        
+        if(keysDiv.length > 0) {
+            keysDiv.after(capoHTML);
+        } else {
+            $pre.before(capoHTML);
+        }
+        capoDiv = $pre.prev('.capo-selector-div');
+    }
+
+    const select = capoDiv.find('select');
+    select.val(item.capo !== undefined ? item.capo : 0);
+
+    select.off('change').on('change', function() {
+        const idx = $(this).data('index');
+        programa[idx].capo = parseInt($(this).val());
+        localStorage.setItem('programaMisa', JSON.stringify(programa));
     });
   }
 
-  // --- Cargar y obtener title + contenido del <pre id="letra"> (sin modificar) ---
-  async function fetchCancionData(ruta) {
-    const res = await fetch(ruta);
-    if (!res.ok) throw new Error('Error al cargar ' + ruta);
-    const text = await res.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/html');
+  cargarTodo();
+</script>
 
-    // Título
-    const titleEl = doc.querySelector('title');
-    const title = titleEl ? titleEl.innerText : 'Sin título';
-
-    // Pre con id="letra" (extraemos su innerHTML y su data-key)
-    const pre = doc.querySelector('pre#letra');
-    if (!pre) throw new Error('No se encontró <pre id="letra"> en ' + ruta);
-
-    const preInner = pre.innerHTML;
-    const dataKey = pre.getAttribute('data-key') || '';
-
-    return { title, preInner, dataKey };
-  }
-
-  // --- Insertar canción en el DOM y, si corresponde, transponer usando plugin ---
-async function insertarYCambiarSiCorresponde(container, ruta, tonoDeseado) {
-  try {
-    const { title, preInner, dataKey: tonoOriginal } = await fetchCancionData(ruta);
-
-    // Crear la columna bootstrap
-    const col = document.createElement("div");
-    col.className = "col-12 col-md-8 col-lg-4 align-self-center";
-
-    // Contenedor de la canción
-    const article = document.createElement("div");
-    article.className = "d-flex justify-content-center cancion-content mb-4";
-
-    // Título
-    const h2 = document.createElement("h2");
-    h2.textContent = title;
-    h2.className = "col-12 text-center";
-    article.appendChild(h2);
-
-    // Pre con la letra
-    const pre = document.createElement("pre");
-    pre.className = "letra";
-    pre.setAttribute("data-key", tonoOriginal);
-    pre.innerHTML = preInner;
-    article.appendChild(pre);
-
-    col.appendChild(article);
-    container.appendChild(col);
-
-    // Determinar si usar versión mayor o menor según el tono solicitado o el original
-    const usarMenor = /m$/i.test(tonoDeseado || tonoOriginal);
-    const script = usarMenor
-      ? "scripts/cancioneromenor.js"
-      : "scripts/cancionero.js";
-
-    // Asegurar que jQuery esté cargado
-    await cargarScript("https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js");
-
-    // Cargar el script adecuado
-    await cargarScript(script);
-
-    // Esperar un momento para que el plugin se registre
-    await new Promise((r) => setTimeout(r, 100));
-
-    // Inicializar el plugin
-    if (window.jQuery && typeof jQuery.fn.transpose === "function") {
-      const $pre = jQuery(pre);
-      $pre.transpose();
-
-      // Aplicar cambio de tono si es distinto
-      if (tonoDeseado && tonoDeseado !== tonoOriginal) {
-        const claveObjetivo = tonoDeseado.replace(/m$/i, "");
-        const $keysBlock = $pre.prev(".transpose-keys");
-        const $link = $keysBlock
-          .find("a")
-          .filter(function () {
-            return (
-              jQuery(this).text().toUpperCase() ===
-              claveObjetivo.toUpperCase()
-            );
-          })
-          .first();
-        if ($link.length) {
-          $link.trigger("click");
-        } else {
-          console.warn(
-            "No se encontró enlace de tono",
-            claveObjetivo,
-            "para",
-            ruta
-          );
-        }
-      }
-    } else {
-      console.warn("⚠️ Plugin transpose no disponible aún:", script);
-    }
-  } catch (err) {
-  console.warn("⚠️ Error menor o falta de tonalidad en:", ruta, err.message);
-  // No mostramos nada visual si el contenido ya se insertó correctamente.
-  // Sólo dejamos el log en consola para depuración.
-}
-}
-
-  // --- Mostrar todas las canciones juntas (modo "acordes") ---
-  async function mostrarProgramaConAcordes() {
-    const container = document.getElementById('programa-acordes-container');
-
-    // Iteramos en orden y procesamos cada canción
-    for (const item of programa) {
-      // item tiene: {seccion, nombre, cancion (ruta), tono}
-      await insertarYCambiarSiCorresponde(container, item.cancion, item.tono);
-    }
-  }
-
-  // Ejecutar
-  mostrarProgramaConAcordes();
-  </script>
 <script src="scripts/cancionero.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

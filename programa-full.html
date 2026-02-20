@@ -2,14 +2,7 @@
 <html lang="es">
 <head>
   <base href="/cancionerobenja/">
- 
- 
- 
-  
- 
-  
   <link rel="icon" href="images/logo-schoenstatt-png.png" type="image/png">
-  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-YES9XTRYX6"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -21,7 +14,6 @@
   <title>Programa de misa - Cancionero Católico</title>
   <meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
-  <meta name="robots" content="noindex">
   <link rel="stylesheet" type="text/css" href="css/cancionero.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 </head>
@@ -34,131 +26,109 @@
     });
   </script> 
 
-  <div class="navigation-buttons">
-    <button id="anterior" class="btn btn-outline-primary">Anterior</button>
-    <button id="siguiente" class="btn btn-outline-primary">Siguiente</button>
+  <div class="navigation-buttons d-flex justify-content-between p-3">
+    <button id="anterior" class="btn btn-outline-primary">⬅ Anterior</button>
+    <button id="siguiente" class="btn btn-outline-primary">Siguiente ➡</button>
   </div>
 
   <div id="programa-container"></div>
 
 <script>
   const programa = JSON.parse(localStorage.getItem('programaMisa'));
-  if (!programa) {
+  if (!programa || programa.length === 0) {
     alert('No hay un programa de misa guardado.');
     window.location.href = 'crear-programa.html';
   }
 
-  const canciones = programa.map(item => item.cancion);
   let currentIndex = 0;
 
   async function cargarCancion(ruta) {
     try {
-      console.log(`Cargando canción desde: ${ruta}`);
       const response = await fetch(ruta);
-      if (!response.ok) {
-        throw new Error('Error al cargar la canción');
-      }
+      if (!response.ok) throw new Error('Error al cargar la canción');
+      
       const contenido = await response.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(contenido, 'text/html');
-      const bodyContent = doc.querySelector('body').innerHTML;
+      
+      const container = document.getElementById('programa-container');
+      container.innerHTML = doc.querySelector('body').innerHTML;
 
-      // Crear un contenedor temporal para manipular el contenido
-      const tempContainer = document.createElement('div');
-      tempContainer.innerHTML = bodyContent;
+      container.querySelectorAll('#nav-placeholder, .nav-canciones, #super-menu-container, #fav-overlay, #fav-modal, script').forEach(el => el.remove());
 
-      // Eliminar el navbar si está presente
-      const navbar = tempContainer.querySelector('#nav-placeholder');
-      if (navbar) {
-        navbar.remove();
-      }
-
-      document.getElementById('programa-container').innerHTML = tempContainer.innerHTML;
-
-      // Ajustar rutas de los scripts y ejecutarlos
-      const scripts = tempContainer.querySelectorAll('script');
-      scripts.forEach(script => {
-        const newScript = document.createElement('script');
-        if (script.src) {
-          let src = script.src;
-          if (src.startsWith('../')) src = src.replace('../', '/');
-          newScript.src = src;
-        } else {
-          newScript.textContent = script.textContent;
-        }
-        document.body.appendChild(newScript);
-      });
-
-      // Esperar un momento para que el script de transposición cargue y cree los botones
-      setTimeout(() => {
-        aplicarTono(programa[currentIndex]);
-      }, 500);
+      setTimeout(() => { aplicarTonoYCapo(programa[currentIndex]); }, 100);
 
     } catch (error) {
-      console.error('Error:', error);
-      document.getElementById('programa-container').innerHTML =
-        '<p>Error al cargar la canción. Inténtalo de nuevo más tarde.</p>';
+      document.getElementById('programa-container').innerHTML = '<p class="text-center mt-5">Error al cargar la canción.</p>';
     }
   }
 
-  // 🔹 Nueva función: aplicar el tono según el programa
-  function aplicarTono(item) {
-    try {
-      const pre = document.querySelector('#letra');
-      if (!pre) return;
+  function aplicarTonoYCapo(item) {
+    const pre = document.querySelector('#letra');
+    if (!pre) return;
+    const $pre = $(pre);
 
-      const tonoOriginal = pre.getAttribute('data-key')?.trim() || '';
-      const tonoDeseado = item.tono?.trim() || '';
+    if (!$pre.prev('.transpose-keys').length && typeof $ !== 'undefined' && typeof $.fn.transpose === 'function') {
+      $pre.transpose();
+    }
 
-      if (!tonoDeseado || tonoDeseado === tonoOriginal) return;
-
-      console.log(`Aplicando transposición de ${tonoOriginal} → ${tonoDeseado}`);
-
-      // Asegurar que el plugin existe
-      if (typeof $ === 'undefined' || typeof $.fn.transpose !== 'function') {
-        console.warn('Plugin transpose no disponible aún.');
-        return;
-      }
-
-      const $pre = $(pre);
-      if (!$pre.prev('.transpose-keys').length) {
-        // inicializa la interfaz del plugin si aún no está creada
-        $pre.transpose();
-      }
-
-      // Buscar el enlace del tono deseado
-      const claveObjetivo = tonoDeseado.replace(/m$/i, '');
-      const $keysBlock = $pre.prev('.transpose-keys');
-      const $link = $keysBlock.find('a').filter(function () {
+    if (item.tono) {
+      const claveObjetivo = item.tono.replace(/m$/i, '');
+      const $link = $pre.prev('.transpose-keys').find('a').filter(function () {
         return $(this).text().toUpperCase() === claveObjetivo.toUpperCase();
       }).first();
-
-      if ($link.length) {
-        $link.trigger('click');
-      } else {
-        console.warn('No se encontró el tono deseado en los botones del plugin.');
-      }
-    } catch (err) {
-      console.error('Error al aplicar tono:', err);
+      if ($link.length) $link.trigger('click');
     }
+
+    const keysDiv = $pre.prev('.transpose-keys');
+    let capoDiv = $pre.prev('.capo-selector-div');
+    
+    if (capoDiv.length === 0) {
+        let opciones = "";
+        for(let i = 0; i <= 12; i++) {
+            let texto = i === 0 ? "Sin Capo" : "Capo " + i;
+            opciones += `<option value="${i}">${texto}</option>`;
+        }
+        // ESTÉTICA AJUSTADA A FOTO 2
+        const capoHTML = `
+            <div class="capo-selector-div" style="text-align:center; margin-top: 10px; margin-bottom: 25px;">
+                <label style="font-size:15px; margin-right: 5px;">🎸 Capo: </label>
+                <select class="form-select form-select-sm d-inline-block capo-dropdown-repertorio" style="width: auto; cursor:pointer;">
+                    ${opciones}
+                </select>
+            </div>
+        `;
+        if(keysDiv.length > 0) {
+            keysDiv.after(capoHTML);
+        } else {
+            $pre.before(capoHTML);
+        }
+        capoDiv = $pre.prev('.capo-selector-div');
+    }
+
+    const select = capoDiv.find('select');
+    select.val(item.capo !== undefined ? item.capo : 0);
+
+    select.off('change').on('change', function() {
+        programa[currentIndex].capo = parseInt($(this).val());
+        localStorage.setItem('programaMisa', JSON.stringify(programa));
+    });
   }
 
   function mostrarCancion(index) {
     currentIndex = index;
     cargarCancion(programa[index].cancion);
+    window.scrollTo(0, 0);
+    document.getElementById('anterior').disabled = currentIndex === 0;
+    document.getElementById('siguiente').disabled = currentIndex === programa.length - 1;
   }
 
-  document.getElementById('anterior').addEventListener('click', function () {
-    if (currentIndex > 0) mostrarCancion(currentIndex - 1);
-  });
+  document.getElementById('anterior').onclick = () => { if (currentIndex > 0) mostrarCancion(currentIndex - 1); };
+  document.getElementById('siguiente').onclick = () => { if (currentIndex < programa.length - 1) mostrarCancion(currentIndex + 1); };
 
-  document.getElementById('siguiente').addEventListener('click', function () {
-    if (currentIndex < programa.length - 1) mostrarCancion(currentIndex + 1);
-  });
-
-  // Mostrar la primera canción al cargar la página
   mostrarCancion(currentIndex);
 </script>
+
 <script src="scripts/cancionero.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

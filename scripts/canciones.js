@@ -17,7 +17,7 @@ const canciones = {
         "Perdón 5 (Dejame nacer)": { ruta: "perdon/perdon-5-dejame-nacer.html", tono: "DO" }
     },
     "Gloria": {
-        "Gloria 1 (Clásico)": { ruta: "gloria/gloria-1.html", tono: "FA" },
+        "Gloria 1 (Clásico)": { ruta: "gloria/gloria-1.html", tono: "RE" },
         "Gloria 2 (con respuesta)": { ruta: "gloria/gloria-2.html", tono: "DO" },
         "Gloria 3 (Litúrgico)": { ruta: "gloria/gloria-3.html", tono: "DO" }
     },
