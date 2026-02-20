@@ -19,7 +19,8 @@
   <style>
   /* La caja que envuelve todo (acordes, capo y botones) */
   .cancion-en-lista {
-    max-width: 500px !important; 
+    width: 100% !important; 
+    max-width: 800px !important;
     margin: 0 auto !important; 
     display: block !important; 
   }
@@ -30,17 +31,24 @@
     justify-content: center !important;
     align-items: center !important;
     width: 100% !important;
-    clear: both !important; /* Evita que nada se ponga a los costados */
+    flex-wrap: wrap !important; /* Para que los botones bajen de línea si no entran en el celu */
+    clear: both !important; 
   }
 
-  /* LA MAGIA: Obliga a la letra a ir abajo y alinea todas las canciones igual */
+  /* LA MAGIA: Obliga a la letra a ir abajo, elimina el scroll y centra el bloque */
   pre[id^="letra-lista"] {
-    display: block !important; /* Fuerza a ir a un renglón nuevo (abajo del capo) */
-    width: 100% !important; /* Todas las canciones ocupan el mismo ancho */
-    text-align: left !important; /* El texto se alinea a la izquierda de la caja */
+    display: inline-block !important; /* Permite que el div padre lo centre como un bloque */
+    width: auto !important; /* Se ajusta al ancho del texto más largo */
+    max-width: 100% !important;
+    text-align: left !important; /* El texto por dentro se alinea a la izquierda de la caja */
     white-space: pre-wrap !important; 
     padding: 0 10px !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
+    
+    /* ESTO ELIMINA EL SCROLL INTERNO Y HACE QUE BAJE DE CORRIDO */
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
   }
 </style>
 </head>
@@ -53,7 +61,7 @@
     });
   </script> 
 
-  <div id="programa-container" class="container" style="max-width: 700px; margin: 0 auto; padding-top: 20px;"></div>
+  <div id="programa-container" class="container" style="max-width: 800px; margin: 0 auto; padding-top: 20px;"></div>
 
 <script>
   const programa = JSON.parse(localStorage.getItem('programaMisa'));
@@ -84,10 +92,9 @@
           letraPre.id = `letra-lista-${i}`;
           
           const divCancion = document.createElement('div');
-          // LE QUITAMOS EL FLEXBOX A ESTE CONTENEDOR
           divCancion.className = 'cancion-en-lista mb-5 pb-5 border-bottom'; 
           
-          // EL TRUCO ESTÁ ACÁ: Envolvemos la letra en un div centrado (`text-align: center`), y como el `<pre>` es `inline-block`, se va a centrar como si fuera una imagen, pero manteniendo su texto interno a la izquierda.
+          // Envolvemos la letra en un div centrado
           divCancion.innerHTML = tituloHTML + `<div style="text-align: center; width: 100%;">${letraPre.outerHTML}</div>`;
           
           container.appendChild(divCancion);
@@ -131,7 +138,7 @@
         
         const capoHTML = `
             <div class="capo-selector-div" style="text-align:center; margin-top: 10px; margin-bottom: 25px;">
-                <label style="font-size:15px; margin-right: 5px;">🎸 Capo: </label>
+                <label style="font-size:15px; margin-right: 5px; font-weight:bold;">🎸 Capo: </label>
                 <select class="form-select form-select-sm d-inline-block capo-dropdown-repertorio" style="width: auto; cursor:pointer;" data-index="${index}">
                     ${opciones}
                 </select>
