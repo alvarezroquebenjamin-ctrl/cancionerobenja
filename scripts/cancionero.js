@@ -481,6 +481,20 @@ document.addEventListener("DOMContentLoaded", function() {
         body.modo-oscuro #menu-trigger { background: #fff; color: #000; }
         body.modo-oscuro .transpose-keys a { background-color: #000 !important; color: #fff !important; border: 1px solid #444 !important; }
         body.modo-oscuro .transpose-keys a.selected { background-color: #444 !important; border-color: #fff !important; }
+
+        /* --- ARREGLO PARA QUE EL REPERTORIO SEA UNA SOLA PÁGINA --- */
+        #letra, .zona-letra {
+            max-height: none !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
+        
+        /* Por si los contenedores de las canciones en el programa tienen otra clase */
+        .cancion-programa, .programa-item {
+            max-height: none !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
     `;
     document.head.appendChild(style);
 
