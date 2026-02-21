@@ -162,6 +162,7 @@ window.canciones = {
         "Digno de alabar": { ruta: "meditacion/digno-de-alabar.html", tono: "SOL", capo: 0 },
         "Dime Rey": { ruta: "meditacion/dime-rey.html", tono: "LA", capo: 0 },
         "El diario de María": { ruta: "marianos/el-diario-de-maria.html", tono: "LA", capo: 0 },
+        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "DO", capo: 1 },
         "El mismo huerto": { ruta: "meditacion/el-mismo-huerto.html", tono: "RE", capo: 0 },
         "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2 },
         "El sale a tu encuentro": { ruta: "comunion/el-sale-a-tu-encuentro.html", tono: "MI", capo: 0 },
@@ -173,15 +174,18 @@ window.canciones = {
         "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL", capo: 0 },
         "Esa flor siempre de pie": { ruta: "comunion/esa-flor-siempre-de-pie.html", tono: "SOL", capo: 2 },
         "Escúchame Dios": { ruta: "meditacion/escuchame-dios.html", tono: "SOL", capo: 0 },
+        "Esperanza": { ruta: "meditacion/esperanza.html", tono: "SOL", capo: 3 },
         "Espíritu Santo": { ruta: "espiritu-santo/espiritu-santo.html", tono: "RE", capo: 0 },
         "Espíritu desciende": { ruta: "espiritu-santo/espiritu-desciende.html", tono: "RE", capo: 0 },
         "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "SOL", capo: 0 },
+        "Estar con Él": { ruta: "meditacion/estar-con-el.html", tono: "SOL", capo: 0 },
         "Extiende tu mano": { ruta: "meditacion/extiende-tu-mano.html", tono: "DO", capo: 0 },
         "Extranjeros": { ruta: "meditacion/extranjeros.html", tono: "DO", capo: 0 },
         "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
         "Hagase mi paz": { ruta: "comunion/hagase-mi-paz.html", tono: "MI", capo: 0 },
         "Hasta que el mundo arda por El": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
         "Hijo amado": { ruta: "meditacion/hijo-amado.html", tono: "SI", capo: 0 },
+        "Hoy quiero mirarte": { ruta: "meditacion/hoy-quiero-mirarte.html", tono: "RE", capo: 0 },
         "Huracán": { ruta: "meditacion/huracan.html", tono: "DO", capo: 0 },
         "Jesús": { ruta: "meditacion/jesus.html", tono: "DO", capo: 0 },
         "Jesús (Berit II)": { ruta: "meditacion/jesus-berit2.html", tono: "DO", capo: 0 },
@@ -208,14 +212,18 @@ window.canciones = {
         "Noche": { ruta: "meditacion/noche.html", tono: "FA", capo: 0 },
         "Oh Padre": { ruta: "ofertorio/oh-padre.html", tono: "DO", capo: 0 },
         "Oración de confianza": { ruta: "meditacion/oracion-de-confianza.html", tono: "DO", capo: 0 },
+        "Paz": { ruta: "meditacion/paz.html", tono: "LA", capo: 0 },
         "Permanecer en ti": { ruta: "meditacion/permanecer-en-ti.html", tono: "SOL", capo: 0 },
         "Pescador de hombres": { ruta: "comunion/pescador-de-hombres.html", tono: "DO", capo: 0 },
         "Por un solo momento": { ruta: "meditacion/por-un-solo-momento.html", tono: "DO", capo: 0 },
         "Puer et Pater": { ruta: "meditacion/puer-et-pater.html", tono: "RE", capo: 0 },
         "Que se abra el cielo": { ruta: "espiritu-santo/que-se-abra-el-cielo.html", tono: "MI", capo: 0 },
+        "Quiero adorarte": { ruta: "meditacion/quiero-adorarte.html", tono: "DO", capo: 3 },
         "Quiero ser Santo": { ruta: "meditacion/quiero-ser-santo.html", tono: "FA", capo: 1 },
         "Quiero ser tu amigo Jesucristo": { ruta: "comunion/quiero-ser-tu-amigo-jesucristo.html", tono: "SOL", capo: 0 },
+        "Regálanos": { ruta: "meditacion/regalanos.html", tono: "MI", capo: 2 },
         "Renace la vida y el corazón": { ruta: "comunion/renace-la-vida-y-el-corazon.html", tono: "SOL", capo: 4 },
+        "Restáuranos": { ruta: "meditacion/restauranos.html", tono: "SOL", capo: 0 },
         "Sal y luz": { ruta: "comunion/sal-y-luz.html", tono: "SI", capo: 0 },
         "Sáname": { ruta: "meditacion/saname.html", tono: "RE", capo: 0 },
         "Señor de la paz": { ruta: "meditacion/señor-de-la-paz.html", tono: "RE", capo: 0 },
@@ -226,7 +234,9 @@ window.canciones = {
         "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
         "Sigueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
         "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 },
+        "Soledad": { ruta: "meditacion/soledad.html", tono: "LA", capo: 0 },
         "Solo por hoy": { ruta: "meditacion/solo-por-hoy.html", tono: "RE", capo: 0 },
+        "Solo Tú": { ruta: "meditacion/solo-tu.html", tono: "SOL", capo: 1 },
         "Sopla": { ruta: "meditacion/sopla.html", tono: "RE", capo: 0 },
         "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 },
         "Subido al sicomoro": { ruta: "meditacion/subido-al-sicomoro.html", tono: "RE", capo: 0 },
@@ -248,6 +258,7 @@ window.canciones = {
         "Ven Espíritu Divino": { ruta: "espiritu-santo/ven-espiritu-divino.html", tono: "DO", capo: 0 },
         "Ven y sígueme": { ruta: "meditacion/ven-y-sigueme.html", tono: "LA", capo: 0 },
         "Ven y verás": { ruta: "meditacion/ven-y-veras.html", tono: "DO", capo: 0 },
+        "Vengan a mí": { ruta: "meditacion/vengan-a-mi.html", tono: "SOL", capo: 0 },
         "Vengo a adorarte": { ruta: "meditacion/vengo-a-adorarte.html", tono: "RE", capo: 0 },
         "Verás cosas mayores": { ruta: "meditacion/veras-cosas-mayores.html", tono: "DO", capo: 5 },
         "Vivir amando": { ruta: "meditacion/vivir-amando.html", tono: "RE", capo: 0 },
@@ -326,6 +337,88 @@ window.canciones = {
         "Ven Espíritu Santo": { ruta: "espiritu-santo/ven-espiritu-santo.html", tono: "RE", capo: 0 },
         "Viento de Dios": { ruta: "espiritu-santo/viento-de-dios.html", tono: "SOL", capo: 0 },
         "Voces de Esperanza": { ruta: "espiritu-santo/voces-de-esperanza.html", tono: "MI", capo: 0 }
+    },
+    "Adoración": {
+        "A Él la Gloria": { ruta: "meditacion/a-el-la-gloria.html", tono: "SOL", capo: 2 },
+        "Abre": { ruta: "comunion/abre.html", tono: "LA", capo: 0 },
+        "Alabado sea el Santísimo": { ruta: "adoracion/alabado-sea-el-santisimo.html", tono: "DO", capo: 0 },
+        "Alábenlo": { ruta: "meditacion/alabenlo.html", tono: "LA", capo: 0 },
+        "Algo de paz": { ruta: "meditacion/algo-de-paz.html", tono: "RE", capo: 0 },
+        "Alma de Cristo": { ruta: "meditacion/alma-de-cristo.html", tono: "LA", capo: 0 },
+        "Caminho de eternidade": { ruta: "meditacion/caminho-de-eternidade.html", tono: "RE", capo: 0 },
+        "Camino, Verdad y Vida": { ruta: "comunion/camino-verdad-y-vida.html", tono: "DO", capo: 0 },
+        "Cántaro Niño": { ruta: "comunion/cantaro-niño.html", tono: "RE", capo: 0 },
+        "Cara a cara": { ruta: "meditacion/cara-a-cara.html", tono: "LA", capo: 0 },
+        "Con vos": { ruta: "comunion/con-vos.html", tono: "MI", capo: 0 },
+        "Conozco tu corazón": { ruta: "meditacion/conozco-tu-corazon.html", tono: "SOL", capo: 0 },
+        "Cristo calla": { ruta: "meditacion/cristo-calla.html", tono: "SOL", capo: 0 },
+        "Cristo reina": { ruta: "meditacion/cristo-reina.html", tono: "DO", capo: 0 },
+        "Cristo Rey": { ruta: "meditacion/cristo-rey.html", tono: "RE", capo: 2 },
+        "Dame tus ojos": { ruta: "meditacion/dame-tus-ojos.html", tono: "DO", capo: 0 },
+        "Déjate": { ruta: "comunion/dejate.html", tono: "DO", capo: 0 },
+        "Derrama": { ruta: "meditacion/derrama.html", tono: "DO", capo: 4 },
+        "Digno de alabar": { ruta: "meditacion/digno-de-alabar.html", tono: "SOL", capo: 0 },
+        "Dime Rey": { ruta: "meditacion/dime-rey.html", tono: "LA", capo: 0 },
+        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "DO", capo: 1 },
+        "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2},
+        "El sale a tu encuentro": { ruta: "comunion/el-sale-a-tu-encuentro.html", tono: "MI", capo: 0 },
+        "Emaús": { ruta: "comunion/emaus.html", tono: "RE", capo: 0 },
+        "En ti descansar": { ruta: "meditacion/en-ti-descansar.html", tono: "SOL", capo: 0 },
+        "En tu misericordia": { ruta: "meditacion/en-tu-misericordia.html", tono: "RE", capo: 0 },
+        "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL", capo: 0 },
+        "Escúchame Dios": { ruta: "meditacion/escuchame-dios.html", tono: "SOL", capo: 0 },
+        "Esperanza": { ruta: "meditacion/esperanza.html", tono: "SOL", capo: 3 },
+        "Espíritu desciende": { ruta: "espiritu-santo/espiritu-desciende.html", tono: "RE", capo: 0 },
+        "Espíritu Santo": { ruta: "espiritu-santo/espiritu-santo.html", tono: "RE", capo: 0 },
+        "Estar con Él": { ruta: "meditacion/estar-con-el.html", tono: "SOL", capo: 0 },
+        "Esto que soy, esto te doy": { ruta: "ofertorio/esto-que-soy-esto-te-doy.html", tono: "DO", capo: 0 },
+        "Extiende tu mano": { ruta: "meditacion/extiende-tu-mano.html", tono: "DO", capo: 0 },
+        "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
+        "Hijo amado": { ruta: "meditacion/hijo-amado.html", tono: "SI", capo: 0 },
+        "Hoy quiero mirarte": { ruta: "meditacion/hoy-quiero-mirarte.html", tono: "RE", capo: 0 },
+        "Jesús": { ruta: "meditacion/jesus.html", tono: "DO", capo: 0 },
+        "Jesús (Berit II)": { ruta: "meditacion/jesus-berit2.html", tono: "DO", capo: 0 },
+        "Maranatha": { ruta: "espiritu-santo/maranatha.html", tono: "SOL", capo: 1 },
+        "¿Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 0 },
+        "Mi 110%": { ruta: "meditacion/mi-110.html", tono: "FA", capo: 0 },
+        "Mi alma descansa en ti": { ruta: "meditacion/mi-alma-descansa-en-ti.html", tono: "LA", capo: 0 },
+        "Mi entrega a ti": { ruta: "meditacion/mi-entrega-a-ti.html", tono: "RE", capo: 0 },
+        "Milagro de amor": { ruta: "meditacion/milagro-de-amor.html", tono: "SOL", capo: 2 },
+        "Nada te turbe": { ruta: "meditacion/nada-te-turbe.html", tono: "RE", capo: 2 },
+        "Nadie te ama como yo": { ruta: "meditacion/nadie-te-ama-como-yo.html", tono: "LA", capo: 0 },
+        "No hay amor más grande": { ruta: "comunion/no-hay-amor-mas-grande.html", tono: "DO", capo: 0 },
+        "No mueras hermano": { ruta: "meditacion/no-mueras-hermano.html", tono: "SOL", capo: 0 },
+        "Noche": { ruta: "meditacion/noche.html", tono: "FA", capo: 0 },
+        "Paz": { ruta: "meditacion/paz.html", tono: "LA", capo: 0 },
+        "Permanecer en ti": { ruta: "meditacion/permanecer-en-ti.html", tono: "SOL", capo: 0 },
+        "Que se abra el cielo": { ruta: "espiritu-santo/que-se-abra-el-cielo.html", tono: "MI", capo: 0 },
+        "Quiero adorarte": { ruta: "meditacion/quiero-adorarte.html", tono: "DO", capo: 3 },
+        "Quiero ser Santo": { ruta: "meditacion/quiero-ser-santo.html", tono: "FA", capo: 1 },
+        "Regálanos": { ruta: "meditacion/regalanos.html", tono: "MI", capo: 2 },
+        "Restáuranos": { ruta: "meditacion/restauranos.html", tono: "SOL", capo: 0 },
+        "Señor de la paz": { ruta: "meditacion/señor-de-la-paz.html", tono: "RE", capo: 0 },
+        "Si quieres te acompaño en el camino": { ruta: "comunion/si-quieres-te-acompaño-en-el-camino.html", tono: "DO",capo: 0 },
+        "Si rasgaras": { ruta: "meditacion/si-rasgaras.html", tono: "SOL", capo: 4 },
+        "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
+        "Sígueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
+        "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 },
+        "Soledad": { ruta: "meditacion/soledad.html", tono: "LA", capo: 0 },
+        "Solo Tú": { ruta: "meditacion/solo-tu.html", tono: "SOL", capo: 1 },
+        "Sopla": { ruta: "meditacion/sopla.html", tono: "RE", capo: 0 },
+        "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 },
+        "Supe que me amabas": { ruta: "meditacion/supe-que-me-amabas.html", tono: "LA", capo: 0 },
+        "Surge valentía": { ruta: "meditacion/surge-valentia.html", tono: "SOL", capo: 0 },
+        "También hoy": { ruta: "meditacion/tambien-hoy.html", tono: "DO", capo: 3 },
+        "Te alabo": { ruta: "meditacion/te-alabo.html", tono: "RE", capo: 0 },
+        "Te encontré": { ruta: "meditacion/te-encontre.html", tono: "DO", capo: 5 },
+        "Tempestad": { ruta: "meditacion/tempestad.html", tono: "SOL", capo: 0 },
+        "Transformación en Pentecostés": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 0 },
+        "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz.html", tono: "LA", capo: 2 },
+        "Tu voluntad (Servus Mariae)": { ruta: "meditacion/tu-voluntad-servus.html", tono: "SI", capo: 0 },
+        "Ven Espíritu de amor": { ruta: "espiritu-santo/ven-espiritu-de-amor.html", tono: "RE", capo: 0 },
+        "Ven Jesús de Nazareth": { ruta: "comunion/ven-jesus-de-nazareth.html", tono: "RE", capo: 2 },
+        "Ven y verás": { ruta: "meditacion/ven-y-veras.html", tono: "DO", capo: 0 },
+        "Vengo a adorarte": { ruta: "meditacion/vengo-a-adorarte.html", tono: "RE", capo: 0 }
     },
     "JM":{
         "Alzar banderas": { ruta: "comunion/alzar-banderas.html", tono: "DO", capo: 0 },
@@ -582,10 +675,33 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed<10) { scrollSpeed++; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
     document.getElementById("scroll-minus").onclick = () => { if(scrollSpeed>1) { scrollSpeed--; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
 
-    const letraDiv = document.getElementById("letra");
+    // --- LÓGICA DE TAMAÑO DE LETRA (ADAPTADA PARA REPERTORIOS) ---
     let fontSize = 100;
-    if(letraDiv) { letraDiv.style.fontSize=fontSize+"%"; letraDiv.style.lineHeight="1.5"; }
-    const updFont = (v) => { if(!letraDiv) return; fontSize+=v; if(fontSize<60) fontSize=60; if(fontSize>250) fontSize=250; letraDiv.style.fontSize=fontSize+"%"; };
+    
+    // Esta función busca tanto la canción individual como las listas del repertorio
+    const obtenerLetras = () => document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra");
+
+    // Aplicar el tamaño inicial y el interlineado
+    setTimeout(() => {
+        obtenerLetras().forEach(el => {
+            el.style.fontSize = fontSize + "%";
+            el.style.lineHeight = "1.5";
+        });
+    }, 500); // Le damos medio segundo para que cargue el repertorio primero
+
+    const updFont = (v) => { 
+        const letras = obtenerLetras();
+        if(letras.length === 0) return; // Si no hay letras en pantalla, no hace nada
+        
+        fontSize += v; 
+        if(fontSize < 60) fontSize = 60; 
+        if(fontSize > 250) fontSize = 250; 
+        
+        letras.forEach(el => {
+            el.style.fontSize = fontSize + "%"; 
+        });
+    };
+
     document.getElementById("font-plus").onclick = () => updFont(10);
     document.getElementById("font-minus").onclick = () => updFont(-10);
 
