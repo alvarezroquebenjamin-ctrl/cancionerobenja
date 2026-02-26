@@ -170,7 +170,7 @@ const canciones = {
         "En ti descansar": { ruta: "meditacion/en-ti-descansar.html", tono: "SOL" },
         "En tu misericordia": { ruta: "meditacion/en-tu-misericordia.html", tono: "RE" },
         "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL" },
-        "Esa flor siempre de pie": { ruta: "comunion/esa-flor-siempre-de-pie.html", tono: "SOL" },
+        "Esa flor siempre de pie": { ruta: "meditacion/esa-flor-siempre-de-pie.html", tono: "SOL" },
         "Escúchame Dios": { ruta: "meditacion/escuchame-dios.html", tono: "SOL" },
         "Espíritu Santo": { ruta: "espiritu-santo/espiritu-santo.html", tono: "RE" },
         "Espíritu desciende": { ruta: "espiritu-santo/espiritu-desciende.html", tono: "RE" },

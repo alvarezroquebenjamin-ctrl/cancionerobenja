@@ -124,6 +124,7 @@ window.canciones = {
         "Sin fronteras": { ruta: "comunion/sin-fronteras.html", tono: "SOL", capo: 0 },
         "Somos JM, somos iglesia": { ruta: "comunion/somos-jm-somos-iglesia.html", tono: "SOL", capo: 0 },
         "Soñar": { ruta: "comunion/soñar.html", tono: "MI", capo: 0 },
+        "Te estaba esperando": { ruta: "comunion/te-estaba-esperando.html", tono: "DO", capo: 0 },
         "Tu amor": { ruta: "comunion/tu-amor.html", tono: "LA", capo: 0 },
         "Una gota de agua": { ruta: "comunion/una-gota-de-agua.html", tono: "SOL", capo: 0 },
         "Ven Jesús de Nazareth": { ruta: "comunion/ven-jesus-de-nazareth.html", tono: "RE", capo: 2 },
@@ -162,7 +163,7 @@ window.canciones = {
         "Digno de alabar": { ruta: "meditacion/digno-de-alabar.html", tono: "SOL", capo: 0 },
         "Dime Rey": { ruta: "meditacion/dime-rey.html", tono: "LA", capo: 0 },
         "El diario de María": { ruta: "marianos/el-diario-de-maria.html", tono: "LA", capo: 0 },
-        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "DO", capo: 1 },
+        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "SOL", capo: 1 },
         "El mismo huerto": { ruta: "meditacion/el-mismo-huerto.html", tono: "RE", capo: 0 },
         "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2 },
         "El sale a tu encuentro": { ruta: "comunion/el-sale-a-tu-encuentro.html", tono: "MI", capo: 0 },
@@ -172,7 +173,7 @@ window.canciones = {
         "En ti descansar": { ruta: "meditacion/en-ti-descansar.html", tono: "SOL", capo: 0 },
         "En tu misericordia": { ruta: "meditacion/en-tu-misericordia.html", tono: "RE", capo: 0 },
         "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL", capo: 0 },
-        "Esa flor siempre de pie": { ruta: "comunion/esa-flor-siempre-de-pie.html", tono: "SOL", capo: 2 },
+        "Esa flor siempre de pie": { ruta: "meditacion/esa-flor-siempre-de-pie.html", tono: "SOL", capo: 2 },
         "Escúchame Dios": { ruta: "meditacion/escuchame-dios.html", tono: "SOL", capo: 0 },
         "Esperanza": { ruta: "meditacion/esperanza.html", tono: "SOL", capo: 3 },
         "Espíritu Santo": { ruta: "espiritu-santo/espiritu-santo.html", tono: "RE", capo: 0 },
@@ -198,7 +199,7 @@ window.canciones = {
         "Maravillas hizo en mi": { ruta: "meditacion/maravillas-hizo-en-mi.html", tono: "DO", capo: 0 },
         "María tierra del Padre": { ruta: "comunion/maria-tierra-del-padre.html", tono: "LA", capo: 0 },
         "Me llamaste amigo": { ruta: "meditacion/me-llamaste-amigo.html", tono: "DO", capo: 3 },
-        "¿Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 0 },
+        "Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 0 },
         "Mi 110%": { ruta: "meditacion/mi-110.html", tono: "FA", capo: 0 },
         "Mi alma descansa en ti": { ruta: "meditacion/mi-alma-descansa-en-ti.html", tono: "LA", capo: 0 },
         "Mi entrega a ti": { ruta: "meditacion/mi-entrega-a-ti.html", tono: "RE", capo: 0 },
@@ -245,6 +246,7 @@ window.canciones = {
         "También hoy": { ruta: "meditacion/tambien-hoy.html", tono: "DO", capo: 3 },
         "Te alabo": { ruta: "meditacion/te-alabo.html", tono: "RE", capo: 0 },
         "Te encontré (Mario Gazal)": { ruta: "meditacion/te-encontre.html", tono: "DO", capo: 5 },
+        "Te estaba esperando": { ruta: "comunion/te-estaba-esperando.html", tono: "DO", capo: 0 },
         "Tempestad": { ruta: "meditacion/tempestad.html", tono: "SOL", capo: 0 },
         "Torrente de Vida": { ruta: "meditacion/torrente-de-vida.html", tono: "DO", capo: 0 },
         "Transforma mi casa en tu hogar": { ruta: "meditacion/transforma-mi-casa-en-tu-hogar.html", tono: "FA", capo: 0 },
@@ -275,7 +277,7 @@ window.canciones = {
         "Hay un río de vida": { ruta: "salida/hay-un-rio-de-vida.html", tono: "RE", capo: 0 },
         "Ignis Mariae": { ruta: "salida/ignis-mariae.html", tono: "LA", capo: 0 },
         "Junto a tí María": { ruta: "salida/junto-a-ti-maria.html", tono: "RE", capo: 0 },
-        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "SOL", capo: 0 },
+        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
         "Mar adentro": { ruta: "salida/mar-adentro.html", tono: "MI", capo: 3 },
         "María de la Alianza": { ruta: "salida/maria-de-la-alianza.html", tono: "LA", capo: 1 },
         "Misioneros": { ruta: "salida/misioneros.html", tono: "LA", capo: 0 },
@@ -295,7 +297,7 @@ window.canciones = {
         "Hasta que el mundo arda por Él": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
         "Junto a ti María": { ruta: "salida/junto-a-ti-maria.html", tono: "RE", capo: 0 },
         "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
-        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "SOL", capo: 0 },
+        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
         "Magnificat (Portugués)": { ruta: "meditacion/magnificat.html", tono: "DO", capo: 0 },
         "María de la alianza": { ruta: "salida/maria-de-la-alianza.html", tono: "LA", capo: 1 },
         "María está pasando por aquí": { ruta: "marianos/maria-esta-pasando-por-aqui.html", tono: "DO", capo: 0 },
@@ -359,7 +361,7 @@ window.canciones = {
         "Derrama": { ruta: "meditacion/derrama.html", tono: "DO", capo: 4 },
         "Digno de alabar": { ruta: "meditacion/digno-de-alabar.html", tono: "SOL", capo: 0 },
         "Dime Rey": { ruta: "meditacion/dime-rey.html", tono: "LA", capo: 0 },
-        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "DO", capo: 1 },
+        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "SOL", capo: 1 },
         "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2},
         "El sale a tu encuentro": { ruta: "comunion/el-sale-a-tu-encuentro.html", tono: "MI", capo: 0 },
         "Emaús": { ruta: "comunion/emaus.html", tono: "RE", capo: 0 },
@@ -379,7 +381,7 @@ window.canciones = {
         "Jesús": { ruta: "meditacion/jesus.html", tono: "DO", capo: 0 },
         "Jesús (Berit II)": { ruta: "meditacion/jesus-berit2.html", tono: "DO", capo: 0 },
         "Maranatha": { ruta: "espiritu-santo/maranatha.html", tono: "SOL", capo: 1 },
-        "¿Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 0 },
+        "Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 0 },
         "Mi 110%": { ruta: "meditacion/mi-110.html", tono: "FA", capo: 0 },
         "Mi alma descansa en ti": { ruta: "meditacion/mi-alma-descansa-en-ti.html", tono: "LA", capo: 0 },
         "Mi entrega a ti": { ruta: "meditacion/mi-entrega-a-ti.html", tono: "RE", capo: 0 },
@@ -411,6 +413,7 @@ window.canciones = {
         "También hoy": { ruta: "meditacion/tambien-hoy.html", tono: "DO", capo: 3 },
         "Te alabo": { ruta: "meditacion/te-alabo.html", tono: "RE", capo: 0 },
         "Te encontré": { ruta: "meditacion/te-encontre.html", tono: "DO", capo: 5 },
+        "Te estaba esperando": { ruta: "comunion/te-estaba-esperando.html", tono: "DO", capo: 0 },
         "Tempestad": { ruta: "meditacion/tempestad.html", tono: "SOL", capo: 0 },
         "Transformación en Pentecostés": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 0 },
         "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz.html", tono: "LA", capo: 2 },
@@ -458,7 +461,10 @@ window.canciones = {
     var wrapChords = function (input) { return input.replace(opts.chordReplaceRegex, "<span class='c'>$1</span>"); };
     return $(this).each(function() { var startKey = $(this).attr("data-key"); if (!startKey || $.trim(startKey) == "") startKey = opts.key; if (!startKey || $.trim(startKey) == "") return this; currentKey = getKeyByName(startKey); var keyLinks = []; $(keys).each(function(i, key) { if (currentKey.name == key.name) keyLinks.push("<a href='#' class='selected'>" + key.name + "</a>"); else keyLinks.push("<a href='#'>" + key.name + "</a>"); }); var $this = $(this); var keysHtml = $("<div class='transpose-keys justify-content-md-center' style='margin-bottom:10px;'></div>"); keysHtml.html(keyLinks.join("")); $("a", keysHtml).click(function(e) { e.preventDefault(); transposeSong($this, $(this).html()); $(".transpose-keys a").removeClass("selected"); $(this).addClass("selected"); return false; }); $(this).before(keysHtml); var output = []; var lines = $(this).html().split("\n"); var line; for (var i = 0; i < lines.length; i++) { line = lines[i]; if (isChordLine(line)) output.push("<span>" + wrapChords(line) + "</span>"); else output.push("<span>" + line + "</span>"); }; $(this).html(output.join("\n")); });
   };
-  $.fn.transpose.defaults = { chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4)*(\/[A-G][b\#]*)*$/, chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4)*)/g };
+  $.fn.transpose.defaults = { 
+      chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\(\#11\)|\+)*(\/[A-G][b\#]*)*$/, 
+      chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\(\#11\)|\+)*)/g 
+  };
   
   $(function() { 
       var targets = $("#letra, .zona-letra"); 
@@ -719,7 +725,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // =============================================================================
-// 4. NAVEGACIÓN ENTRE CANCIONES
+// 4. NAVEGACIÓN ENTRE CANCIONES (CORREGIDO)
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function() {
     if (!document.getElementById("letra")) return;
@@ -731,31 +737,48 @@ document.addEventListener("DOMContentLoaded", function() {
     const hasBaseTag = document.getElementsByTagName('base').length > 0;
 
     let playlist = [];
-    let tituloSeccion = "";
+    
+    // NUEVO: Verificamos si venimos navegando dentro de una sección específica
+    const params = new URLSearchParams(window.location.search);
+    const seccionFijada = params.get('seccion');
 
     if (esModoAlfabetico) {
         let todasLasCanciones = [];
         for (const [seccion, objCanciones] of Object.entries(window.canciones)) {
             for (const [titulo, datos] of Object.entries(objCanciones)) {
-                if (!todasLasCanciones.some(c => c.ruta === datos.ruta)) { todasLasCanciones.push({ t: titulo, ...datos }); }
+                if (!todasLasCanciones.some(c => c.ruta === datos.ruta)) { 
+                    todasLasCanciones.push({ t: titulo, ...datos, sec: seccion }); 
+                }
             }
         }
         todasLasCanciones.sort((a, b) => a.t.localeCompare(b.t));
         playlist = todasLasCanciones;
     } else {
         for (const [nombreSeccion, cancionesDeSeccion] of Object.entries(window.canciones)) {
-            const listaDeSeccion = Object.entries(cancionesDeSeccion).map(([k, v]) => ({ t: k, ...v }));
-            const estaAqui = listaDeSeccion.some(c => c.ruta.endsWith(archivoActual));
+            const listaDeSeccion = Object.entries(cancionesDeSeccion).map(([k, v]) => ({ t: k, ...v, sec: nombreSeccion }));
+            
+            // FIX: Usamos split('/').pop() para buscar la coincidencia EXACTA del archivo
+            const estaAqui = listaDeSeccion.some(c => c.ruta.split('/').pop() === archivoActual);
+            
             if (estaAqui) {
+                // Si la URL nos dice en qué sección estamos, le damos prioridad absoluta
+                if (seccionFijada && seccionFijada === nombreSeccion) {
+                    playlist = listaDeSeccion;
+                    break;
+                }
+                // Si no, intentamos adivinar por la carpeta
                 const coincideCarpeta = nombreSeccion.toLowerCase().includes(carpetaActual.toLowerCase());
-                if (coincideCarpeta || playlist.length === 0) { playlist = listaDeSeccion; }
+                if (coincideCarpeta || playlist.length === 0) { 
+                    playlist = listaDeSeccion; 
+                }
             }
         }
     }
 
     if (playlist.length === 0) return;
 
-    let indiceActual = playlist.findIndex(c => c.ruta.endsWith(archivoActual));
+    // FIX: Volvemos a usar la coincidencia EXACTA para encontrar el índice de la canción
+    let indiceActual = playlist.findIndex(c => c.ruta.split('/').pop() === archivoActual);
     if (indiceActual === -1) return;
 
     const navDiv = document.createElement("div");
@@ -763,16 +786,24 @@ document.addEventListener("DOMContentLoaded", function() {
     navDiv.style.width = "100%";
 
     let htmlBotones = "";
-    const getLink = (rutaDestino) => hasBaseTag ? rutaDestino : "../" + rutaDestino;
+    
+    // Función para armar el link y pasarle la sección de forma invisible
+    const getLink = (rutaDestino, seccion) => {
+        let link = hasBaseTag ? rutaDestino : "../" + rutaDestino;
+        if (!esModoAlfabetico && seccion) {
+            link += `?seccion=${encodeURIComponent(seccion)}`;
+        }
+        return link;
+    };
 
     if (indiceActual > 0) {
         const anterior = playlist[indiceActual - 1];
-        htmlBotones += `<a href="${getLink(anterior.ruta)}" class="btn btn-outline-secondary btn-sm">⬅ ${anterior.t}</a>`;
+        htmlBotones += `<a href="${getLink(anterior.ruta, anterior.sec)}" class="btn btn-outline-secondary btn-sm">⬅ ${anterior.t}</a>`;
     } else { htmlBotones += `<div></div>`; }
 
     if (indiceActual < playlist.length - 1) {
         const siguiente = playlist[indiceActual + 1];
-        htmlBotones += `<a href="${getLink(siguiente.ruta)}" class="btn btn-outline-secondary btn-sm">${siguiente.t} ➡</a>`;
+        htmlBotones += `<a href="${getLink(siguiente.ruta, siguiente.sec)}" class="btn btn-outline-secondary btn-sm">${siguiente.t} ➡</a>`;
     } else { htmlBotones += `<div></div>`; }
 
     navDiv.innerHTML = htmlBotones;
@@ -841,4 +872,195 @@ document.addEventListener('click', function(event) {
     if (contenedor && input && event.target !== input && event.target !== contenedor) {
         contenedor.style.display = 'none';
     }
+});
+
+// =============================================================================
+// 5. DICCIONARIO DE ACORDES VISUAL
+// =============================================================================
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // 1. Inyectamos los estilos del Modo Oscuro para esta ventanita
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            body.modo-oscuro #acorde-modal { background: #222 !important; border: 1px solid #555; }
+            body.modo-oscuro #acorde-titulo { color: #90caf9 !important; }
+            body.modo-oscuro .mastil-fondo { background: #333 !important; border-color: #777 !important; border-top-color: #777 !important; }
+            body.modo-oscuro .mastil-texto { color: #e0e0e0 !important; }
+        </style>
+    `);
+
+    // 2. Inyectamos la ventanita oculta (Modal) en el HTML
+    const modalAcordes = `
+        <div id="acorde-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2147483647;"></div>
+        <div id="acorde-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; z-index:2147483648; border-radius:12px; padding:20px; box-shadow: 0 5px 25px rgba(0,0,0,0.4); text-align:center; min-width: 220px;">
+            <h3 id="acorde-titulo" style="margin-top:0; color:#0A2846; font-weight:bold; font-size:28px;">DO</h3>
+            <div id="acorde-dibujo" style="margin: 20px 0;"></div>
+            <button class="mini-btn" id="acorde-close" style="width:100%; background:#0A2846; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; font-size:16px;">Cerrar</button>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalAcordes);
+
+    // 3. BASE DE DATOS DE ACORDES
+    // El formato es: [6ta, 5ta, 4ta, 3ra, 2da, 1ra]
+    // -1 significa "no tocar" (X) | 0 significa "cuerda al aire" (O) | Los números son el traste
+    const dbAcordes = {
+        // Mayores
+        "DO": [-1, 3, 2, 0, 1, 0], "RE": [-1, -1, 0, 2, 3, 2], "MI": [0, 2, 2, 1, 0, 0],
+        "FA": [1, 3, 3, 2, 1, 1], "SOL": [3, 2, 0, 0, 0, 3], "LA": [-1, 0, 2, 2, 2, 0], "SI": [-1, 2, 4, 4, 4, 2],
+        
+        // Menores
+        "DOm": [-1, 3, 5, 5, 4, 3], "REm": [-1, -1, 0, 2, 3, 1], "MIm": [0, 2, 2, 0, 0, 0],
+        "FAm": [1, 3, 3, 1, 1, 1], "SOLm": [3, 5, 5, 3, 3, 3], "LAm": [-1, 0, 2, 2, 1, 0], "SIm": [-1, 2, 4, 4, 3, 2],
+        
+        // Sostenidos Mayores
+        "DO#": [-1, 4, 6, 6, 6, 4], "RE#": [-1, 6, 8, 8, 8, 6], "FA#": [2, 4, 4, 3, 2, 2], "SOL#": [4, 6, 6, 5, 4, 4], "LA#": [-1, 1, 3, 3, 3, 1],
+        
+        // Sostenidos Menores
+        "DO#m": [-1, 4, 6, 6, 5, 4], "FA#m": [2, 4, 4, 2, 2, 2], "SOL#m": [4, 6, 6, 4, 4, 4],
+        
+        // Séptimas (Básicos)
+        "DO7": [-1, 3, 2, 3, 1, 0], "RE7": [-1, -1, 0, 2, 1, 2], "MI7": [0, 2, 0, 1, 0, 0],
+        "FA7": [1, 3, 1, 2, 1, 1], "SOL7": [3, 2, 0, 0, 0, 1], "LA7": [-1, 0, 2, 0, 2, 0], "SI7": [-1, 2, 1, 2, 0, 2],
+
+        // Menores con Séptima (m7)
+        "REm7": [-1, -1, 0, 2, 1, 1], "MIm7": [0, 2, 0, 0, 0, 0], "FAm7": [1, 3, 1, 1, 1, 1],
+        "SOLm7": [3, 5, 3, 3, 3, 3], "LAm7": [-1, 0, 2, 0, 1, 0], "SIm7": [-1, 2, 4, 2, 3, 2], "FA#m7": [2, 4, 2, 2, 2, 2],
+
+        // Mayores con Séptima Mayor (maj7) y sus sinónimos (+ / 7+)
+        "DOmaj7": [-1, 3, 2, 0, 0, 0], "FAmaj7": [-1, -1, 3, 2, 1, 0], "SOLmaj7": [-1, 2, -1, 0, 3, 2],
+        "LAmaj7": [-1, 0, 2, 1, 2, 0], "LA7+": [-1, 0, 2, 1, 2, 0], 
+        "MImaj7": [0, 2, 1, 1, 0, 0],
+        "SIbmaj7": [-1, 1, 3, 2, 3, 1], "LA#maj7": [-1, 1, 3, 2, 3, 1],
+        "SImaj7": [-1, 2, 4, 3, 4, 2],
+        "REmaj7": [-1, -1, 0, 2, 2, 2], "RE7+": [-1, -1, 0, 2, 2, 2], 
+        "SOLmaj9": [3, -1, 4, 2, 3, 0], "LA6+": [-1, 0, 4, 4, 0, 0],
+
+        // Novenas y Oncenas (y sus variaciones)
+        "DO9": [-1, 3, 2, 0, 3, 3], "LA9": [-1, 0, 2, 4, 2, 0], "FA#9": [2, 2, 2, 2, 2, 4],
+        "FA#m11": [-1, 4, 4, 2, 0, 0],
+        "LAm79": [5, 5, 5, 5, 5, 7], "LAm9": [-1, 0, 2, 4, 1, 0],
+
+        // Suspendidos (sus4 / sus2)
+        "REsus4": [-1, -1, 0, 2, 3, 3], "MIsus4": [0, 2, 2, 2, 0, 0], "SOLsus4": [3, 2, 0, 0, 1, 3],
+        "LAsus4": [-1, 0, 2, 2, 3, 0], "LAsus2": [-1, 0, 2, 2, 0, 0],
+        "REsus2": [-1, -1, 0, 2, 3, 0], "LA7sus4": [-1, 0, 2, 0, 3, 0],
+        "MI7sus4": [0, 2, 0, 2, 0, 0], "FA#sus4": [2, 4, 4, 4, 2, 2], "SI9sus4": [-1, 2, 4, 2, 2, 2],
+
+        // Añadidos (add)
+        "DOadd9": [-1, 3, 2, 0, 3, 0], "REadd9": [-1, -1, 0, 2, 3, 0], "SOLadd9": [3, 2, 0, 2, 0, 3],
+
+        // Acordes Alterados
+        "DO9(#11)": [-1, 3, 4, 2, 3, 0], "SOL9(#11)": [3, -1, 0, 2, 2, -1],
+        "SI9+": [-1, 2, 1, 2, 3, -1], "REmajb5": [-1, -1, 0, 1, 2, 2], "SIdim7+": [-1, 2, 3, 3, 3, -1],
+
+        // Disminuidos (dim) y Semidisminuidos (m7b5)
+        "FA#dim": [-1, -1, 4, 5, 4, 5], "SOL#dim": [-1, -1, 6, 7, 6, 7],
+        "DO#m7b5": [-1, 4, 5, 4, 5, -1], "RE#m7b5": [-1, 6, 7, 6, 7, -1],
+        "RE#dim7": [-1, -1, 1, 2, 1, 2], "DOdim7": [-1, 3, 4, 2, 4, -1],
+        "SIdim": [-1, 2, 3, 4, 3, -1], "SIdim7": [-1, 2, 3, 1, 3, -1], "DO#dim": [-1, 4, 5, 6, 5, -1],
+
+        // Acordes con Bajo Distinto (Slash Chords Mayores)
+        "DO/MI": [0, 3, 2, 0, 1, 0], "RE/FA#": [2, 0, 0, 2, 3, 2], "MI/SOL#": [4, -1, 2, 1, 0, 0],
+        "SOL/SI": [-1, 2, 0, 0, 0, 3], "LA/DO#": [-1, 4, 2, 2, 2, 0],
+        "DO/SOL": [3, 3, 2, 0, 1, 0], "RE/LA": [-1, 0, 0, 2, 3, 2], "SOL/RE": [-1, -1, 0, 0, 0, 3],
+        "DOmaj7/SOL": [3, 3, 2, 0, 0, 0], "FAmaj13/DO": [-1, 3, 3, 2, 3, 0],
+        "LA9/FA#": [2, 0, 2, 2, 0, 0], "LA9+/SI": [-1, 2, 2, 2, 2, 4],
+        "FA9/DO": [-1, 3, 3, 0, 1, 0], "DO9/MI": [-1, -1, 2, 0, 3, 3],
+        "DO/RE": [-1, -1, 0, 0, 1, 0], "LA/MI": [0, 0, 2, 2, 2, 0],
+        "LA/SOL#": [4, -1, 2, 2, 2, 0], "MI/RE#": [-1, 6, 6, 4, 5, 4],
+        "SI/FA#": [2, 2, 4, 4, 4, 2], "SI/DO#": [-1, 4, 4, 4, 4, 2],
+        "SI/MI": [0, 2, 4, 4, 4, 2], "REmaj7/FA#": [2, -1, 0, 2, 2, 0],
+        "MI/DO#": [-1, 4, 2, 1, 0, 0], "MI/FA#": [2, 2, 2, 1, 0, 0],
+        "FAmaj7/SOL": [3, -1, 3, 2, 1, 0], "RE/DO#": [-1, 4, 0, 2, 3, 2],
+
+        // Acordes con Bajo Distinto (Slash Chords Menores y Raros)
+        "LAm/SOL": [3, 0, 2, 2, 1, 0], "SIm/LA": [-1, 0, 4, 4, 3, 2], "MIm/RE": [-1, -1, 0, 0, 0, 0],
+        "DOm/SOL": [3, 3, 5, 5, 4, 3], "REm/LA": [-1, 0, 0, 2, 3, 1],
+        "LAm7/FA": [1, 0, 2, 0, 1, 0], "SIm/SOL#": [4, -1, 4, 4, 3, -1],
+        "DO#m/SI": [-1, 2, 2, 1, 2, 0], "SIm11+/LA": [-1, 0, 3, 4, 3, 0],
+        "SIm11+": [-1, 2, 3, 2, 3, -1]
+    };
+
+    // 4. Función mágica que dibuja el mástil usando HTML
+    function generarDibujoAcorde(posiciones) {
+        let trastesUsados = posiciones.filter(p => p > 0);
+        let trasteMin = trastesUsados.length ? Math.min(...trastesUsados) : 1;
+        let trasteMax = trastesUsados.length ? Math.max(...trastesUsados) : 4;
+        let trasteInicio = (trasteMax <= 4) ? 1 : trasteMin; // Si el acorde pasa del traste 4, bajamos por el mástil
+
+        // Fila superior (X y O)
+        let html = '<div class="mastil-texto" style="display:flex; justify-content:space-between; width:130px; margin:0 auto 5px; color:#555; font-weight:bold; font-size:16px; padding: 0 4px;">';
+        posiciones.forEach(p => { html += `<span>${p === -1 ? 'X' : (p === 0 ? 'O' : '&nbsp;')}</span>`; });
+        html += '</div>';
+
+        // El mástil (Rectángulo principal)
+        let bordeSuperior = trasteInicio === 1 ? '10px solid #222' : '3px solid #222';
+        html += `<div class="mastil-fondo" style="position:relative; width:130px; height:150px; border:3px solid #222; border-top:${bordeSuperior}; margin:0 auto; background:white;">`;
+
+        // Indicador de traste al costado (ej: "4fr")
+        if (trasteInicio > 1) {
+            html += `<div class="mastil-texto" style="position:absolute; left:-32px; top:15px; font-weight:bold; font-size:16px; color:#333;">${trasteInicio}fr</div>`;
+        }
+
+        // Dibuja los 4 trastes (líneas horizontales)
+        for(let i=1; i<=4; i++) html += `<div style="position:absolute; top:${i*25}%; left:0; right:0; height:3px; background:#999;"></div>`;
+        // Dibuja las 6 cuerdas (líneas verticales)
+        for(let i=0; i<6; i++) html += `<div style="position:absolute; left:${i*20}%; top:0; bottom:0; width:2px; background:#aaa; transform:translateX(-1px);"></div>`;
+
+        // Coloca los puntos azules (dedos)
+        posiciones.forEach((traste, cuerda) => {
+            if(traste > 0) {
+                let top = ((traste - trasteInicio) * 25) + 12.5; // Calcula el centro del espacio del traste
+                let left = cuerda * 20;
+                html += `<div style="position:absolute; top:${top}%; left:${left}%; width:20px; height:20px; background:#0A2846; border-radius:50%; transform:translate(-50%,-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></div>`;
+            }
+        });
+
+        html += '</div>';
+        return html;
+    }
+
+    // 5. El "Escuchador" de clicks (CON VISIÓN PERIFÉRICA PARA BAJOS)
+    $(document).on("click", ".c", function() {
+        let nombreAcorde = $(this).text().trim(); 
+        let nodo = $(this)[0];
+        
+        let prev = nodo.previousSibling;
+        let next = nodo.nextSibling;
+
+        // Si tocaste la primera parte (ej: tocaste LAm en LAm/SOL)
+        if (next && next.nodeType === 3 && next.nodeValue.trim() === "/" && next.nextSibling && $(next.nextSibling).hasClass("c")) {
+            nombreAcorde = nombreAcorde + "/" + $(next.nextSibling).text().trim();
+        }
+        // Si tocaste el bajo (ej: tocaste SOL en LAm/SOL)
+        else if (prev && prev.nodeType === 3 && prev.nodeValue.trim() === "/" && prev.previousSibling && $(prev.previousSibling).hasClass("c")) {
+            nombreAcorde = $(prev.previousSibling).text().trim() + "/" + nombreAcorde;
+        }
+        
+        // 1. Buscamos si el acorde completo (ej: LAm/SOL) existe en la base de datos
+        if(dbAcordes[nombreAcorde]) {
+            document.getElementById("acorde-titulo").innerText = nombreAcorde;
+            document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[nombreAcorde]);
+            document.getElementById("acorde-overlay").style.display = "block";
+            document.getElementById("acorde-modal").style.display = "block";
+        } 
+        // 2. Si no tenés cargado el bajo, mostramos el acorde base como Plan B
+        else {
+            let acordeBase = nombreAcorde.split("/")[0];
+            if (dbAcordes[acordeBase]) {
+                document.getElementById("acorde-titulo").innerText = nombreAcorde + " (Acorde base)"; 
+                document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[acordeBase]);
+                document.getElementById("acorde-overlay").style.display = "block";
+                document.getElementById("acorde-modal").style.display = "block";
+            }
+        }
+    });
+
+    // 6. Cerrar la ventanita
+    const cerrarAcorde = () => { 
+        document.getElementById("acorde-overlay").style.display="none"; 
+        document.getElementById("acorde-modal").style.display="none"; 
+    };
+    document.getElementById("acorde-close").onclick = cerrarAcorde;
+    document.getElementById("acorde-overlay").onclick = cerrarAcorde;
 });
