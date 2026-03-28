@@ -570,3 +570,22 @@ html, body {
     min-height: 100%;
     -webkit-overflow-scrolling: touch; /* Magia para iOS */
 }
+
+/* Asegura que la imagen sea siempre un cuadrado perfecto */
+.portada-cuadrada {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Le da un efecto lindo al pasar el mouse (se levanta un poquito) */
+.album-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.album-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
