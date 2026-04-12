@@ -589,3 +589,13 @@ html, body {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.15);
 }
+
+.texto-azul {
+    color: #4273B8;
+    font-weight: bold;
+}
+
+.texto-naranja {
+    color: #FFA500;
+    font-weight: bold;
+}
