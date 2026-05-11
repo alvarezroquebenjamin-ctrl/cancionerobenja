@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v4'; 
+const CACHE_NAME = 'cancionero-v5'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -427,9 +427,9 @@ self.addEventListener('install', event => {
 // --- 2. INTERCEPTOR (CON SALVAVIDAS PARA SAFARI) ---
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    // ¡ESTA ES LA LÍNEA CLAVE!
+    caches.match(event.request, { ignoreSearch: true })
       .then(response => {
-        // Si está en la mochila, lo devuelve
         if (response) {
           return response; 
         }
