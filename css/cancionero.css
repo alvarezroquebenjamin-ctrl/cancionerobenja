@@ -648,3 +648,43 @@ html, body {
 [data-bs-theme="dark"] .album-card small.text-muted {
     color: #cccccc !important; 
 }
+
+/* ===================================================
+   FIX DEFINITIVO: VISIBILIDAD DE TEXTOS Y MODO OSCURO
+   =================================================== */
+
+/* Aseguramos el título "Albumes" en modo claro */
+.seccion {
+    color: #009F98 !important; /* El turquesa que usás siempre */
+}
+
+/* --- MODO CLARO (Default) --- */
+.album-card {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+}
+.album-card h6.text-dark {
+    color: #212529 !important; /* Letras casi negras */
+}
+.album-card small.text-muted {
+    color: #6c757d !important; /* Subtítulo gris */
+}
+
+/* --- MODO OSCURO (Automático y por Botón) --- */
+@media (prefers-color-scheme: dark), [data-bs-theme="dark"] {
+    .album-card {
+        background-color: #2b2b2b !important;
+        border-color: #444444 !important;
+    }
+    /* Invertimos las letras a blanco/gris claro */
+    .album-card h6.text-dark {
+        color: #ffffff !important;
+    }
+    .album-card small.text-muted {
+        color: #cccccc !important;
+    }
+    /* Si el título principal también se perdía en modo oscuro: */
+    .seccion {
+        color: #49C8DC !important; /* Un celeste más brillante para el fondo negro */
+    }
+}
