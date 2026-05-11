@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v3'; 
+const CACHE_NAME = 'cancionero-v4'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -406,25 +406,35 @@ const urlsToCache = [
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'
 ];
 
-// INSTALACIÓN: Descarga toda la lista gigante de una sola vez
+// --- 1. INSTALACIÓN ANTI-BOMBAS ---
+// En vez de cancelar todo si hay un error de tipeo, 
+// descarga una por una y si una falla, la ignora y sigue con el resto.
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Descargando todo el cancionero para modo offline...');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Empezando a descargar la lista gigante...');
+      return Promise.all(
+        urlsToCache.map(url => {
+          return cache.add(url).catch(error => {
+            console.error('Che, esta ruta falló y no se guardó:', url);
+          });
+        })
+      );
+    })
   );
 });
 
-// INTERCEPTOR: Busca en la mochila primero, y si te olvidaste de algo en la lista, lo guarda dinámicamente
+// --- 2. INTERCEPTOR (CON SALVAVIDAS PARA SAFARI) ---
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
+        // Si está en la mochila, lo devuelve
         if (response) {
-          return response; // Lo encontró en la mochila
+          return response; 
         }
+
+        // Si no está, va a internet
         return fetch(event.request).then(networkResponse => {
           if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
             return networkResponse;
@@ -435,8 +445,17 @@ self.addEventListener('fetch', event => {
               cache.put(event.request, responseToCache);
             });
           return networkResponse;
+          
         }).catch(() => {
-          console.log("Offline y archivo no cacheado: ", event.request.url);
+          // EL SALVAVIDAS: Si no hay internet y no estaba en la mochila, 
+          // le devolvemos una mini página a Safari para que no tire el error "null".
+          return new Response(
+            '<div style="text-align:center; padding:50px; font-family:sans-serif;">' +
+            '<h2>¡Ups! Estás sin internet</h2>' +
+            '<p>Y parece que esta canción todavía no se guardó en el celular.</p>' +
+            '<a href="/cancionerobenja/">Volver al inicio</a></div>',
+            { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+          );
         });
       })
   );
