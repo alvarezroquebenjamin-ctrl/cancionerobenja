@@ -599,3 +599,52 @@ html, body {
     color: #FFA500;
     font-weight: bold;
 }
+
+/* ===================================================
+   TARJETAS DE ALBUMES DEFINITIVAS
+   =================================================== */
+
+/* --- 1. MODO CLARO (Por defecto) --- */
+.album-card {
+    background-color: #ffffff !important; 
+    border: 1px solid #dee2e6 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+.album-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15) !important;
+}
+
+/* --- 2. MODO OSCURO (Detecta tu celular/PC) --- */
+@media (prefers-color-scheme: dark) {
+    .album-card {
+        background-color: #2b2b2b !important; 
+        border-color: #444444 !important;
+    }
+    
+    /* Apuntamos directamente al h6 para matar al text-dark */
+    .album-card h6.text-dark {
+        color: #ffffff !important; 
+    }
+    
+    /* Apuntamos directamente al small para matar al text-muted */
+    .album-card small.text-muted {
+        color: #cccccc !important; 
+    }
+}
+
+/* --- 3. MODO OSCURO (Si usás un botón en tu página para cambiar el tema) --- */
+[data-bs-theme="dark"] .album-card {
+    background-color: #2b2b2b !important; 
+    border-color: #444444 !important;
+}
+
+[data-bs-theme="dark"] .album-card h6.text-dark {
+    color: #ffffff !important; 
+}
+
+[data-bs-theme="dark"] .album-card small.text-muted {
+    color: #cccccc !important; 
+}

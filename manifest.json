@@ -1,19 +1,14 @@
 {
-  "name": "Cancionero católico Schoenstatt",
+  "name": "Cancionero Benja",
   "short_name": "Cancionero",
-  "start_url": "./index.html",
+  "start_url": "/cancionerobenja/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#009F98",
   "icons": [
     {
-      "src": "icono.png",
+      "src": "images/logo-schoenstatt-png.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icono.png",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
