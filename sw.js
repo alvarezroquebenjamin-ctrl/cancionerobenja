@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v6'; 
+const CACHE_NAME = 'cancionero-v7'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -170,7 +170,7 @@ const urlsToCache = [
 '/cancionerobenja/comunion/eres.html',
 '/cancionerobenja/comunion/es-aqui.html',
 '/cancionerobenja/meditacion/esa-flor-siempre-de-pie.html',
-'/cancionerobenja/comunion/escalva-de-mi-salvador.html',
+'/cancionerobenja/comunion/esclava-de-mi-salvador.html',
 '/cancionerobenja/meditacion/escuchame-dios.html',
 '/cancionerobenja/meditacion/esperanza.html',
 '/cancionerobenja/espiritu-santo/espiritu-santo.html',
@@ -401,7 +401,94 @@ const urlsToCache = [
 '/cancionerobenja/porta/maria-luz-de-esperanza.html',
 '/cancionerobenja/porta/contigo-maria.html',
 
-  // 5. Librerías externas
+'/cancionerobenja/hoy-quiero-cantarte/tu-canto.html',
+'/cancionerobenja/hoy-quiero-cantarte/brille-tu-luz-señor.html',
+'/cancionerobenja/hoy-quiero-cantarte/que-el-fuego-se-transforme.html',
+'/cancionerobenja/hoy-quiero-cantarte/vivir-en-ti.html',
+'/cancionerobenja/hoy-quiero-cantarte/esperaban-en-jerusalen.html',
+'/cancionerobenja/hoy-quiero-cantarte/señor-de-mis-silencios.html',
+'/cancionerobenja/hoy-quiero-cantarte/maria-de-la-trinidad.html',
+'/cancionerobenja/hoy-quiero-cantarte/de-mi-vida-eres-el-sol.html',
+'/cancionerobenja/hoy-quiero-cantarte/primera-misionera.html',
+'/cancionerobenja/hoy-quiero-cantarte/regreso.html',
+'/cancionerobenja/hoy-quiero-cantarte/quiero-decir-tu-nombre.html',
+'/cancionerobenja/hoy-quiero-cantarte/buenas-noches-padre-dios.html',
+
+'/cancionerobenja/santuario-corazon/amen-del-padre.html',
+'/cancionerobenja/santuario-corazon/argentina-nos-necesita.html',
+'/cancionerobenja/santuario-corazon/en-tus-manos.html',
+'/cancionerobenja/santuario-corazon/espiritu-conquistado.html',
+'/cancionerobenja/santuario-corazon/ave-imperatrix.html',
+'/cancionerobenja/santuario-corazon/jardin-oculto.html',
+
+'/cancionerobenja/como-un-niño/bendita-eres-madre.html',
+'/cancionerobenja/como-un-niño/es-el-señor.html',
+'/cancionerobenja/como-un-niño/haz-que-el-sol-de-cristo.html',
+'/cancionerobenja/como-un-niño/por-tu-pureza.html',
+'/cancionerobenja/como-un-niño/lazaro.html',
+'/cancionerobenja/como-un-niño/rema.html',
+'/cancionerobenja/como-un-niño/cancion-de-elias.html',
+'/cancionerobenja/como-un-niño/amar.html',
+'/cancionerobenja/como-un-niño/mi-buen-pastor.html',
+'/cancionerobenja/como-un-niño/por-ti-con-alegria.html',
+'/cancionerobenja/como-un-niño/te-adoro-con-fe.html',
+'/cancionerobenja/como-un-niño/lo-nuestro.html',
+'/cancionerobenja/como-un-niño/al-caer-la-tarde.html',
+'/cancionerobenja/como-un-niño/mar-adentro.html',
+'/cancionerobenja/como-un-niño/hijos.html',
+'/cancionerobenja/como-un-niño/asemejanos-a-ti.html',
+'/cancionerobenja/como-un-niño/vuela.html',
+'/cancionerobenja/como-un-niño/padre-nuestro.html',
+
+'/cancionerobenja/en-tus-ojos/quiero-cantar.html',
+'/cancionerobenja/en-tus-ojos/movimiento.html',
+'/cancionerobenja/en-tus-ojos/de-tu-mano.html',
+'/cancionerobenja/en-tus-ojos/mi-alianza-de-amor.html',
+'/cancionerobenja/en-tus-ojos/navegar-la-barca.html',
+'/cancionerobenja/en-tus-ojos/miraran-al-que-traspasaron.html',
+'/cancionerobenja/en-tus-ojos/en-ti-señor.html',
+'/cancionerobenja/en-tus-ojos/la-fuerza-en-ti.html',
+'/cancionerobenja/en-tus-ojos/quedate.html',
+'/cancionerobenja/en-tus-ojos/reina-de-la-mision.html',
+
+'/cancionerobenja/ciudad-multicor/te-vuelvo-a-entregar.html',
+'/cancionerobenja/ciudad-multicor/brother-to-brother.html',
+'/cancionerobenja/ciudad-multicor/cuerdas-de-barro.html',
+'/cancionerobenja/ciudad-multicor/vivir.html',
+'/cancionerobenja/ciudad-multicor/kuarahy-ose-jevy.html',
+'/cancionerobenja/ciudad-multicor/abriendo-el-sol.html',
+'/cancionerobenja/ciudad-multicor/siao-multicor.html',
+
+'/cancionerobenja/queda-entre-nosotros/corazon-+-ancho.html',
+'/cancionerobenja/queda-entre-nosotros/nuevas-playas.html',
+'/cancionerobenja/queda-entre-nosotros/todavia-una-vez-mas.html',
+
+'/cancionerobenja/tiempo-de-alianza/en-manos-del-padre.html',
+'/cancionerobenja/tiempo-de-alianza/milagro-en-el-jordan.html',
+'/cancionerobenja/tiempo-de-alianza/tu-voz.html',
+
+'/cancionerobenja/contigo-+-feliz/sabes-que-te-quiero.html',
+'/cancionerobenja/contigo-+-feliz/maria-de-los-campos.html',
+'/cancionerobenja/contigo-+-feliz/mais-feliz.html',
+'/cancionerobenja/contigo-+-feliz/vem-maria-com-tua-cor.html',
+
+'/cancionerobenja/berit-1/renuevanos-señor.html',
+'/cancionerobenja/berit-1/jesus-en-ti-confio.html',
+
+'/cancionerobenja/berit-2/stay.html',
+
+'/cancionerobenja/vive-dios/resplandor-del-sol-eterno.html',
+'/cancionerobenja/vive-dios/fica-conosco.html',
+'/cancionerobenja/vive-dios/mas-alla.html',
+'/cancionerobenja/vive-dios/fado-do-amigo.html',
+'/cancionerobenja/vive-dios/forevermore.html',
+'/cancionerobenja/vive-dios/mae-da-confianca.html',
+'/cancionerobenja/vive-dios/ven-jesus.html',
+'/cancionerobenja/vive-dios/and-we-go.html',
+'/cancionerobenja/vive-dios/ahi-vino-jesus.html',
+'/cancionerobenja/vive-dios/maria-te-quiero-cantar.html',
+
+// 5. Librerías externas
   'https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'
 ];

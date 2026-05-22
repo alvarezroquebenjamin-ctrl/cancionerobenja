@@ -23,7 +23,7 @@ window.canciones = {
         "Gloria 1 (Clásico)": { ruta: "gloria/gloria-1.html", tono: "RE", capo: 1 },
         "Gloria 2 (con respuesta)": { ruta: "gloria/gloria-2.html", tono: "DO", capo: 0 },
         "Gloria 3 (Litúrgico)": { ruta: "gloria/gloria-3.html", tono: "DO", capo: 0 },
-        "Gloria 4 (Nortino)": { ruta: "gloria/gloria-4.html", tono: "DO", capo: 0 },
+        "Gloria 4 (Nortino)": { ruta: "gloria/gloria-4.html", tono: "FA", capo: 0 },
         "Letanías": { ruta: "gloria/letanias.html", tono: "RE", capo: 0 },
         "Pregón Pascual": { ruta: "gloria/pregon-pascual.html", tono: "DO", capo: 0 }
     },
@@ -222,6 +222,7 @@ window.canciones = {
         "Espíritu desciende": { ruta: "espiritu-santo/espiritu-desciende.html", tono: "RE", capo: 0 },
         "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "SOL", capo: 0 },
         "Estar con Él": { ruta: "meditacion/estar-con-el.html", tono: "SOL", capo: 0 },
+        "Estate": { ruta: "meditacion/estate.html", tono: "SOL", capo: 0 },
         "Extiende tu mano": { ruta: "meditacion/extiende-tu-mano.html", tono: "DO", capo: 0 },
         "Extranjeros": { ruta: "meditacion/extranjeros.html", tono: "DO", capo: 0 },
         "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
@@ -303,8 +304,8 @@ window.canciones = {
         "Te veo": { ruta: "comunion/te-veo.html", tono: "DO", capo: 0 },
         "Tempestad": { ruta: "meditacion/tempestad.html", tono: "SOL", capo: 0 },
         "Torrente de Vida": { ruta: "meditacion/torrente-de-vida.html", tono: "DO", capo: 0 },
-        "Transforma mi casa en tu hogar": { ruta: "meditacion/transforma-mi-casa-en-tu-hogar.html", tono: "FA", capo: 0 },
-        "Transformación en Pentecostes": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 0 },
+        "Transforma mi casa en tu hogar": { ruta: "meditacion/transforma-mi-casa-en-tu-hogar.html", tono: "RE", capo: 0 },
+        "Transformación en Pentecostes": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 2 },
         "Tú, el único Rey": { ruta: "meditacion/tu-el-unico-rey.html", tono: "DO", capo: 0 },
         "Tu estás aquí / De tal manera": { ruta: "meditacion/tu-estas-aqui-de-tal-manera.html", tono: "SOL", capo: 0 },
         "Tu luz (Contigo + Feliz)": { ruta: "comunion/tu-luz.html", tono: "SOL", capo: 5 },
@@ -440,6 +441,7 @@ window.canciones = {
         "Espíritu desciende": { ruta: "espiritu-santo/espiritu-desciende.html", tono: "RE", capo: 0 },
         "Espíritu Santo": { ruta: "espiritu-santo/espiritu-santo.html", tono: "RE", capo: 0 },
         "Estar con Él": { ruta: "meditacion/estar-con-el.html", tono: "SOL", capo: 0 },
+        "Estate": { ruta: "meditacion/estate.html", tono: "SOL", capo: 0 },
         "Esto que soy, esto te doy": { ruta: "ofertorio/esto-que-soy-esto-te-doy.html", tono: "DO", capo: 0 },
         "Extiende tu mano": { ruta: "meditacion/extiende-tu-mano.html", tono: "DO", capo: 0 },
         "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
@@ -491,7 +493,7 @@ window.canciones = {
         "Te estaba esperando": { ruta: "comunion/te-estaba-esperando.html", tono: "DO", capo: 0 },
         "Te veo": { ruta: "comunion/te-veo.html", tono: "DO", capo: 0 },
         "Tempestad": { ruta: "meditacion/tempestad.html", tono: "SOL", capo: 0 },
-        "Transformación en Pentecostés": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 0 },
+        "Transformación en Pentecostés": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 2 },
         "Tú, el único Rey": { ruta: "meditacion/tu-el-unico-rey.html", tono: "DO", capo: 0 },
         "Tu estás aquí / De tal manera": { ruta: "meditacion/tu-estas-aqui-de-tal-manera.html", tono: "SOL", capo: 0 },
         "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz.html", tono: "LA", capo: 2 },
@@ -541,8 +543,8 @@ window.canciones = {
     return $(this).each(function() { var startKey = $(this).attr("data-key"); if (!startKey || $.trim(startKey) == "") startKey = opts.key; if (!startKey || $.trim(startKey) == "") return this; currentKey = getKeyByName(startKey); var keyLinks = []; $(keys).each(function(i, key) { if (currentKey.name == key.name) keyLinks.push("<a href='#' class='selected'>" + key.name + "</a>"); else keyLinks.push("<a href='#'>" + key.name + "</a>"); }); var $this = $(this); var keysHtml = $("<div class='transpose-keys justify-content-md-center' style='margin-bottom:10px;'></div>"); keysHtml.html(keyLinks.join("")); $("a", keysHtml).click(function(e) { e.preventDefault(); transposeSong($this, $(this).html()); $(".transpose-keys a").removeClass("selected"); $(this).addClass("selected"); return false; }); $(this).before(keysHtml); var output = []; var lines = $(this).html().split("\n"); var line; for (var i = 0; i < lines.length; i++) { line = lines[i]; if (isChordLine(line)) output.push("<span>" + wrapChords(line) + "</span>"); else output.push("<span>" + line + "</span>"); }; $(this).html(output.join("\n")); });
   };
   $.fn.transpose.defaults = { 
-      chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\(\#11\)|\+)*(\/[A-G][b\#]*)*$/, 
-      chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\(\#11\)|\+)*)/g 
+      chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/[A-G][b\#]*)*$/, 
+      chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*)/g 
   };
   
   $(function() { 
@@ -1016,7 +1018,9 @@ document.addEventListener("DOMContentLoaded", function() {
         "MImaj7": [0, 2, 1, 1, 0, 0], "FAmaj7": [-1, -1, 3, 2, 1, 0], "SOLmaj7": [-1, 2, -1, 0, 3, 2], "LAmaj7": [-1, 0, 2, 1, 2, 0], "LA7+": [-1, 0, 2, 1, 2, 0], 
         "SImaj7": [-1, 2, 4, 3, 4, 2],
         
-        "SOLmaj9": [3, -1, 4, 2, 3, 0], "LA6+": [-1, 0, 4, 4, 0, 0],
+        "FAmaj9": [-1, -1, 3, 0, 1, 0], "LAmaj9": [-1, 0, 2, 1, 0, 0], "SOLmaj9": [3, -1, 4, 2, 3, 0], "LA6+": [-1, 0, 4, 4, 0, 0], "MIb6+": [-1, -1, 1, 0, 1, -1], "SIb6(11)": [-1, 1, -1, 0, 3, 0], "MI6(9)": [-1, -1, 1, 0, 1, 1], 
+        "DOm6": [-1, 3, -1, 5, 4, 5],
+        "FA#7(11)": [2, 4, 4, 3, 0, 0], "FA#m7(11)": [2, -1, 2, 2, 0, 0],
 
         // Sostenidos Mayores con Séptima Mayor (#maj7) y sus sinónimos (+ / 7+)
         "DO#maj7": [-1, 4, 6, 5, 6, 4], "RE#maj7": [-1, -1, 1, 3, 3, 3], "FA#maj7": [2, 4, 3, 3, 2, 2], "SOL#maj7": [4, 6, 5, 5, 4, 4], 
@@ -1025,6 +1029,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Novenas y Oncenas (y sus variaciones)
         "DO9": [-1, 3, 2, 0, 3, 3], "RE9": [-1, 5, 4, 5, 5, 5], "MI9": [0, 2, 0, 1, 0, 2], "FA9": [1, 3, 1, 2, 1, 3], "SOL9": [3, 5, 3, 4, 3, 5], "LA9": [-1, 0, 2, 4, 2, 0], "SI9": [-1, 2, 1, 2, 2, 2],
         "DOm9": [-1, 3, 1, 3, 3, -1], "REm9": [-1, 5, 3, 5, 5, 5], "MIm9": [0, 2, 0, 0, 0, 2], "FAm9": [1, 3, 1, 1, 1, 3], "SOLm9": [3, 1, 3, 2, -1, -1], "LAm9": [-1, 0, 2, 4, 1, 0], "SIm9": [-1, 2, 0, 2, 2, 2],
+        "RE11": [-1, 5, 4, 0, 3, -1], "SI11": [-1, 2, 4, 4, 4, 0],
         "DOm11": [-1, 3, 5, 3, 6, 3], "REm11": [-1, 5, 7, 5, 8, 5], "MIm11": [0, 0, 0, 0, 0, 0], "FAm11": [1, 1, 1, 1, 1, 1], "SOLm11": [3, 3, 3, 3, 3, 3], "LAm11": [-1, 0, 2, 0, 3, 0], "SIm11": [-1, 2, 4, 2, 5, 2], 
         "LAm79": [5, 5, 5, 5, 5, 7], 
 
@@ -1034,7 +1039,7 @@ document.addEventListener("DOMContentLoaded", function() {
         "DO#m11": [-1, 4, 6, 4, 7, 4], "RE#m11": [-1, 6, 8, 6, 9, 6], "FA#m11": [-1, 4, 4, 2, 0, 0], "SOL#m11": [4, 4, 4, 4, 4, 4], "LA#m11": [-1, 1, 3, 1, 4, 1], 
 
         // Suspendidos (sus4 / sus2)
-        "DOsus4": [-1, 3, 3, 0, 1, -1], "REsus4": [-1, -1, 0, 2, 3, 3], "MIsus4": [0, 2, 2, 2, 0, 0], "FAsus4": [1, 3, 3, 3, 1, 1], "SOLsus4": [3, 2, 0, 0, 1, 3], "LAsus4": [-1, 0, 2, 2, 3, 0], "SIsus4": [-1, 2, 4, 4, 5, 2], 
+        "DOsus4": [-1, 3, 3, 0, 1, -1], "REsus4": [-1, -1, 0, 2, 3, 3], "MIsus4": [0, 2, 2, 2, 0, 0], "FAsus4": [1, 3, 3, 3, 1, 1], "SOLsus4": [3, 5, 5, 5, 3, 3], "LAsus4": [-1, 0, 2, 2, 3, 0], "SIsus4": [-1, 2, 4, 4, 5, 2], 
         "DOsus2": [-1, 3, 0, 0, 1, -1], "REsus2": [-1, -1, 0, 2, 3, 0], "MIsus2": [0, 2, 4, 4, 0, 0], "FAsus2": [-1, -1, 3, 0, 1, 1], "SOLsus2": [-1, -1, 5, 7, 8, 5], "LAsus2": [-1, 0, 2, 2, 0, 0], "SIsus2": [-1, 2, 4, 4, 2, 2], 
         "DO7sus4": [-1, 3, 3, 3, 1, -1], "RE7sus4": [-1, -1, 0, 2, 1, 3], "MI7sus4": [0, 2, 0, 2, 0, 0], "FA7sus4": [1, 3, 1, 3, 1, 1], "SOL7sus4": [3, 5, 3, 5, 3, 3], "LA7sus4": [-1, 0, 2, 0, 3, 0], "SI7sus4": [-1, 2, 4, 2, 5, 2], 
         "SI9sus4": [-1, 2, 4, 2, 2, 2],
@@ -1052,6 +1057,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Acordes Alterados
         "DO9(#11)": [-1, 3, 4, 2, 3, 0], "RE9(#11)": [-1, 5, 4, 5, 5, 4], "MI9(#11)": [-1, 7, 6, 7, 7, 6], "SOL9(#11)": [3, -1, 0, 2, 2, -1],
+        "LAmaj7(#11)": [-1, 0, 2, 1, 4, 0],
         "DO9+": [-1, 3, 2, 1, 3, -1], "RE9+": [-1, 5, 4, 3, 5, -1], "MI9+": [0, -1, 0, 1, 1, 2], "SI9+": [-1, 2, 1, 2, 3, -1], "REmajb5": [-1, -1, 0, 1, 2, 2], "SIdim7+": [-1, 2, 3, 3, 3, -1],
 
         // Acordes Sostenidos Alterados
@@ -1060,33 +1066,34 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Disminuidos (dim) y Semidisminuidos (m7b5)
         "DOdim": [-1, 3, 4, 5, 4, -1], "REdim": [-1, -1, 0, 1, 3, 1], "MIdim": [-1, -1, 2, 3, 2, 3], "FAdim": [1, 2, 3, 1, -1, -1], "SIdim": [-1, 2, 3, 4, 3, -1], 
-        "DOdim7": [-1, 3, 4, 2, 4, -1], "REdim7": [-1, -1, 0, 1, 0, 1], "MIdim7": [-1, -1, 2, 3, 2, 3], "FAdim7": [1, 2, 3, 1, 3, 1], "SIdim7": [-1, 2, 3, 1, 3, -1],
+        "DOdim7": [-1, 3, 4, 2, 4, -1], "REdim7": [-1, -1, 0, 1, 0, 1], "MIdim7": [-1, -1, 2, 3, 2, 3], "FAdim7": [1, 2, 3, 1, 3, 1], "SOLdim7": [-1, 1, 2, 0, 2, -1], "SIdim7": [-1, 2, 3, 1, 3, -1],
         "DOm7b5": [-1, 3, 4, 3, 4, -1], "REm7b5": [-1, -1, 0, 1, 1, 1], "MIm7b5": [-1, -1, 2, 3, 3, 3],
 
         // Sostenidos Disminuidos (#dim) y Semidisminuidos (#m7b5)
-        "DO#dim": [-1, 4, 5, 6, 5, -1], "RE#dim": [-1, 6, 7, 8, 7, -1], "FA#dim": [-1, -1, 4, 5, 4, 5], "SOL#dim": [-1, -1, 6, 7, 6, 7],
+        "DO#dim": [-1, 4, 5, 6, 5, -1], "RE#dim": [-1, -1, 1, 2, 1, 2], "FA#dim": [-1, -1, 4, 5, 4, 5], "SOL#dim": [-1, -1, 6, 7, 6, 7],
         "DO#dim7": [-1, 5, 6, 4, 6, -1], "RE#dim7": [-1, -1, 1, 2, 1, 2],
         "DO#m7b5": [-1, 4, 5, 4, 5, -1], "RE#m7b5": [-1, 6, 7, 6, 7, -1],
 
         // Acordes con Bajo Distinto (Slash Chords Mayores)
         "DO/MI": [0, 3, 2, 0, 1, 0], "RE/FA#": [2, 0, 0, 2, 3, 2], "MI/SOL#": [4, -1, 2, 1, 0, 0],
-        "SOL/SI": [-1, 2, 0, 0, 0, 3], "LA/DO#": [-1, 4, 2, 2, 2, 0],
-        "DO/SOL": [3, 3, 2, 0, 1, 0], "RE/LA": [-1, 0, 0, 2, 3, 2], "SOL/RE": [-1, -1, 0, 0, 0, 3],
+        "SOL/SI": [-1, 2, 0, 0, 3, 3], "LA/DO#": [-1, 4, 2, 2, 2, 0],
+        "DO/SOL": [3, 3, 2, 0, 1, 0], "RE/LA": [-1, 0, 0, 2, 3, 2], "SOL/RE": [-1, -1, 0, 0, 3, 3],
         "DOmaj7/SOL": [3, 3, 2, 0, 0, 0], "FAmaj13/DO": [-1, 3, 3, 2, 3, 0],
-        "LA9/FA#": [2, 0, 2, 2, 0, 0], "LA9+/SI": [-1, 2, 2, 2, 2, 4],
+        "LA9/FA#": [2, 0, 2, 2, 0, 0], "LA9+/SI": [-1, 2, 2, 2, 2, 4], "LA9/DO#": [-1, 4, 2, 4, 2, 0],
         "FA9/DO": [-1, 3, 3, 0, 1, 0], "DO9/MI": [-1, -1, 2, 0, 3, 3],
-        "DO/RE": [-1, -1, 0, 0, 1, 0], "LA/MI": [0, 0, 2, 2, 2, 0],
-        "LA/SOL#": [4, -1, 2, 2, 2, 0], "MI/RE#": [-1, 6, 6, 4, 5, 4],
+        "DO/RE": [-1, -1, 0, 0, 1, 0], "LA/MI": [0, -1, 2, 2, 2, 0],
+        "LA/SOL#": [4, -1, 2, 2, 2, 0], "MI/RE#": [-1, -1, 1, 1, 0, 0],
         "SI/FA#": [2, 2, 4, 4, 4, 2], "SI/DO#": [-1, 4, 4, 4, 4, 2],
         "SI/MI": [0, 2, 4, 4, 4, 2], "REmaj7/FA#": [2, -1, 0, 2, 2, 0],
         "MI/DO#": [-1, 4, 2, 1, 0, 0], "MI/FA#": [2, 2, 2, 1, 0, 0],
         "FAmaj7/SOL": [3, -1, 3, 2, 1, 0], "RE/DO#": [-1, 4, 0, 2, 3, 2],
+        "SOLmaj7/SI": [-1, 2, -1, 0, 3, 2],
 
-        // Acordes con Bajo Distinto (Slash Chords Menores y Raros)
+        // Acordes menores con Bajo Distinto (Slash Chords Menores y Raros)
         "LAm/SOL": [3, 0, 2, 2, 1, 0], "SIm/LA": [-1, 0, 4, 4, 3, 2], "MIm/RE": [-1, -1, 0, 0, 0, 0],
         "DOm/SOL": [3, 3, 5, 5, 4, 3], "REm/LA": [-1, 0, 0, 2, 3, 1],
-        "LAm7/FA": [1, 0, 2, 0, 1, 0], "SIm/SOL#": [4, -1, 4, 4, 3, -1],
-        "DO#m/SI": [-1, 2, 2, 1, 2, 0], "SIm11+/LA": [-1, 0, 3, 4, 3, 0],
+        "LAm7/FA": [1, 0, 2, 0, 1, 0], "LAm7/SOL": [3, 0, 2, 0, 1, 0], "SIm/SOL#": [4, -1, 4, 4, 3, -1], "LAm9/DO": [-1, 3, 2, 4, 1, 0],
+        "DO#m/SI": [7, 4, 6, 4, 5, 4], "SIm11+/LA": [-1, 0, 3, 4, 3, 0],
         "SIm11+": [-1, 2, 3, 2, 3, -1]
     };
 
