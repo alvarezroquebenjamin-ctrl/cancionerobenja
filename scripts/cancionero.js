@@ -22,7 +22,7 @@ window.canciones = {
     "Gloria": {
         "Gloria 1 (Clásico)": { ruta: "gloria/gloria-1.html", tono: "RE", capo: 1 },
         "Gloria 2 (con respuesta)": { ruta: "gloria/gloria-2.html", tono: "DO", capo: 0 },
-        "Gloria 3 (Litúrgico)": { ruta: "gloria/gloria-3.html", tono: "DO", capo: 0 },
+        "Gloria 3 (Litúrgico)": { ruta: "gloria/gloria-3.html", tono: "SOL", capo: 3 },
         "Gloria 4 (Nortino)": { ruta: "gloria/gloria-4.html", tono: "FA", capo: 0 },
         "Letanías": { ruta: "gloria/letanias.html", tono: "RE", capo: 0 },
         "Pregón Pascual": { ruta: "gloria/pregon-pascual.html", tono: "DO", capo: 0 }
@@ -55,7 +55,7 @@ window.canciones = {
         "Comenzaste a hacerte pan": { ruta: "ofertorio/comenzaste-a-hacerte-pan.html", tono: "DO", capo: 0 },
         "Esto que soy, esto te doy": { ruta: "ofertorio/esto-que-soy-esto-te-doy.html", tono: "SOL", capo: 0 },
         "Juntos nos acercamos": { ruta: "ofertorio/juntos-nos-acercamos.html", tono: "SOL", capo: 0 },
-        "Nuestra fe en tu amor": { ruta: "ofertorio/nuestra-fe-en-tu-amor.html", tono: "LA", capo: 0 },
+        "Nuestra fe en tu amor": { ruta: "ofertorio/nuestra-fe-en-tu-amor.html", tono: "SOL", capo: 0 },
         "Oh Padre": { ruta: "ofertorio/oh-padre.html", tono: "DO", capo: 0 },
         "Oh Señor": { ruta: "ofertorio/oh-señor.html", tono: "MI", capo: 0 },
         "Para darlo a los demas": { ruta: "ofertorio/para-darlo-a-los-demas.html", tono: "RE", capo: 0 },
@@ -68,7 +68,7 @@ window.canciones = {
         "Santo 3 (Clásico)": { ruta: "santo/santo3.html", tono: "DO", capo: 0 },
         "Santo 4 (Nuevo)": { ruta: "santo/santo4.html", tono: "RE", capo: 0 },
         "Santo 5 (Saaanto)": { ruta: "santo/santo5.html", tono: "LA", capo: 0 },
-        "Santo 6 (Santo es)": { ruta: "santo/santo6.html", tono: "LA", capo: 0 },
+        "Santo 6 (Santo es)": { ruta: "santo/santo6.html", tono: "SOL", capo: 0 },
         "Santo 7 (No Pasará)": { ruta: "santo/santo7.html", tono: "FA", capo: 0 }
     },
     "Padrenuestro": {
@@ -230,6 +230,7 @@ window.canciones = {
         "Hago nuevas todas las cosas": { ruta: "meditacion/hago-nuevas-todas-las-cosas.html", tono: "SOL", capo: 0 },
         "Hasta que el mundo arda por El": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
         "Haz llover": { ruta: "meditacion/haz-llover.html", tono: "DO", capo: 0 },
+        "Haz llover x Que se abra el cielo": { ruta: "meditacion/haz-llover-x-que-se-abra-el-cielo.html", tono: "SOL", capo: 0 },
         "Hijo amado": { ruta: "meditacion/hijo-amado.html", tono: "SI", capo: 0 },
         "Hoy quiero mirarte": { ruta: "meditacion/hoy-quiero-mirarte.html", tono: "RE", capo: 0 },
         "Huracán": { ruta: "meditacion/huracan.html", tono: "DO", capo: 0 },
@@ -447,6 +448,7 @@ window.canciones = {
         "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
         "Hago nuevas todas las cosas": { ruta: "meditacion/hago-nuevas-todas-las-cosas.html", tono: "SOL", capo: 0 },
         "Haz llover": { ruta: "meditacion/haz-llover.html", tono: "DO", capo: 0 },
+        "Haz llover x Que se abra el cielo": { ruta: "meditacion/haz-llover-x-que-se-abra-el-cielo.html", tono: "SOL", capo: 0 },
         "Hijo amado": { ruta: "meditacion/hijo-amado.html", tono: "SI", capo: 0 },
         "Hoy quiero mirarte": { ruta: "meditacion/hoy-quiero-mirarte.html", tono: "RE", capo: 0 },
         "Jesús": { ruta: "meditacion/jesus.html", tono: "DO", capo: 0 },
@@ -756,7 +758,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // AUTOSCROLL, LETRA, TEMA
     let scrollSpeed=3, isScrolling=false, scrollInterval;
     const stopScroll = () => { clearInterval(scrollInterval); isScrolling=false; document.getElementById("scroll-play").innerHTML="▶"; document.getElementById("scroll-play").classList.remove("active"); document.documentElement.style.scrollBehavior="smooth"; };
-    const startScroll = () => { clearInterval(scrollInterval); document.documentElement.style.scrollBehavior="auto"; const delay = 330-(scrollSpeed*20); scrollInterval=setInterval(()=>{ if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight) stopScroll(); else window.scrollTo(0,window.pageYOffset+1); }, delay); document.getElementById("scroll-play").innerHTML="⏸"; document.getElementById("scroll-play").classList.add("active"); isScrolling=true; };
+    const startScroll = () => { clearInterval(scrollInterval); document.documentElement.style.scrollBehavior="auto"; const delay = 275-(scrollSpeed*20); scrollInterval=setInterval(()=>{ if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight) stopScroll(); else window.scrollTo(0,window.pageYOffset+1); }, delay); document.getElementById("scroll-play").innerHTML="⏸"; document.getElementById("scroll-play").classList.add("active"); isScrolling=true; };
     
     document.getElementById("scroll-play").onclick = () => isScrolling?stopScroll():startScroll();
     document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed<10) { scrollSpeed++; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };

@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v7'; 
+const CACHE_NAME = 'cancionero-v8'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -196,6 +196,7 @@ const urlsToCache = [
 '/cancionerobenja/comunion/hasta-que-el-mundo-arda-por-el.html',
 '/cancionerobenja/salida/hay-un-rio-de-vida.html',
 '/cancionerobenja/meditacion/haz-llover.html',
+'/cancionerobenja/meditacion/haz-llover-x-que-se-abra-el-cielo.html',
 '/cancionerobenja/jm/herencia.html',
 '/cancionerobenja/meditacion/hijo-amado.html',
 '/cancionerobenja/meditacion/hoy-quiero-mirarte.html',
