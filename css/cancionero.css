@@ -608,7 +608,7 @@ html, body {
 .album-card {
     background-color: #ffffff !important; 
     border: 1px solid #dee2e6 !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s, border-color 0.3s !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
 }
 
@@ -617,36 +617,22 @@ html, body {
     box-shadow: 0 8px 15px rgba(0,0,0,0.15) !important;
 }
 
-/* --- 2. MODO OSCURO (Detecta tu celular/PC) --- */
-@media (prefers-color-scheme: dark) {
-    .album-card {
-        background-color: #2b2b2b !important; 
-        border-color: #444444 !important;
-    }
-    
-    /* Apuntamos directamente al h6 para matar al text-dark */
-    .album-card h6.text-dark {
-        color: #ffffff !important; 
-    }
-    
-    /* Apuntamos directamente al small para matar al text-muted */
-    .album-card small.text-muted {
-        color: #cccccc !important; 
-    }
+/* Forzar que el texto sea oscuro en modo claro */
+.album-card h6, 
+.album-card small {
+    color: #212529 !important;
+    transition: color 0.3s ease;
 }
 
-/* --- 3. MODO OSCURO (Si usás un botón en tu página para cambiar el tema) --- */
-[data-bs-theme="dark"] .album-card {
-    background-color: #2b2b2b !important; 
-    border-color: #444444 !important;
+/* --- 2. MODO OSCURO (Con tu botón de la lunita) --- */
+body.modo-oscuro .album-card {
+    background-color: #1e1e1e !important; 
+    border-color: #333333 !important;
 }
 
-[data-bs-theme="dark"] .album-card h6.text-dark {
+body.modo-oscuro .album-card h6, 
+body.modo-oscuro .album-card small {
     color: #ffffff !important; 
-}
-
-[data-bs-theme="dark"] .album-card small.text-muted {
-    color: #cccccc !important; 
 }
 
 /* ===================================================

@@ -651,6 +651,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         body.modo-oscuro { background-color: #121212 !important; color: #e0e0e0 !important; }
+        body.modo-oscuro .texto { color: #e0e0e0 !important; }
         body.modo-oscuro a, body.modo-oscuro a:visited { color: #90caf9 !important; }
         body.modo-oscuro nav a, body.modo-oscuro .navbar a, body.modo-oscuro .nav-link, body.modo-oscuro .navbar-brand, body.modo-oscuro .dropdown-toggle { color: #ffffff !important; }
         body.modo-oscuro .card, body.modo-oscuro .list-group-item, body.modo-oscuro .btn, body.modo-oscuro a.btn, body.modo-oscuro .card a { color: #ffffff !important; }
