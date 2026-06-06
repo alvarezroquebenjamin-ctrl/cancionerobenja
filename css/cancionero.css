@@ -648,3 +648,22 @@ html, body {
 [data-bs-theme="dark"] .album-card small.text-muted {
     color: #cccccc !important; 
 }
+
+/* ===================================================
+   SUBTÍTULOS DE TONALIDAD
+   =================================================== */
+
+.subtitulo-tonalidad {
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
+    color: #212529 !important; /* Gris oscuro para el modo claro */
+    margin-top: -10px;
+    margin-bottom: 25px;
+    font-size: 0.9rem; /* <--- ACÁ MANEJÁS EL TAMAÑO */
+}
+
+/* El truco definitivo: engancharse a TU clase personalizada */
+body.modo-oscuro .subtitulo-tonalidad {
+    color: #ffffff !important; /* Blanco puro brillante */
+}

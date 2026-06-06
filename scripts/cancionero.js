@@ -1,3 +1,12 @@
+function limpiarTexto(texto) {
+    if (!texto) return ""; // Por si llega algún texto vacío
+    return texto
+        .toLowerCase() // 1. Pasa todo a minúsculas
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // 2. Saca los acentos
+        .replace(/[,.-]/g, "") // 3. Saca comas, puntos y guiones
+        .trim(); // 4. Saca los espacios de más en los bordes
+}
+
 // =============================================================================
 // 0. BASE DE DATOS DE CANCIONES (GLOBAL)
 // =============================================================================
@@ -43,7 +52,7 @@ window.canciones = {
         "Aleluya (cada palabra)": { ruta: "aleluya/aleluya-cada-palabra.html", tono: "MI", capo: 0 },
         "Aleluya (cantad alegres)": { ruta: "aleluya/aleluya-cantad-alegres.html", tono: "DO", capo: 0 },
         "Aleluya (común)": { ruta: "aleluya/aleluya-comun.html", tono: "LA", capo: 0 },
-        "Aleluya (cuaresma)": { ruta: "aleluya/aleluya-cuaresma.html", tono: "DO", capo: 0 },
+        "Aleluya (cuaresma)": { ruta: "aleluya/aleluya-cuaresma.html", tono: "LA", capo: 0 },
         "Aleluya (JLG)": { ruta: "aleluya/aleluya-jlg.html", tono: "SOL", capo: 0 },
         "Aleluya (yo soy el maestro)": { ruta: "aleluya/aleluya-yo-soy-el-maestro.html", tono: "MI", capo: 0 },
         "Te adoramos Cristo": { ruta: "aleluya/te-adoramos-cristo.html", tono: "LA", capo: 0 },
@@ -93,7 +102,7 @@ window.canciones = {
         "Caminando": { ruta: "comunion/caminando.html", tono: "LA", capo: 0 },
         "Camino, verdad y vida": { ruta: "comunion/camino-verdad-y-vida.html", tono: "DO", capo: 0 },
         "Cantaro niño": { ruta: "comunion/cantaro-niño.html", tono: "RE", capo: 0 },
-        "Cena de jueves": { ruta: "comunion/cena-de-jueves.html", tono: "FA", capo: 0 },
+        "Cena de jueves": { ruta: "comunion/cena-de-jueves.html", tono: "DO", capo: 0 },
         "Clarifica-te": { ruta: "comunion/clarifica-te.html", tono: "MI", capo: 0 },
         "Como antes, más que antes": { ruta: "comunion/como-antes-mas-que-antes.html", tono: "RE", capo: 0 },
         "Como un niño": { ruta: "comunion/como-un-niño.html", tono: "SOL", capo: 0 },
@@ -112,13 +121,13 @@ window.canciones = {
         "Enciende nuestra misión": { ruta: "comunion/enciende-nuestra-mision.html", tono: "MI", capo: 0 },
         "Eres": { ruta: "comunion/eres.html", tono: "SOL", capo: 4 },
         "Es aquí": { ruta: "comunion/es-aqui.html", tono: "RE", capo: 0 },
-        "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "SOL", capo: 0 },
+        "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "MI", capo: 0 },
         "Estandarte": { ruta: "comunion/estandarte.html", tono: "RE", capo: 0 },
         "Frente a ti": { ruta: "comunion/frente-a-ti.html", tono: "SOL", capo: 0 },
         "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
         "Hagase mi paz": { ruta: "comunion/hagase-mi-paz.html", tono: "MI", capo: 0 },
         "Hago nuevas todas las cosas": { ruta: "meditacion/hago-nuevas-todas-las-cosas.html", tono: "SOL", capo: 0 },
-        "Hasta que el mundo arda por El": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
+        "Hasta que el mundo arda por El": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "SOL", capo: 0 },
         "Hoy vivo": { ruta: "comunion/hoy-vivo.html", tono: "RE", capo: 2 },
         "Jesús y Pedro": { ruta: "comunion/jesus-y-pedro.html", tono: "DO", capo: 1 },
         "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
@@ -220,7 +229,7 @@ window.canciones = {
         "Esperanza": { ruta: "meditacion/esperanza.html", tono: "SOL", capo: 3 },
         "Espíritu Santo": { ruta: "espiritu-santo/espiritu-santo.html", tono: "RE", capo: 0 },
         "Espíritu desciende": { ruta: "espiritu-santo/espiritu-desciende.html", tono: "RE", capo: 0 },
-        "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "SOL", capo: 0 },
+        "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "MI", capo: 0 },
         "Estar con Él": { ruta: "meditacion/estar-con-el.html", tono: "SOL", capo: 0 },
         "Estate": { ruta: "meditacion/estate.html", tono: "SOL", capo: 0 },
         "Extiende tu mano": { ruta: "meditacion/extiende-tu-mano.html", tono: "DO", capo: 0 },
@@ -228,7 +237,7 @@ window.canciones = {
         "Ha sido largo el viaje": { ruta: "comunion/ha-sido-largo-el-viaje.html", tono: "MI", capo: 0 },
         "Hagase mi paz": { ruta: "comunion/hagase-mi-paz.html", tono: "MI", capo: 0 },
         "Hago nuevas todas las cosas": { ruta: "meditacion/hago-nuevas-todas-las-cosas.html", tono: "SOL", capo: 0 },
-        "Hasta que el mundo arda por El": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
+        "Hasta que el mundo arda por El": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "SOL", capo: 0 },
         "Haz llover": { ruta: "meditacion/haz-llover.html", tono: "DO", capo: 0 },
         "Haz llover x Que se abra el cielo": { ruta: "meditacion/haz-llover-x-que-se-abra-el-cielo.html", tono: "SOL", capo: 0 },
         "Hijo amado": { ruta: "meditacion/hijo-amado.html", tono: "SI", capo: 0 },
@@ -286,7 +295,7 @@ window.canciones = {
         "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
         "Sigueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
         "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 1 },
-        "Silencio en la cruz": { ruta: "comunion/silencio-en-la-cruz.html", tono: "SOL", capo: 0 },
+        "Silencio en la cruz": { ruta: "meditacion/silencio-en-la-cruz.html", tono: "SOL", capo: 0 },
         "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 },
         "Sobre el mar (Berit II)": { ruta: "comunion/sobre-el-mar-berit2.html", tono: "DO", capo: 0 },
         "Soledad": { ruta: "meditacion/soledad.html", tono: "LA", capo: 0 },
@@ -310,7 +319,7 @@ window.canciones = {
         "Tú, el único Rey": { ruta: "meditacion/tu-el-unico-rey.html", tono: "DO", capo: 0 },
         "Tu estás aquí / De tal manera": { ruta: "meditacion/tu-estas-aqui-de-tal-manera.html", tono: "SOL", capo: 0 },
         "Tu luz (Contigo + Feliz)": { ruta: "comunion/tu-luz.html", tono: "SOL", capo: 5 },
-        "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz.html", tono: "LA", capo: 2 },
+        "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz-signos-de-amor.html", tono: "LA", capo: 2 },
         "Tu modo": { ruta: "meditacion/tu-modo.html", tono: "LA", capo: 0 },
         "Tu voluntad": { ruta: "meditacion/tu-voluntad.html", tono: "LA", capo: 0 },
         "Tu voluntad (Servus Mariae)": { ruta: "meditacion/tu-voluntad-servus.html", tono: "SI", capo: 0 },
@@ -354,7 +363,7 @@ window.canciones = {
         "Dios te salve": { ruta: "salida/dios-te-salve.html", tono: "SOL", capo: 0 },
         "El diario de María": { ruta: "marianos/el-diario-de-maria.html", tono: "LA", capo: 0 },
         "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL", capo: 0 },
-        "Hasta que el mundo arda por Él": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
+        "Hasta que el mundo arda por Él": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "SOL", capo: 0 },
         "Junto a ti María": { ruta: "salida/junto-a-ti-maria.html", tono: "RE", capo: 0 },
         "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
         "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
@@ -480,7 +489,7 @@ window.canciones = {
         "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
         "Sígueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
         "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 1 },
-        "Silencio en la cruz": { ruta: "comunion/silencio-en-la-cruz.html", tono: "SOL", capo: 0 },
+        "Silencio en la cruz": { ruta: "meditacion/silencio-en-la-cruz.html", tono: "SOL", capo: 0 },
         "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 },
         "Sobre el mar (Berit II)": { ruta: "comunion/sobre-el-mar-berit2.html", tono: "DO", capo: 0 },
         "Soledad": { ruta: "meditacion/soledad.html", tono: "LA", capo: 0 },
@@ -498,7 +507,7 @@ window.canciones = {
         "Transformación en Pentecostés": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 2 },
         "Tú, el único Rey": { ruta: "meditacion/tu-el-unico-rey.html", tono: "DO", capo: 0 },
         "Tu estás aquí / De tal manera": { ruta: "meditacion/tu-estas-aqui-de-tal-manera.html", tono: "SOL", capo: 0 },
-        "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz.html", tono: "LA", capo: 2 },
+        "Tu luz (Signos de amor)": { ruta: "meditacion/tu-luz-signos-de-amor.html", tono: "LA", capo: 2 },
         "Tu voluntad (Servus Mariae)": { ruta: "meditacion/tu-voluntad-servus.html", tono: "SI", capo: 0 },
         "Velad por mi": { ruta: "meditacion/velad-por-mi.html", tono: "SOL", capo: 0 },
         "Ven Espíritu de amor": { ruta: "espiritu-santo/ven-espiritu-de-amor.html", tono: "RE", capo: 0 },
@@ -510,7 +519,7 @@ window.canciones = {
         "Alzar banderas": { ruta: "comunion/alzar-banderas.html", tono: "DO", capo: 0 },
         "Corazón de Fuego": { ruta: "jm/corazon-de-fuego.html", tono: "MI", capo: 0 },
         "Estandarte": { ruta: "comunion/estandarte.html", tono: "RE", capo: 0 },
-        "Hasta que el mundo arda por Él": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "LA", capo: 0 },
+        "Hasta que el mundo arda por Él": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "SOL", capo: 0 },
         "Herencia (José Engling)": { ruta: "jm/herencia.html", tono: "DO", capo: 0 },
         "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
         "Mi 110%": { ruta: "meditacion/mi-110.html", tono: "FA", capo: 0 },
@@ -834,7 +843,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         }
-        todasLasCanciones.sort((a, b) => a.t.localeCompare(b.t));
+        todasLasCanciones.sort((a, b) => a.t.localeCompare(b.t, undefined, { numeric: true, sensitivity: 'base' }));
         playlist = todasLasCanciones;
     } else {
         for (const [nombreSeccion, cancionesDeSeccion] of Object.entries(window.canciones)) {
@@ -932,7 +941,9 @@ function filtrarGlobal() {
     if(!input || !contenedor) return;
 
     var enlaces = contenedor.getElementsByTagName("a");
-    var filtro = input.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    
+    // ACÁ APLICAMOS LA MAGIA AL TEXTO QUE ESCRIBE EL USUARIO
+    var filtro = limpiarTexto(input.value);
 
     if (filtro.length === 0) { contenedor.style.display = "none"; return; } 
     else { contenedor.style.display = "block"; }
@@ -941,7 +952,9 @@ function filtrarGlobal() {
         var texto = enlaces[i].textContent || enlaces[i].innerText;
         var letra = enlaces[i].getAttribute("data-letra") || ""; 
         var textoCompleto = texto + " " + letra;
-        if (textoCompleto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().indexOf(filtro) > -1) {
+        
+        // ACÁ APLICAMOS LA MAGIA AL NOMBRE DE LA CANCIÓN Y COMPARAMOS
+        if (limpiarTexto(textoCompleto).indexOf(filtro) > -1) {
             enlaces[i].style.display = ""; 
         } else {
             enlaces[i].style.display = "none"; 
