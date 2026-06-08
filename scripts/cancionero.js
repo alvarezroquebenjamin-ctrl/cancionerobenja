@@ -6,7 +6,32 @@ function limpiarTexto(texto) {
         .replace(/[,.-]/g, "") // 3. Saca comas, puntos y guiones
         .trim(); // 4. Saca los espacios de más en los bordes
 }
-
+/* ===================================================
+   AUTOCORRECTOR GLOBAL DE LINKS (Secciones y Álbumes)
+   =================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+    const tituloH1 = document.querySelector("h1");
+    const linksCanciones = document.querySelectorAll("a.btn-outline-primary");
+    
+    if (tituloH1 && linksCanciones.length > 0) {
+        let nombreSeccion = tituloH1.innerText.trim();
+        
+        // LIMPIEZA DE TÍTULO: Ataja "Cantos de " y "Cantos "
+        if (nombreSeccion.startsWith("Cantos de ")) {
+            nombreSeccion = nombreSeccion.replace("Cantos de ", "");
+        } else if (nombreSeccion.startsWith("Cantos ")) {
+            nombreSeccion = nombreSeccion.replace("Cantos ", "");
+        }
+        
+        linksCanciones.forEach(link => {
+            const hrefOriginal = link.getAttribute("href");
+            
+            if (hrefOriginal && hrefOriginal.includes(".html") && !hrefOriginal.includes("?seccion=")) {
+                link.setAttribute("href", `${hrefOriginal}?seccion=${encodeURIComponent(nombreSeccion)}`);
+            }
+        });
+    }
+});
 // =============================================================================
 // 0. BASE DE DATOS DE CANCIONES (GLOBAL)
 // =============================================================================
@@ -121,6 +146,7 @@ window.canciones = {
         "Enciende nuestra misión": { ruta: "comunion/enciende-nuestra-mision.html", tono: "MI", capo: 0 },
         "Eres": { ruta: "comunion/eres.html", tono: "SOL", capo: 4 },
         "Es aquí": { ruta: "comunion/es-aqui.html", tono: "RE", capo: 0 },
+        "Esclava de mi salvador": { ruta: "comunion/esclava-de-mi-salvador.html", tono: "RE", capo: 2 },
         "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "MI", capo: 0 },
         "Estandarte": { ruta: "comunion/estandarte.html", tono: "RE", capo: 0 },
         "Frente a ti": { ruta: "comunion/frente-a-ti.html", tono: "SOL", capo: 0 },
@@ -142,7 +168,7 @@ window.canciones = {
         "No hay amor más grande": { ruta: "comunion/no-hay-amor-mas-grande.html", tono: "DO", capo: 0 },
         "No temas": { ruta: "comunion/no-temas.html", tono: "MI", capo: 2 },
         "Nuestra alianza": { ruta: "comunion/nuestra-alianza.html", tono: "MI", capo: 0 },
-        "Para que todos tengan vida": { ruta: "comunion/para-que-todos-tengan-vida.html", tono: "DO", capo: 0 },
+        "Para que todos tengan vida": { ruta: "comunion/para-que-todos-tengan-vida.html", tono: "FA", capo: 0 },
         "Pasión que transforma": { ruta: "comunion/pasion-que-transforma.html", tono: "RE", capo: 0 },
         "Perfume A Tus Pies": { ruta: "comunion/perfume-a-tus-pies.html", tono: "MI", capo: 0 },
         "Pescador de hombres": { ruta: "comunion/pescador-de-hombres.html", tono: "DO", capo: 0 },
@@ -303,7 +329,7 @@ window.canciones = {
         "Solo Tú": { ruta: "meditacion/solo-tu.html", tono: "SOL", capo: 1 },
         "Sopla": { ruta: "meditacion/sopla.html", tono: "RE", capo: 0 },
         "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 },
-        "Su canto": { ruta: "meditacion/su-canto.html", tono: "LA", capo: 0 },
+        "Su canto": { ruta: "meditacion/su-canto.html", tono: "RE", capo: 2 },
         "Subido al sicomoro": { ruta: "meditacion/subido-al-sicomoro.html", tono: "RE", capo: 0 },
         "Supe que me amabas": { ruta: "meditacion/supe-que-me-amabas.html", tono: "LA", capo: 0 },
         "Surge valentía": { ruta: "meditacion/surge-valentia.html", tono: "SOL", capo: 0 },
@@ -376,11 +402,11 @@ window.canciones = {
         "María Vai": { ruta: "comunion/maria-vai.html", tono: "DO", capo: 0 },
         "Nuestra Alianza": { ruta: "comunion/nuestra-alianza.html", tono: "MI", capo: 0 },
         "Oración de consagración": { ruta: "marianos/oracion-de-consagracion.html", tono: "SOL", capo: 0 },
-        "Para que todos tengan vida": { ruta: "comunion/para-que-todos-tengan-vida.html", tono: "DO", capo: 0 },
+        "Para que todos tengan vida": { ruta: "comunion/para-que-todos-tengan-vida.html", tono: "FA", capo: 0 },
         "Reina de mi corazón": { ruta: "salida/reina-de-mi-corazon.html", tono: "RE", capo: 0 },
         "Reina y Madre": { ruta: "marianos/reina-y-madre.html", tono: "SOL", capo: 0 },
         "Se llama María": { ruta: "marianos/se-llama-maria.html", tono: "DO", capo: 0 },
-        "Su canto": { ruta: "meditacion/su-canto.html", tono: "LA", capo: 0 },
+        "Su canto": { ruta: "meditacion/su-canto.html", tono: "RE", capo: 2 },
         "Tu amor": { ruta: "comunion/tu-amor.html", tono: "LA", capo: 0 }
     },
     "Envío": {
@@ -532,6 +558,293 @@ window.canciones = {
     "JF":{
         "Generación fundadora": {ruta:"jf/generacion-fundadora.html", tono: "SOL", capo: 0 },
         "Talita Kum": {ruta:"jf/talita-kum.html", tono: "DO", capo: 0 }
+    },
+    "Tierra Nueva de la Trinidad": {
+        "Siempre has sido tú": { ruta: "meditacion/siempre-has-sido-tu.html", tono: "LA", capo: 0 },
+        "Agradecimiento": { ruta: "tierra-nueva-de-la-trinidad/agradecimiento.html", tono: "RE", capo: 0 },
+        "Señor de mi barca": { ruta: "tierra-nueva-de-la-trinidad/señor-de-mi-barca.html", tono: "RE", capo: 0 },
+        "Cristo del calvario": { ruta: "tierra-nueva-de-la-trinidad/cristo-del-calvario.html", tono: "RE", capo: 2 },
+        "Hacia Ti": { ruta: "tierra-nueva-de-la-trinidad/hacia-ti.html", tono: "RE", capo: 0 },
+        "Estás dentro de mí": { ruta: "tierra-nueva-de-la-trinidad/estas-dentro-de-mi.html", tono: "LA", capo: 0 },
+        "Espíritu Santo (Hacia el Padre)": { ruta: "tierra-nueva-de-la-trinidad/espiritu-santo-hacia-el-padre.html", tono: "RE", capo: 0 },
+        "Tierra nueva de la trinidad": { ruta: "tierra-nueva-de-la-trinidad/tierra-nueva-de-la-trinidad.html", tono: "LA", capo: 0 },
+        "Quien me quiera seguir": { ruta: "tierra-nueva-de-la-trinidad/quien-me-quiera-seguir.html", tono: "DO", capo: 2 },
+        "Confío (En tu poder y en tu bondad)": { ruta: "tierra-nueva-de-la-trinidad/confio.html", tono: "RE", capo: 0 },
+        "Madre, aquí estoy": { ruta: "tierra-nueva-de-la-trinidad/madre-aqui-estoy.html", tono: "RE", capo: 0 },
+        "María de la Alianza": { ruta: "salida/maria-de-la-alianza.html", tono: "LA", capo: 1 },
+        "Solo basta Dios": { ruta: "tierra-nueva-de-la-trinidad/solo-basta-dios.html", tono: "RE", capo: 0 },
+        "Por ti, hija de Sion": { ruta: "tierra-nueva-de-la-trinidad/por-ti-hija-de-sion.html", tono: "DO", capo: 0 }
+    },
+    "Quiero Construirte una Casa Señor": {
+        "Quiero construirte una casa, Señor": { ruta: "quiero-construirte-una-casa-señor/quiero-construirte-una-casa-señor.html", tono: "LA", capo: 0 },
+        "Desierto": { ruta: "quiero-construirte-una-casa-señor/desierto.html", tono: "SOL", capo: 0 },
+        "Quien eres tú": { ruta: "quiero-construirte-una-casa-señor/quien-eres-tu.html", tono: "DO", capo: 0 },
+        "Madre aquí estoy": { ruta: "quiero-construirte-una-casa-señor/madre-aqui-estoy-qcucs.html", tono: "LA", capo: 3 },
+        "Mi Señor, mi Dios": { ruta: "quiero-construirte-una-casa-señor/mi-señor-mi-dios.html", tono: "LA", capo: 3 },
+        "Ofrenda (Trilla y Vendimia)": { ruta: "quiero-construirte-una-casa-señor/ofrenda.html", tono: "DO", capo: 0 },
+        "Venid a mi": { ruta: "quiero-construirte-una-casa-señor/venid-a-mi.html", tono: "LA", capo: 3 },
+        "Siervo de Dios": { ruta: "quiero-construirte-una-casa-señor/siervo-de-dios.html", tono: "RE", capo: 0 },
+        "Ven y verás": { ruta: "quiero-construirte-una-casa-señor/ven-y-veras.html", tono: "SOL", capo: 0 },
+        "Pasas Madre": { ruta: "quiero-construirte-una-casa-señor/pasas-madre.html", tono: "DO", capo: 0 },
+        "Encuentro": { ruta: "quiero-construirte-una-casa-señor/encuentro.html", tono: "MI", capo: 1 },
+        "Con la vuelta del Sol": { ruta: "quiero-construirte-una-casa-señor/con-la-vuelta-del-sol.html", tono: "DO", capo: 1 },
+        "Pastor y Cordero": { ruta: "quiero-construirte-una-casa-señor/pastor-y-cordero.html", tono: "RE", capo: 2 },
+        "Si pudiera": { ruta: "quiero-construirte-una-casa-señor/si-pudiera.html", tono: "MI", capo: 0 }
+    },
+    "Hoy Quiero Cantarte": {
+        "Alza mi paz": { ruta: "comunion/alza-mi-paz.html", tono: "DO", capo: 0 },
+        "Tu canto": { ruta: "hoy-quiero-cantarte/tu-canto.html", tono: "DO", capo: 0 },
+        "Brille tu luz Señor": { ruta: "hoy-quiero-cantarte/brille-tu-luz-señor.html", tono: "RE", capo: 0 },
+        "Que el fuego se transforme": { ruta: "hoy-quiero-cantarte/que-el-fuego-se-transforme.html", tono: "RE", capo: 0 },
+        "Vivir en ti": { ruta: "hoy-quiero-cantarte/vivir-en-ti.html", tono: "DO", capo: 1 },
+        "Esperaban en Jerusalén": { ruta: "hoy-quiero-cantarte/esperaban-en-jerusalen.html", tono: "FA", capo: 0 },
+        "Señor de mis silencios": { ruta: "hoy-quiero-cantarte/señor-de-mis-silencios.html", tono: "LA", capo: 3 },
+        "María de la trinidad": { ruta: "hoy-quiero-cantarte/maria-de-la-trinidad.html", tono: "RE", capo: 2 },
+        "De mi vida eres el sol": { ruta: "hoy-quiero-cantarte/de-mi-vida-eres-el-sol.html", tono: "RE", capo: 2 },
+        "Primera misionera": { ruta: "hoy-quiero-cantarte/primera-misionera.html", tono: "DO", capo: 0 },
+        "Regreso": { ruta: "hoy-quiero-cantarte/regreso.html", tono: "SOL", capo: 0 },
+        "Transforma mi casa en tu hogar": { ruta: "meditacion/transforma-mi-casa-en-tu-hogar.html", tono: "RE", capo: 0 },
+        "Quiero decir tu nombre": { ruta: "hoy-quiero-cantarte/quiero-decir-tu-nombre.html", tono: "MI", capo: 1 },
+        "Buenas noches Padre Dios": { ruta: "hoy-quiero-cantarte/buenas-noches-padre-dios.html", tono: "LA", capo: 0 }
+    },
+    "Santuario Corazón": {
+        "Para darlo a los demás": { ruta: "ofertorio/para-darlo-a-los-demas.html", tono: "RE", capo: 0 },
+        "Amanecer": { ruta: "meditacion/amanecer.html", tono: "FA", capo: 0 },
+        "Amén del Padre": { ruta: "santuario-corazon/amen-del-padre.html", tono: "SOL", capo: 0 },
+        "Argentina nos necesita": { ruta: "santuario-corazon/argentina-nos-necesita.html", tono: "SOL", capo: 0 },
+        "En tus manos": { ruta: "santuario-corazon/en-tus-manos.html", tono: "DO", capo: 0 },
+        "Deja que nazca": { ruta: "entrada/deja-que-nazca.html", tono: "MI", capo: 0 },
+        "No mueras hermano": { ruta: "meditacion/no-mueras-hermano.html", tono: "SOL", capo: 0 },
+        "Espíritu conquistado": { ruta: "santuario-corazon/espiritu-conquistado.html", tono: "RE", capo: 0 },
+        "Ave imperatrix": { ruta: "santuario-corazon/ave-imperatrix.html", tono: "SOL", capo: 0 },
+        "Jardín oculto": { ruta: "santuario-corazon/jardin-oculto.html", tono: "LA", capo: 0 },
+        "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 },
+        "Cayado de amor": { ruta: "meditacion/cayado-de-amor.html", tono: "DO", capo: 0 }
+    },
+    "Como un Niño": {
+        "Bendita eres Madre": { ruta: "como-un-niño/bendita-eres-madre.html", tono: "DO", capo: 2 },
+        "En ti": { ruta: "meditacion/en-ti.html", tono: "SOL", capo: 0 },
+        "Es el Señor": { ruta: "como-un-niño/es-el-señor.html", tono: "MI", capo: 0 },
+        "Haz que el sol de Cristo": { ruta: "como-un-niño/haz-que-el-sol-de-cristo.html", tono: "LA", capo: 0 },
+        "Por tu pureza": { ruta: "como-un-niño/por-tu-pureza.html", tono: "DO", capo: 2 },
+        "Lázaro": { ruta: "como-un-niño/lazaro.html", tono: "RE", capo: 2 },
+        "Rema": { ruta: "como-un-niño/rema.html", tono: "DO", capo: 4 },
+        "Canción de Elías": { ruta: "como-un-niño/cancion-de-elias.html", tono: "SOL", capo: 2 },
+        "Amar": { ruta: "como-un-niño/amar.html", tono: "SOL", capo: 0 },
+        "Mi buen pastor": { ruta: "como-un-niño/mi-buen-pastor.html", tono: "DO", capo: 2 },
+        "Por ti con alegría": { ruta: "como-un-niño/por-ti-con-alegria.html", tono: "MI", capo: 0 },
+        "Te adoro con fe": { ruta: "como-un-niño/te-adoro-con-fe.html", tono: "MI", capo: 2 },
+        "Lo nuestro": { ruta: "como-un-niño/lo-nuestro.html", tono: "SOL", capo: 0 },
+        "Al caer la tarde": { ruta: "como-un-niño/al-caer-la-tarde.html", tono: "LA", capo: 0 },
+        "Mar adentro": { ruta: "como-un-niño/mar-adentro-cun.html", tono: "RE", capo: 2 },
+        "Hijos": { ruta: "como-un-niño/hijos.html", tono: "RE", capo: 0 },
+        "Asemejanos a ti": { ruta: "como-un-niño/asemejanos-a-ti.html", tono: "RE", capo: 0 },
+        "Vuela": { ruta: "como-un-niño/vuela.html", tono: "RE", capo: 0 },
+        "Padre nuestro": { ruta: "como-un-niño/padre-nuestro.html", tono: "RE", capo: 2 },
+        "Como un niño": { ruta: "comunion/como-un-niño.html", tono: "SOL", capo: 0 }
+    },
+    "Porta": {
+        "Más allá del mar": { ruta: "comunion/mas-alla-del-mar.html", tono: "MI", capo: 0 },
+        "De una historia entre dos": { ruta: "porta/de-una-historia-entre-dos.html", tono: "DO", capo: 0 },
+        "Será Dios": { ruta: "comunion/sera-dios.html", tono: "SOL", capo: 0 },
+        "Alzar banderas": { ruta: "comunion/alzar-banderas.html", tono: "DO", capo: 0 },
+        "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2 },
+        "Soñar": { ruta: "comunion/soñar.html", tono: "MI", capo: 0 },
+        "Confia": { ruta: "porta/confia.html", tono: "LA", capo: 1 },
+        "Ego Paulus": { ruta: "comunion/ego-paulus.html", tono: "SOL", capo: 0 },
+        "Entrega": { ruta: "porta/entrega.html", tono: "SOL", capo: 0 },
+        "María, luz de esperanza": { ruta: "porta/maria-luz-de-esperanza.html", tono: "FA", capo: 0 },
+        "Estamos aquí": { ruta: "comunion/estamos-aqui.html", tono: "MI", capo: 0 },
+        "Contigo María": { ruta: "porta/contigo-maria.html", tono: "RE", capo: 0 }
+    },
+    "Ciudad Multicor": {
+        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
+        "Tu amor": { ruta: "comunion/tu-amor.html", tono: "LA", capo: 0 },
+        "Te vuelvo a entregar": { ruta: "ciudad-multicor/te-vuelvo-a-entregar.html", tono: "DO", capo: 0 },
+        "Cena de jueves": { ruta: "comunion/cena-de-jueves.html", tono: "DO", capo: 0 },
+        "Brother to brother": { ruta: "ciudad-multicor/brother-to-brother.html", tono: "LA", capo: 0 },
+        "Cristo Rey": { ruta: "meditacion/cristo-rey.html", tono: "RE", capo: 2 },
+        "Alimento que da vida": { ruta: "ofertorio/alimento-que-da-vida.html", tono: "RE", capo: 2 },
+        "Cuerdas de barro": { ruta: "ciudad-multicor/cuerdas-de-barro.html", tono: "LA", capo: 0 },
+        "Vivir": { ruta: "ciudad-multicor/vivir.html", tono: "RE", capo: 0 },
+        "Kurahy Ose Jevy (El sol vuelve a alumbrar)": { ruta: "ciudad-multicor/kuarahy-ose-jevy.html", tono: "SOL", capo: 0 },
+        "Abriendo el sol": { ruta: "ciudad-multicor/abriendo-el-sol.html", tono: "LA", capo: 0 },
+        "No hay amor más grande": { ruta: "comunion/no-hay-amor-mas-grande.html", tono: "DO", capo: 0 },
+        "María Madre": { ruta: "comunion/maria-madre.html", tono: "MI", capo: 0 },
+        "Estandarte": { ruta: "comunion/estandarte.html", tono: "RE", capo: 0 },
+        "Sião Multicor": { ruta: "ciudad-multicor/siao-multicor.html", tono: "MI", capo: 0 }
+    },
+    "En Tus Ojos": {
+        "Avanza Reina": { ruta: "salida/avanza-reina.html", tono: "RE", capo: 2 },
+        "Quiero cantar": { ruta: "en-tus-ojos/quiero-cantar.html", tono: "LA", capo: 0 },
+        "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL", capo: 0 },
+        "Movimiento": { ruta: "en-tus-ojos/movimiento.html", tono: "DO", capo: 0 },
+        "De tu mano": { ruta: "en-tus-ojos/de-tu-mano.html", tono: "SOL", capo: 0 },
+        "Mi alianza de amor": { ruta: "en-tus-ojos/mi-alianza-de-amor.html", tono: "RE", capo: 0 },
+        "Navegar la barca": { ruta: "en-tus-ojos/navegar-la-barca.html", tono: "LA", capo: 0 },
+        "Mirarán al que traspasaron": { ruta: "en-tus-ojos/miraran-al-que-traspasaron.html", tono: "LA", capo: 0 },
+        "En ti Señor": { ruta: "en-tus-ojos/en-ti-señor.html", tono: "SOL", capo: 0 },
+        "La fuerza en ti": { ruta: "en-tus-ojos/la-fuerza-en-ti.html", tono: "RE", capo: 0 },
+        "Quédate": { ruta: "en-tus-ojos/quedate.html", tono: "MI", capo: 0 },
+        "Reina de la misión": { ruta: "en-tus-ojos/reina-de-la-mision.html", tono: "FA", capo: 0 }
+    },
+    "Queda Entre Nosotros": {
+        "Misioneros": { ruta: "salida/misioneros.html", tono: "LA", capo: 0 },
+        "Somos JM, somos iglesia": { ruta: "comunion/somos-jm-somos-iglesia.html", tono: "SOL", capo: 0 },
+        "Por un solo momento": { ruta: "meditacion/por-un-solo-momento.html", tono: "DO", capo: 0 },
+        "Corazón + ancho": { ruta: "queda-entre-nosotros/corazon-+-ancho.html", tono: "DO", capo: 3 },
+        "De Cirene": { ruta: "comunion/de-cirene.html", tono: "LA", capo: 3 },
+        "Cántaro niño": { ruta: "comunion/cantaro-niño.html", tono: "RE", capo: 0 },
+        "Nuevas playas": { ruta: "queda-entre-nosotros/nuevas-playas.html", tono: "MI", capo: 0 },
+        "Después de caer": { ruta: "comunion/despues-de-caer.html", tono: "LA", capo: 1 },
+        "Subido al sicomoro": { ruta: "meditacion/subido-al-sicomoro.html", tono: "RE", capo: 0 },
+        "Todavía una vez más": { ruta: "queda-entre-nosotros/todavia-una-vez-mas.html", tono: "RE", capo: 0 },
+        "Herencia (José Engling)": { ruta: "jm/herencia.html", tono: "DO", capo: 0 }
+    },
+    "Para Darlo a los Demás": {
+        "Para darlo a los demás": { ruta: "ofertorio/para-darlo-a-los-demas.html", tono: "RE", capo: 0 },
+        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
+        "Tu amor": { ruta: "comunion/tu-amor.html", tono: "LA", capo: 0 },
+        "Amanecer": { ruta: "meditacion/amanecer.html", tono: "FA", capo: 0 },
+        "Cena de jueves": { ruta: "comunion/cena-de-jueves.html", tono: "DO", capo: 0 },
+        "No mueras hermano": { ruta: "meditacion/no-mueras-hermano.html", tono: "SOL", capo: 0 },
+        "Cristo Rey": { ruta: "meditacion/cristo-rey.html", tono: "RE", capo: 2 },
+        "En tus manos": { ruta: "santuario-corazon/en-tus-manos.html", tono: "", capo: 0 },
+        "Cayado de amor": { ruta: "meditacion/cayado-de-amor.html", tono: "DO", capo: 0 },
+        "María Madre": { ruta: "comunion/maria-madre.html", tono: "MI", capo: 0 },
+        "Argentina nos necesita": { ruta: "santuario-corazon/argentina-nos-necesita.html", tono: "", capo: 0 },
+        "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 },
+        "Deja que nazca": { ruta: "entrada/deja-que-nazca.html", tono: "MI", capo: 0 },
+        "Estandarte": { ruta: "comunion/estandarte.html", tono: "RE", capo: 0 }
+    },
+    "Tiempo de Alianza": {
+        "Reina y Madre": { ruta: "marianos/reina-y-madre.html", tono: "SOL", capo: 0 },
+        "Apareces": { ruta: "comunion/apareces.html", tono: "DO", capo: 0 },
+        "Frente a ti": { ruta: "comunion/frente-a-ti.html", tono: "SOL", capo: 0 },
+        "Caminho de eternidade": { ruta: "meditacion/caminho-de-eternidade.html", tono: "RE", capo: 0 },
+        "En manos del Padre": { ruta: "tiempo-de-alianza/en-manos-del-padre.html", tono: "", capo: 0 },
+        "Milagro en el Jordán": { ruta: "tiempo-de-alianza/milagro-en-el-jordan.html", tono: "", capo: 0 },
+        "Acuérdate de mí": { ruta: "comunion/acuerdate-de-mi.html", tono: "LA", capo: 0 },
+        "Mi entrega a ti": { ruta: "meditacion/mi-entrega-a-ti.html", tono: "RE", capo: 0 },
+        "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
+        "Apóstol de Jesucristo": { ruta: "meditacion/apostol-de-jesucristo.html", tono: "LA", capo: 0 },
+        "Caminando": { ruta: "comunion/caminando.html", tono: "LA", capo: 0 },
+        "Tu voz": { ruta: "tiempo-de-alianza/tu-voz.html", tono: "", capo: 0 },
+        "Labor del Apóstol": { ruta: "comunion/labor-del-apostol.html", tono: "DO", capo: 0 },
+        "Sin fronteras": { ruta: "comunion/sin-fronteras.html", tono: "SOL", capo: 0 },
+        "Sé en quién he puesto mi confianza": { ruta: "comunion/se-en-quien-he-puesto-mi-confianza.html", tono: "MI", capo: 0 }
+    },
+    "Contigo + Feliz": {
+        "Ya es hora": { ruta: "comunion/ya-es-hora.html", tono: "SOL", capo: 1 },
+        "Sabes que te quiero": { ruta: "contigo-+-feliz/sabes-que-te-quiero.html", tono: "MI", capo: 3 },
+        "En tu misericordia": { ruta: "meditacion/en-tu-misericordia.html", tono: "RE", capo: 0 },
+        "Esclava de mi salvador": { ruta: "comunion/esclava-de-mi-salvador.html", tono: "RE", capo: 2 },
+        "María de los campos": { ruta: "contigo-+-feliz/maria-de-los-campos.html", tono: "LA", capo: 3 },
+        "Mais feliz": { ruta: "contigo-+-feliz/mais-feliz.html", tono: "RE", capo: 0 },
+        "Quiero ser tu amigo Jesucristo": { ruta: "comunion/quiero-ser-tu-amigo-jesucristo.html", tono: "SOL", capo: 0 },
+        "Vem Maria com tua cor": { ruta: "contigo-+-feliz/vem-maria-com-tua-cor.html", tono: "RE", capo: 3 },
+        "Barro soy": { ruta: "meditacion/barro-soy.html", tono: "RE", capo: 0 },
+        "Surge valentía": { ruta: "meditacion/surge-valentia.html", tono: "SOL", capo: 0 },
+        "Mais longe": { ruta: "comunion/mais-longe.html", tono: "SOL", capo: 0 },
+        "María Vai": { ruta: "comunion/maria-vai.html", tono: "SO", capo: 0 },
+        "Sígueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
+        "Clarifica-te": { ruta: "comunion/clarifica-te.html", tono: "MI", capo: 0 },
+        "Tu luz": { ruta: "comunion/tu-luz.html", tono: "SOL", capo: 5 }
+    },
+    "Nos Junta el Sol": {
+        "El pulso de Dios": { ruta: "entrada/el-pulso-de-dios.html", tono: "MI", capo: 1 },
+        "Hágase mi paz": { ruta: "comunion/hagase-mi-paz.html", tono: "MI", capo: 0 },
+        "Quédate Señor": { ruta: "comunion/quedate-señor.html", tono: "DO", capo: 0 }
+    },
+    "JM Argentina": {
+        "Vida en abundancia": { ruta: "comunion/vida-en-abundancia.html", tono: "MI", capo: 0 },
+        "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2 },
+        "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 },
+        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
+        "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
+        "Oración de Franz Reinisch": { ruta: "jm/oracion-de-franz-reinisch.html", tono: "SOL", capo: 0 }
+    },
+    "¡Vive Dios!": {
+        "Abre": { ruta: "comunion/abre.html", tono: "LA", capo: 0 },
+        "Resplandor del sol eterno": { ruta: "vive-dios/resplandor-del-sol-eterno.html", tono: "SOL", capo: 0 },
+        "Mi alma descansa en ti": { ruta: "meditacion/mi-alma-descansa-en-ti.html", tono: "LA", capo: 0 },
+        "Fica conosco": { ruta: "vive-dios/fica-conosco.html", tono: "DO", capo: 1 },
+        "¿Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 0 },
+        "Más allá": { ruta: "vive-dios/mas-alla.html", tono: "SOL", capo: 0 },
+        "Permanecer en ti": { ruta: "meditacion/permanecer-en-ti.html", tono: "SOL", capo: 0 },
+        "Fado ao amigo": { ruta: "vive-dios/fado-ao-amigo.html", tono: "MI", capo: 2 },
+        "Vuelve a mí": { ruta: "meditacion/vuelve-a-mi.html", tono: "SOL", capo: 2 },
+        "Forevermore": { ruta: "vive-dios/forevermore.html", tono: "DO", capo: 2 },
+        "Para que todos tengan vida": { ruta: "comunion/para-que-todos-tengan-vida.html", tono: "FA", capo: 0 },
+        "Nuestra fe en tu amor": { ruta: "ofertorio/nuestra-fe-en-tu-amor.html", tono: "SOL", capo: 0 },
+        "Mãe da confiança": { ruta: "vive-dios/mae-da-confianca.html", tono: "SOL", capo: 0 },
+        "Ven Jesús": { ruta: "vive-dios/ven-jesus.html", tono: "SOL", capo: 2 },
+        "Me llamaste amigo": { ruta: "meditacion/me-llamaste-amigo.html", tono: "DO", capo: 3 },
+        "And we go": { ruta: "vive-dios/and-we-go.html", tono: "SOL", capo: 6 },
+        "Ahí vino Jesús": { ruta: "vive-dios/ahi-vino-jesus.html", tono: "SOL", capo: 0 },
+        "María, te quiero cantar": { ruta: "vive-dios/maria-te-quiero-cantar.html", tono: "MI", capo: 0 }
+    },
+    "Berit I": {
+        "Sígueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
+        "Quiero ser tu amigo Jesucristo": { ruta: "comunion/quiero-ser-tu-amigo-jesucristo.html", tono: "SOL", capo: 0 },
+        "Renuévanos Señor": { ruta: "berit-1/renuevanos-señor.html", tono: "MI", capo: 0 },
+        "Señor de la paz": { ruta: "meditacion/señor-de-la-paz.html", tono: "RE", capo: 0 },
+        "Nuestra alianza": { ruta: "comunion/nuestra-alianza.html", tono: "MI", capo: 0 },
+        "Jesús en Ti confío": { ruta: "berit-1/jesus-en-ti-confio.html", tono: "RE", capo: 1 },
+        "Si quieres te acompaño en el camino": { ruta: "comunion/si-quieres-te-acompaño-en-el-camino.html", tono: "DO", capo: 0 },
+        "Surge valentía": { ruta: "meditacion/surge-valentia.html", tono: "SOL", capo: 0 },
+        "También hoy": { ruta: "meditacion/tambien-hoy.html", tono: "DO", capo: 3 },
+        "Ven y verás": { ruta: "meditacion/ven-y-veras.html", tono: "DO", capo: 0 },
+        "Vivir amando": { ruta: "meditacion/vivir-amando.html", tono: "RE", capo: 0 },
+        "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 }
+    },
+    "Berit II": {
+        "Jesús (Berit II)": { ruta: "meditacion/jesus-berit2.html", tono: "DO", capo: 0 },
+        "Oración de confianza": { ruta: "meditacion/oracion-de-confianza.html", tono: "DO", capo: 0 },
+        "El sale a tu encuentro": { ruta: "comunion/el-sale-a-tu-encuentro.html", tono: "MI", capo: 0 },
+        "Hago nuevas todas las cosas": { ruta: "meditacion/hago-nuevas-todas-las-cosas.html", tono: "SOL", capo: 0 },
+        "Stay": { ruta: "berit-2/stay.html", tono: "MI", capo: 2 },
+        "De Cirene": { ruta: "comunion/de-cirene.html", tono: "LA", capo: 3 },
+        "Sobre el mar": { ruta: "comunion/sobre-el-mar-berit2.html", tono: "DO", capo: 0 },
+        "Verás cosas mayores": { ruta: "meditacion/veras-cosas-mayores.html", tono: "DO", capo: 5 },
+        "Arde": { ruta: "meditacion/arde.html", tono: "RE", capo: 0 },
+        "Te estaba esperando": { ruta: "comunion/te-estaba-esperando.html", tono: "DO", capo: 0 },
+        "Te veo": { ruta: "comunion/te-veo.html", tono: "DO", capo: 0 },
+        "La luz de Jesús": { ruta: "meditacion/la-luz-de-jesus.html", tono: "DO", capo: 0 }
+    },
+    "De Peregrinos y Mediodías": {
+        "Ven Espíritu Santo": { ruta: "espiritu-santo/ven-espiritu-santo.html", tono: "RE", capo: 0 },
+        "Jesús y Pedro": { ruta: "comunion/jesus-y-pedro.html", tono: "DO", capo: 1 },
+        "Amigo": { ruta: "meditacion/amigo.html", tono: "RE", capo: 1 },
+        "No tienen vino": { ruta: "meditacion/no-tienen-vino.html", tono: "DO", capo: 0 },
+        "Ven Pastor": { ruta: "comunion/ven-pastor.html", tono: "RE", capo: 0 },
+        "Solo por hoy": { ruta: "meditacion/solo-por-hoy.html", tono: "RE", capo: 0 },
+        "Sáname": { ruta: "meditacion/saname.html", tono: "RE", capo: 0 },
+        "El mismo huerto": { ruta: "meditacion/el-mismo-huerto.html", tono: "RE", capo: 0 },
+        "Es aquí": { ruta: "comunion/es-aqui.html", tono: "RE", capo: 0 },
+        "Una cuerda menos": { ruta: "meditacion/una-cuerda-menos.html", tono: "LA", capo: 0 },
+        "Vengan y coman": { ruta: "comunion/vengan-y-coman.html", tono: "RE", capo: 0 },
+        "Hoy vivo": { ruta: "comunion/hoy-vivo.html", tono: "RE", capo: 2 },
+        "Su canto": { ruta: "meditacion/su-canto.html", tono: "RE", capo: 2 },
+        "Esa flor siempre de pie": { ruta: "meditacion/esa-flor-siempre-de-pie.html", tono: "SOL", capo: 2 },
+        "Viento de Dios": { ruta: "espiritu-santo/viento-de-dios.html", tono: "SOL", capo: 0 },
+        "Abramos": { ruta: "meditacion/abramos.html", tono: "RE", capo: 1 },
+        "Una gota de agua": { ruta: "comunion/una-gota-de-agua.html", tono: "SOL", capo: 0 },
+        "Voces de esperanza": { ruta: "espiritu-santo/voces-de-esperanza.html", tono: "MI", capo: 0 }
+    },
+    "Vengan a mí": {
+        "Hoy quiero mirarte": { ruta: "meditacion/hoy-quiero-mirarte.html", tono: "RE", capo: 0 },
+        "Vengan a mí": { ruta: "meditacion/vengan-a-mi.html", tono: "SOL", capo: 0 },
+        "Derrama": { ruta: "meditacion/derrama.html", tono: "DO", capo: 4 },
+        "Estar con Él": { ruta: "meditacion/estar-con-el.html", tono: "SOL", capo: 0 },
+        "Él me miró": { ruta: "meditacion/el-me-miro.html", tono: "SOL", capo: 1 },
+        "Soledad": { ruta: "meditacion/soledad.html", tono: "LA", capo: 0 },
+        "Restáuranos": { ruta: "meditacion/restauranos.html", tono: "SOL", capo: 0 },
+        "Paz": { ruta: "meditacion/paz.html", tono: "LA", capo: 0 },
+        "Regálanos": { ruta: "meditacion/regalanos.html", tono: "MI", capo: 2 },
+        "Quiero adorarte": { ruta: "meditacion/quiero-adorarte.html", tono: "DO", capo: 3 },
+        "Solo Tú": { ruta: "meditacion/solo-tu.html", tono: "SOL", capo: 1 },
+        "Esperanza": { ruta: "meditacion/esperanza.html", tono: "SOL", capo: 3 }
     }
 };
 
@@ -554,9 +867,9 @@ window.canciones = {
     return $(this).each(function() { var startKey = $(this).attr("data-key"); if (!startKey || $.trim(startKey) == "") startKey = opts.key; if (!startKey || $.trim(startKey) == "") return this; currentKey = getKeyByName(startKey); var keyLinks = []; $(keys).each(function(i, key) { if (currentKey.name == key.name) keyLinks.push("<a href='#' class='selected'>" + key.name + "</a>"); else keyLinks.push("<a href='#'>" + key.name + "</a>"); }); var $this = $(this); var keysHtml = $("<div class='transpose-keys justify-content-md-center' style='margin-bottom:10px;'></div>"); keysHtml.html(keyLinks.join("")); $("a", keysHtml).click(function(e) { e.preventDefault(); transposeSong($this, $(this).html()); $(".transpose-keys a").removeClass("selected"); $(this).addClass("selected"); return false; }); $(this).before(keysHtml); var output = []; var lines = $(this).html().split("\n"); var line; for (var i = 0; i < lines.length; i++) { line = lines[i]; if (isChordLine(line)) output.push("<span>" + wrapChords(line) + "</span>"); else output.push("<span>" + line + "</span>"); }; $(this).html(output.join("\n")); });
   };
   $.fn.transpose.defaults = { 
-      chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/[A-G][b\#]*)*$/, 
-      chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|m6|m7|m7b5|m9|m11|m13|maj7|maj9|maj11|maj13|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*)/g 
-  };
+    chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*$/, 
+    chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*)/g 
+};
   
   $(function() { 
       var targets = $("#letra, .zona-letra"); 
@@ -997,121 +1310,220 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.insertAdjacentHTML('beforeend', modalAcordes);
 
-    // 3. BASE DE DATOS DE ACORDES
-    // El formato es: [6ta, 5ta, 4ta, 3ra, 2da, 1ra]
-    // -1 significa "no tocar" (X) | 0 significa "cuerda al aire" (O) | Los números son el traste
-    const dbAcordes = {
-        // Mayores
-        "DO": [-1, 3, 2, 0, 1, 0], "RE": [-1, -1, 0, 2, 3, 2], "MI": [0, 2, 2, 1, 0, 0],
-        "FA": [1, 3, 3, 2, 1, 1], "SOL": [3, 2, 0, 0, 0, 3], "LA": [-1, 0, 2, 2, 2, 0], "SI": [-1, 2, 4, 4, 4, 2],
+// 3. BASE DE DATOS DE ACORDES
+// El formato es: [6ta, 5ta, 4ta, 3ra, 2da, 1ra]
+// -1 significa "no tocar" (X) | 0 significa "cuerda al aire" (O) | Los números son el traste
+const dbAcordes = {
+    // ==========================================
+    // MAYORES Y MENORES BÁSICOS
+    // ==========================================
+    "DO": [-1, 3, 2, 0, 1, 0], "DO#": [-1, 4, 6, 6, 6, 4], "RE": [-1, -1, 0, 2, 3, 2], "RE#": [-1, 6, 8, 8, 8, 6], 
+    "MI": [0, 2, 2, 1, 0, 0], "FA": [1, 3, 3, 2, 1, 1], "FA#": [2, 4, 4, 3, 2, 2], "SOL": [3, 2, 0, 0, 0, 3], 
+    "SOL#": [4, 6, 6, 5, 4, 4], "LA": [-1, 0, 2, 2, 2, 0], "LA#": [-1, 1, 3, 3, 3, 1], "SIb": [-1, 1, 3, 3, 3, 1], "SI": [-1, 2, 4, 4, 4, 2],
+
+    "DOm": [-1, 3, 5, 5, 4, 3], "DO#m": [-1, 4, 6, 6, 5, 4], "REm": [-1, -1, 0, 2, 3, 1], "RE#m": [-1, 6, 8, 8, 7, 6], 
+    "MIm": [0, 2, 2, 0, 0, 0], "FAm": [1, 3, 3, 1, 1, 1], "FA#m": [2, 4, 4, 2, 2, 2], "SOLm": [3, 5, 5, 3, 3, 3], 
+    "SOL#m": [4, 6, 6, 4, 4, 4], "LAm": [-1, 0, 2, 2, 1, 0], "LA#m": [-1, 1, 3, 3, 2, 1], "SIbm": [-1, 1, 3, 3, 2, 1], "SIm": [-1, 2, 4, 4, 3, 2],
+
+    // ==========================================
+    // SÉPTIMAS (7 y m7)
+    // ==========================================
+    "DO7": [-1, 3, 2, 3, 1, 0], "DO#7": [-1, 4, 6, 4, 6, 4], "RE7": [-1, -1, 0, 2, 1, 2], "RE#7": [-1, 6, 8, 6, 8, 6], 
+    "MI7": [0, 2, 0, 1, 0, 0], "FA7": [1, 3, 1, 2, 1, 1], "FA#7": [2, 4, 2, 3, 2, 2], "SOL7": [3, 2, 0, 0, 0, 1], 
+    "SOL#7": [4, 6, 4, 5, 4, 4], "LA7": [-1, 0, 2, 0, 2, 0], "LA#7": [-1, 1, 3, 1, 3, 1], "SI7": [-1, 2, 1, 2, 0, 2],
+
+    "DOm7": [-1, 3, 5, 3, 4, 3], "DO#m7": [-1, 4, 6, 4, 5, 4], "REm7": [-1, -1, 0, 2, 1, 1], "RE#m7": [-1, 6, 8, 6, 7, 6], 
+    "MIm7": [0, 2, 0, 0, 0, 0], "FAm7": [1, 3, 1, 1, 1, 1], "FA#m7": [2, 4, 2, 2, 2, 2], "SOLm7": [3, 5, 3, 3, 3, 3], 
+    "SOL#m7": [4, 6, 4, 4, 4, 4], "LAm7": [-1, 0, 2, 0, 1, 0], "LA#m7": [-1, 1, 3, 1, 2, 1], "SIm7": [-1, 2, 4, 2, 3, 2],
+
+    // ==========================================
+    // SÉPTIMAS MAYORES (maj7 / + / 7+)
+    // ==========================================
+    "DOmaj7": [-1, 3, 2, 0, 0, 0], "DO7+": [-1, 3, 2, 0, 0, 0],
+    "DO#maj7": [-1, 4, 6, 5, 6, 4],
+    "REmaj7": [-1, -1, 0, 2, 2, 2], "RE7+": [-1, -1, 0, 2, 2, 2],
+    "RE#maj7": [-1, 6, 8, 7, 8, 6],
+    "MImaj7": [0, 2, 1, 1, 0, 0],
+    "FAmaj7": [-1, -1, 3, 2, 1, 0], "FA7+": [-1, -1, 3, 2, 1, 0],
+    "FA#maj7": [2, 4, 3, 3, 2, 2],
+    "SOLmaj7": [-1, 2, -1, 0, 3, 2],
+    "SOL#maj7": [4, 6, 5, 5, 4, 4],
+    "LAmaj7": [-1, 0, 2, 1, 2, 0], "LA7+": [-1, 0, 2, 1, 2, 0],
+    "LA#maj7": [-1, 1, 3, 2, 3, 1], "SIbmaj7": [-1, 1, 3, 2, 3, 1],
+    "SImaj7": [-1, 2, 4, 3, 4, 2],
+
+    // ==========================================
+    // SUSPENDIDOS (sus4 y sus2)
+    // ==========================================
+    "DOsus4": [-1, 3, 3, 0, 1, 1], "DO#sus4": [-1, 4, 6, 6, 7, 4], "REsus4": [-1, -1, 0, 2, 3, 3], "RE#sus4": [-1, 6, 8, 8, 9, 6],
+    "MIsus4": [0, 2, 2, 2, 0, 0], "FAsus4": [1, 3, 3, 3, 1, 1], "FA#sus4": [2, 4, 4, 4, 2, 2], "SOLsus4": [3, 5, 5, 5, 3, 3],
+    "SOL#sus4": [4, 6, 6, 6, 4, 4], "LAsus4": [-1, 0, 2, 2, 3, 0], "LA#sus4": [-1, 1, 3, 3, 4, 1], "SIsus4": [-1, 2, 4, 4, 5, 2],
+
+    "DOsus2": [-1, 3, 0, 0, 1, -1], "DO#sus2": [-1, 4, 6, 6, 4, 4], "REsus2": [-1, -1, 0, 2, 3, 0], "RE#sus2": [-1, 6, 8, 8, 6, 6],
+    "MIsus2": [0, 2, 4, 4, 0, 0], "FAsus2": [1, 3, 3, 0, 1, 1], "FA#sus2": [2, 4, 4, 1, 2, 2], "SOLsus2": [3, 0, 0, 0, 3, 3],
+    "SOL#sus2": [4, 6, 6, 3, 4, 4], "LAsus2": [-1, 0, 2, 2, 0, 0], "LA#sus2": [-1, 1, 3, 3, 1, 1], "SIsus2": [-1, 2, 4, 4, 2, 2],
+
+    "DO7sus4": [-1, 3, 3, 3, 1, -1], "DO#7sus4": [-1, 4, 6, 4, 7, 4], "RE7sus4": [-1, -1, 0, 2, 1, 3], "RE#7sus4": [-1, 6, 8, 6, 9, 6], 
+    "MI7sus4": [0, 2, 0, 2, 0, 0], "FA7sus4": [1, 3, 1, 3, 1, 1], "SOL7sus4": [3, 5, 3, 5, 3, 3], "LA7sus4": [-1, 0, 2, 0, 3, 0], 
+    "SI7sus4": [-1, 2, 4, 2, 5, 2], "SI9sus4": [-1, 2, 4, 2, 2, 2],
+
+    // ==========================================
+    // SEMIDISMINUIDOS (m7b5)
+    // ==========================================
+    "DOm7b5": [-1, 3, 4, 3, 4, -1], "DO#m7b5": [-1, 4, 5, 4, 5, -1], "REm7b5": [-1, 5, 6, 5, 6, -1], 
+    "RE#m7b5": [-1, 6, 7, 6, 7, -1], "MIm7b5": [0, 1, 0, 0, 3, 0], "FAm7b5": [1, -1, 1, 1, 0, -1], 
+    "FA#m7b5": [2, -1, 2, 2, 1, -1], "SOLm7b5": [3, -1, 3, 3, 2, -1], "SOL#m7b5": [4, -1, 4, 4, 3, -1], 
+    "LAm7b5": [-1, 0, 1, 0, 1, -1], "LA#m7b5": [-1, 1, 2, 1, 2, -1], "SIm7b5": [-1, 2, 3, 2, 3, -1],
+
+    // ==========================================
+    // DISMINUIDOS BÁSICOS Y dim7
+    // ==========================================
+    "DOdim": [-1, 3, 4, 5, 4, -1], "REdim": [-1, -1, 0, 1, 3, 1], "MIdim": [-1, -1, 2, 3, 2, 3], "FAdim": [1, 2, 3, 1, -1, -1], "SIdim": [-1, 2, 3, 4, 3, -1], 
+    "DO#dim": [-1, 4, 5, 6, 5, -1], "RE#dim": [-1, -1, 1, 2, 1, 2], "FA#dim": [-1, -1, 4, 5, 4, 5], "SOL#dim": [-1, -1, 6, 7, 6, 7],
+
+    "DOdim7": [-1, 3, 4, 2, 4, -1], "DO#dim7": [-1, 4, 5, 3, 5, -1], "REdim7": [-1, 5, 6, 4, 6, -1], 
+    "RE#dim7": [-1, -1, 1, 2, 1, 2], "MIdim7": [-1, -1, 2, 3, 2, 3], "FAdim7": [1, -1, 0, 1, 0, -1], 
+    "FA#dim7": [2, -1, 1, 2, 1, -1], "SOLdim7": [3, -1, 2, 3, 2, -1], "SOL#dim7": [4, -1, 3, 4, 3, -1], 
+    "LAdim7": [-1, 0, 1, 2, 1, 2], "LA#dim7": [-1, 1, 2, 0, 2, -1], "SIdim7": [-1, 2, 3, 1, 3, -1],
+
+    // ==========================================
+    // AÑADIDOS (add9)
+    // ==========================================
+    "DOadd9": [-1, 3, 2, 0, 3, 0], "DO#add9": [-1, 4, 6, 5, 4, 4], "REadd9": [-1, -1, 0, 2, 3, 0], 
+    "RE#add9": [-1, 6, 8, 7, 6, 6], "MIadd9": [0, 2, 2, 1, 0, 2], "FAadd9": [1, -1, 3, 2, 1, 3], 
+    "FA#add9": [2, -1, 4, 3, 2, 4], "SOLadd9": [3, 2, 0, 2, 0, 3], "SOL#add9": [4, -1, 6, 5, 4, 6], 
+    "LAadd9": [-1, 0, 2, 4, 2, 0], "LA#add9": [-1, 1, 3, 5, 3, 1], "SIadd9": [-1, 2, 4, 6, 4, 2],
+
+    // ==========================================
+    // NOVENAS DOMINANTES (9) Y MENORES (m9)
+    // ==========================================
+    "DO9": [-1, 3, 2, 3, 3, -1], "DO#9": [-1, 4, 3, 4, 4, -1], "RE9": [-1, 5, 4, 5, 5, -1], "RE#9": [-1, 6, 5, 6, 6, -1], 
+    "MI9": [0, 2, 0, 1, 0, 2], "FA9": [1, 3, 1, 2, 1, 3], "FA#9": [2, 4, 2, 3, 2, 4], "SOL9": [3, 5, 3, 4, 3, 5], 
+    "SOL#9": [4, 6, 4, 5, 4, 6], "LA9": [-1, 0, 2, 4, 2, 0], "LA#9": [-1, 1, 0, 1, 1, -1], "SI9": [-1, 2, 1, 2, 2, -1],
+
+    "DOm9": [-1, 3, 1, 3, 3, -1], "DO#m9": [-1, 4, 2, 4, 4, -1], "REm9": [-1, 5, 3, 5, 5, -1], "RE#m9": [-1, 6, 4, 6, 6, -1], 
+    "MIm9": [0, 2, 0, 0, 0, 2], "FAm9": [1, 3, 1, 1, 1, 3], "FA#m9": [2, 4, 2, 2, 2, 4], "SOLm9": [3, 5, 3, 3, 3, 5], 
+    "SOL#m9": [4, 6, 4, 4, 4, 6], "LAm9": [-1, 0, 2, 4, 1, 0], "LA#m9": [6, 8, 6, 6, 6, 8], "SIm9": [-1, 2, 0, 2, 2, -1],
+
+    // ==========================================
+    // ONCENAS, TRECENAS Y ALTERADOS ESPECIALES
+    // ==========================================
+    "RE11": [-1, 5, 4, 0, 3, -1], "SI11": [-1, 2, 4, 4, 4, 0],
+    "DOm11": [-1, 3, 5, 3, 6, 3], "DO#m11": [-1, 4, 6, 4, 7, 4], "REm11": [-1, 5, 7, 5, 8, 5], "RE#m11": [-1, 6, 8, 6, 9, 6],
+    "MIm11": [0, 0, 0, 0, 0, 0], "FAm11": [1, 1, 1, 1, 1, 1], "FA#m11": [-1, 4, 4, 2, 0, 0], "SOLm11": [3, 3, 3, 3, 3, 3],
+    "SOL#m11": [4, 4, 4, 4, 4, 4], "LAm11": [-1, 0, 2, 0, 3, 0], "LA#m11": [-1, 1, 3, 1, 4, 1], "SIm11": [-1, 2, 4, 2, 5, 2],
+
+    "FAmaj9": [-1, -1, 3, 0, 1, 0], "LAmaj9": [-1, 0, 2, 1, 0, 0], "SOLmaj9": [3, -1, 4, 2, 3, 0], 
+    "LA6+": [-1, 0, 4, 4, 0, 0], "MIb6+": [-1, -1, 1, 0, 1, -1], "SIb6(11)": [-1, 1, -1, 0, 3, 0], "MI6(9)": [-1, -1, 1, 0, 1, 1], 
+    "DOm6": [-1, 3, -1, 5, 4, 5], "LAm79": [5, 5, 5, 5, 5, 7],
+    "FA#7(11)": [2, 4, 4, 3, 0, 0], "FA#m7(11)": [2, -1, 2, 2, 0, 0],
+
+    "DO9(#11)": [-1, 3, 4, 2, 3, 0], "DO#9(#11)": [-1, 4, 3, 4, 4, 3], "RE9(#11)": [-1, 5, 4, 5, 5, 4], 
+    "RE#9(#11)": [-1, 6, 5, 6, 6, 5], "MI9(#11)": [-1, 7, 6, 7, 7, 6], "SOL9(#11)": [3, -1, 0, 2, 2, -1],
+    "LAmaj7(#11)": [-1, 0, 2, 1, 4, 0],
+    
+    "DO9+": [-1, 3, 2, 1, 3, -1], "DO#9+": [-1, 4, 3, 2, 4, -1], "RE9+": [-1, 5, 4, 3, 5, -1], 
+    "RE#9+": [-1, 6, 5, 4, 6, -1], "MI9+": [0, -1, 0, 1, 1, 2], "SI9+": [-1, 2, 1, 2, 3, -1], 
+    "REmajb5": [-1, -1, 0, 1, 2, 2], "SIdim7+": [-1, 2, 3, 3, 3, -1], "SIm11+": [-1, 2, 3, 2, 3, -1],
+
+    // ==========================================
+    // SLASH CHORDS (Bajos Invertidos / Distintos)
+    // ==========================================
+    "DO/MI": [0, 3, 2, 0, 1, 0], "DO/SOL": [3, 3, 2, 0, 1, 0], "DO/RE": [-1, -1, 0, 0, 1, 0],
+    "RE/FA#": [2, 0, 0, 2, 3, 2], "RE/LA": [-1, 0, 0, 2, 3, 2], "RE/DO#": [-1, 4, 0, 2, 3, 2],
+    "MI/SOL#": [4, -1, 2, 1, 0, 0], "MI/RE#": [-1, -1, 1, 1, 0, 0], "MI/DO#": [-1, 4, 2, 1, 0, 0], "MI/FA#": [2, 2, 2, 1, 0, 0],
+    "SOL/SI": [-1, 2, 0, 0, 3, 3], "SOL/RE": [-1, -1, 0, 0, 3, 3],
+    "LA/DO#": [-1, 4, 2, 2, 2, 0], "LA/MI": [0, -1, 2, 2, 2, 0], "LA/SOL#": [4, -1, 2, 2, 2, 0],
+    "SI/FA#": [2, 2, 4, 4, 4, 2], "SI/DO#": [-1, 4, 4, 4, 4, 2], "SI/MI": [0, 2, 4, 4, 4, 2],
+    
+    // Bajos en Acordes Compuestos
+    "DOmaj7/SOL": [3, 3, 2, 0, 0, 0], "FAmaj13/DO": [-1, 3, 3, 2, 3, 0], "FAmaj7/SOL": [3, -1, 3, 2, 1, 0], 
+    "REmaj7/FA#": [2, -1, 0, 2, 2, 0], "SOLmaj7/SI": [-1, 2, -1, 0, 3, 2],
+    "LA9/FA#": [2, 0, 2, 2, 0, 0], "LA9+/SI": [-1, 2, 2, 2, 2, 4], "LA9/DO#": [-1, 4, 2, 4, 2, 0],
+    "FA9/DO": [-1, 3, 3, 0, 1, 0], "DO9/MI": [-1, -1, 2, 0, 3, 3],
+
+    // Bajos en Menores
+    "DOm/SOL": [3, 3, 5, 5, 4, 3], "REm/LA": [-1, 0, 0, 2, 3, 1], "MIm/RE": [-1, -1, 0, 0, 0, 0], 
+    "LAm/SOL": [3, 0, 2, 2, 1, 0], "SIm/LA": [-1, 0, 4, 4, 3, 2], "SIm/SOL#": [4, -1, 4, 4, 3, -1],
+    "DO#m/SI": [7, 4, 6, 4, 5, 4],
+    
+    "LAm7/FA": [1, 0, 2, 0, 1, 0], "LAm7/SOL": [3, 0, 2, 0, 1, 0], "LAm9/DO": [-1, 3, 2, 4, 1, 0],
+    "SIm11+/LA": [-1, 0, 3, 4, 3, 0],
+    // ==========================================
+    // ACORDES FALTANTES (Alterados, Dim y Sus4)
+    // ==========================================
+    "FA9(#11)": [1, -1, 1, 2, 0, -1],
+    "FA9+": [1, -1, 1, 2, 2, -1],
+    "FA#7sus4": [2, 4, 2, 4, 2, 2],
+    "FA#9(#11)": [2, -1, 2, 3, 1, -1],
+    "FA#9+": [2, -1, 2, 3, 3, -1],
+    
+    "SOLdim": [3, 4, 5, 3, -1, -1],
+    "SOL9+": [3, -1, 3, 4, 4, -1],
+    "SOL#7sus4": [4, 6, 4, 6, 4, 4],
+    "SOL#9(#11)": [4, -1, 4, 5, 3, -1],
+    "SOL#9+": [4, -1, 4, 5, 5, -1],
         
-        // Menores
-        "DOm": [-1, 3, 5, 5, 4, 3], "REm": [-1, -1, 0, 2, 3, 1], "MIm": [0, 2, 2, 0, 0, 0],
-        "FAm": [1, 3, 3, 1, 1, 1], "SOLm": [3, 5, 5, 3, 3, 3], "LAm": [-1, 0, 2, 2, 1, 0], "SIm": [-1, 2, 4, 4, 3, 2],
+    "LAdim": [-1, 0, 1, 2, 1, -1],
+    "LA9(#11)": [5, -1, 5, 6, 4, -1],
+    "LA9+": [5, -1, 5, 6, 6, -1],
         
-        // Sostenidos Mayores
-        "DO#": [-1, 4, 6, 6, 6, 4], "RE#": [-1, 6, 8, 8, 8, 6], "FA#": [2, 4, 4, 3, 2, 2], "SOL#": [4, 6, 6, 5, 4, 4], "LA#": [-1, 1, 3, 3, 3, 1],
+    "LA#7sus4": [-1, 1, 3, 1, 4, 1],
+    "LA#dim": [-1, 1, 2, 3, 2, -1],
+    "LA#9(#11)": [-1, 1, 2, 1, 1, -1],
+    "LA#9+": [-1, 1, 0, 1, 2, -1],
         
-        // Sostenidos Menores
-        "DO#m": [-1, 4, 6, 6, 5, 4], "RE#m": [-1, 6, 8, 8, 7, 6], "FA#m": [2, 4, 4, 2, 2, 2], "SOL#m": [4, 6, 6, 4, 4, 4], "LA#m": [-1, 1, 3, 3, 2, 1],
-        
-        // Séptimas (Básicos)
-        "DO7": [-1, 3, 2, 3, 1, 0], "RE7": [-1, -1, 0, 2, 1, 2], "MI7": [0, 2, 0, 1, 0, 0],
-        "FA7": [1, 3, 1, 2, 1, 1], "SOL7": [3, 2, 0, 0, 0, 1], "LA7": [-1, 0, 2, 0, 2, 0], "SI7": [-1, 2, 1, 2, 0, 2],
+    "SI9(#11)": [-1, 2, 1, 2, 2, 1],
+    "FA/LA": [-1, 0, 3, 2, 1, 1],
+    "SIm6(9)": [-1, 2, 0, 1, 2, 2],
+    "SImMaj7": [-1, 2, 4, 3, 3, 2],
 
-        // Sostenidos Séptimas (Básicos)
-        "DO#7": [-1, 4, 6, 4, 6, 4], "RE#7": [-1, 6, 8, 6, 8, 6], "FA#7": [2, 4, 2, 3, 2, 2], "SOL#7": [4, 6, 4, 5, 4, 4], "LA#7": [-1, 1, 3, 1, 3, 1],
+    // ==========================================
+    // FAMILIAS COMPLETAS DE ACORDES COMPLEJOS Y TENSIONES
+    // ==========================================
 
-        // Menores con Séptima (m7)
-        "DOm7": [-1, 3, 5, 3, 4, 3], "REm7": [-1, -1, 0, 2, 1, 1], "MIm7": [0, 2, 0, 0, 0, 0],
-        "FAm7": [1, 3, 1, 1, 1, 1], "SOLm7": [3, 5, 3, 3, 3, 3], "LAm7": [-1, 0, 2, 0, 1, 0], "SIm7": [-1, 2, 4, 2, 3, 2],
+    // Menores Sexta (m6)
+    "DOm6": [-1, 3, 1, 2, 1, 3], "DO#m6": [-1, 4, 2, 3, 2, 4], "REm6": [-1, 5, 3, 4, 3, 5], 
+    "RE#m6": [-1, 6, 4, 5, 4, 6], "MIm6": [0, 2, 2, 0, 2, 0], "FAm6": [1, -1, 0, 1, 1, 1], 
+    "FA#m6": [2, -1, 1, 2, 2, 2], "SOLm6": [3, -1, 2, 3, 3, 3], "SOL#m6": [4, -1, 3, 4, 4, 4], 
+    "LAm6": [-1, 0, 2, 2, 1, 2], "LA#m6": [-1, 1, 3, 3, 2, 3], "SIm6": [-1, 2, 4, 4, 3, 4],
 
-        // Sostenidos Menores con Séptima (#m7)
-        "DO#m7": [-1, 4, 6, 4, 5, 4],"RE#m7": [-1, 6, 8, 6, 7, 6], "FA#m7": [2, 4, 2, 2, 2, 2], "SOL#m7": [4, 6, 4, 4, 4, 4], "LA#m7": [-1, 1, 3, 1, 2, 1],
+    // Mayores con Novena (maj9)
+    "DOmaj9": [-1, 3, 2, 4, 3, -1], "DO#maj9": [-1, 4, 3, 5, 4, -1], "REmaj9": [-1, 5, 4, 6, 5, -1], 
+    "RE#maj9": [-1, 6, 5, 7, 6, -1], "MImaj9": [0, 2, 4, 1, 0, 0], "FAmaj9": [1, 0, 3, 0, 1, 0], 
+    "FA#maj9": [2, -1, 3, 1, 2, -1], "SOLmaj9": [3, -1, 4, 2, 3, -1], "SOL#maj9": [4, -1, 5, 3, 4, -1], 
+    "LAmaj9": [-1, 0, 2, 1, 0, 0], "LA#maj9": [-1, 1, 3, 2, 1, 1], "SImaj9": [-1, 2, 4, 3, 2, 2],
 
-        // Mayores con Séptima Mayor (maj7) y sus sinónimos (+ / 7+)
-        "DOmaj7": [-1, 3, 2, 0, 0, 0], "REmaj7": [-1, -1, 0, 2, 2, 2], "RE7+": [-1, -1, 0, 2, 2, 2],
-        "MImaj7": [0, 2, 1, 1, 0, 0], "FAmaj7": [-1, -1, 3, 2, 1, 0], "SOLmaj7": [-1, 2, -1, 0, 3, 2], "LAmaj7": [-1, 0, 2, 1, 2, 0], "LA7+": [-1, 0, 2, 1, 2, 0], 
-        "SImaj7": [-1, 2, 4, 3, 4, 2],
-        
-        "FAmaj9": [-1, -1, 3, 0, 1, 0], "LAmaj9": [-1, 0, 2, 1, 0, 0], "SOLmaj9": [3, -1, 4, 2, 3, 0], "LA6+": [-1, 0, 4, 4, 0, 0], "MIb6+": [-1, -1, 1, 0, 1, -1], "SIb6(11)": [-1, 1, -1, 0, 3, 0], "MI6(9)": [-1, -1, 1, 0, 1, 1], 
-        "DOm6": [-1, 3, -1, 5, 4, 5],
-        "FA#7(11)": [2, 4, 4, 3, 0, 0], "FA#m7(11)": [2, -1, 2, 2, 0, 0],
+    // Sexta con Novena Añadida (6/9 o 6(9))
+    "DO6(9)": [-1, 3, 2, 2, 3, 3], "DO#6(9)": [-1, 4, 3, 3, 4, 4], "RE6(9)": [-1, 5, 4, 4, 5, 5], 
+    "RE#6(9)": [-1, 6, 5, 5, 6, 6], "MI6(9)": [0, 2, 2, 1, 2, 2], "FA6(9)": [1, -1, 0, 0, 1, 1], 
+    "FA#6(9)": [2, -1, 1, 1, 2, 2], "SOL6(9)": [3, -1, 2, 2, 3, 3], "SOL#6(9)": [4, -1, 3, 3, 4, 4], 
+    "LA6(9)": [-1, 0, 2, 2, 0, 0], "LA#6(9)": [-1, 1, 0, 0, 1, 1], "SI6(9)": [-1, 2, 1, 1, 2, 2],
 
-        // Sostenidos Mayores con Séptima Mayor (#maj7) y sus sinónimos (+ / 7+)
-        "DO#maj7": [-1, 4, 6, 5, 6, 4], "RE#maj7": [-1, -1, 1, 3, 3, 3], "FA#maj7": [2, 4, 3, 3, 2, 2], "SOL#maj7": [4, 6, 5, 5, 4, 4], 
-        "LA#maj7": [-1, 1, 3, 2, 3, 1], "SIbmaj7": [-1, 1, 3, 2, 3, 1],
+    // Menores con Séptima Mayor (mMaj7)
+    "DOmMaj7": [-1, 3, 1, 0, 0, 3], "DO#mMaj7": [-1, 4, 2, 1, 1, 4], "REmMaj7": [-1, 5, 3, 2, 2, 5], 
+    "RE#mMaj7": [-1, 6, 4, 3, 3, 6], "MImMaj7": [0, 2, 1, 0, 0, 0], "FAmMaj7": [1, 3, 2, 1, 1, 1], 
+    "FA#mMaj7": [2, 4, 3, 2, 2, 2], "SOLmMaj7": [3, 5, 4, 3, 3, 3], "SOL#mMaj7": [4, 6, 5, 4, 4, 4], 
+    "LAmMaj7": [-1, 0, 2, 1, 1, 0], "LA#mMaj7": [-1, 1, 3, 2, 2, 1], "SImMaj7": [-1, 2, 4, 3, 3, 2],
 
-        // Novenas y Oncenas (y sus variaciones)
-        "DO9": [-1, 3, 2, 0, 3, 3], "RE9": [-1, 5, 4, 5, 5, 5], "MI9": [0, 2, 0, 1, 0, 2], "FA9": [1, 3, 1, 2, 1, 3], "SOL9": [3, 5, 3, 4, 3, 5], "LA9": [-1, 0, 2, 4, 2, 0], "SI9": [-1, 2, 1, 2, 2, 2],
-        "DOm9": [-1, 3, 1, 3, 3, -1], "REm9": [-1, 5, 3, 5, 5, 5], "MIm9": [0, 2, 0, 0, 0, 2], "FAm9": [1, 3, 1, 1, 1, 3], "SOLm9": [3, 1, 3, 2, -1, -1], "LAm9": [-1, 0, 2, 4, 1, 0], "SIm9": [-1, 2, 0, 2, 2, 2],
-        "RE11": [-1, 5, 4, 0, 3, -1], "SI11": [-1, 2, 4, 4, 4, 0],
-        "DOm11": [-1, 3, 5, 3, 6, 3], "REm11": [-1, 5, 7, 5, 8, 5], "MIm11": [0, 0, 0, 0, 0, 0], "FAm11": [1, 1, 1, 1, 1, 1], "SOLm11": [3, 3, 3, 3, 3, 3], "LAm11": [-1, 0, 2, 0, 3, 0], "SIm11": [-1, 2, 4, 2, 5, 2], 
-        "LAm79": [5, 5, 5, 5, 5, 7], 
+    // Séptima Mayor con Oncena Aumentada (maj7#11)
+    "DOmaj7(#11)": [-1, 3, 4, 4, 5, -1], "DO#maj7(#11)": [-1, 4, 5, 5, 6, -1], "REmaj7(#11)": [-1, 5, 6, 6, 7, -1], 
+    "RE#maj7(#11)": [-1, 6, 7, 7, 8, -1], "MImaj7(#11)": [0, 3, 2, 1, 0, 0], "FAmaj7(#11)": [1, -1, 2, 2, 0, 0], 
+    "FA#maj7(#11)": [2, -1, 3, 3, 1, -1], "SOLmaj7(#11)": [3, -1, 4, 4, 2, -1], "SOL#maj7(#11)": [4, -1, 5, 5, 3, -1], 
+    "LAmaj7(#11)": [-1, 0, 2, 1, 4, 0], "LA#maj7(#11)": [-1, 1, 3, 2, 5, -1], "SImaj7(#11)": [-1, 2, 4, 3, 6, -1],
 
-        // Sostenidos con Novenas y Oncenas (y sus variaciones)
-        "DO#9": [-1, 4, 3, 4, 4, 4], "RE#9": [-1, 6, 5, 6, 6, 6], "FA#9": [2, 2, 2, 2, 2, 4], "SOL#9": [4, 6, 4, 5, 4, 6], "LA#9": [6, 8, 6, 7, 6, 8],
-        "DO#m9": [-1, 4, 2, 4, 4, 4], "RE#m9": [-1, 6, 4, 6, 6, 6], "FA#m9": [2, 4, 2, 2, 2, 4], "SOL#m9": [4, 6, 4, 4, 4, 6], "LA#m9": [6, 8, 6, 6, 6, 8], 
-        "DO#m11": [-1, 4, 6, 4, 7, 4], "RE#m11": [-1, 6, 8, 6, 9, 6], "FA#m11": [-1, 4, 4, 2, 0, 0], "SOL#m11": [4, 4, 4, 4, 4, 4], "LA#m11": [-1, 1, 3, 1, 4, 1], 
+    // Oncenas Dominantes (11)
+    "DO11": [8, -1, 8, 7, 6, -1], "DO#11": [9, -1, 9, 8, 7, -1], "RE11": [-1, 5, 4, 0, 3, -1], 
+    "RE#11": [-1, 6, 5, 1, 4, -1], "MI11": [0, 0, 2, 1, 0, 0], "FA11": [1, 1, 1, 0, 1, 1], 
+    "FA#11": [2, -1, 2, 1, 0, 0], "SOL11": [3, -1, 3, 2, 1, 1], "SOL#11": [4, -1, 4, 3, 2, 2], 
+    "LA11": [5, -1, 5, 4, 3, 3], "LA#11": [6, -1, 6, 5, 4, 4], "SI11": [-1, 2, 4, 4, 4, 0],
 
-        // Suspendidos (sus4 / sus2)
-        "DOsus4": [-1, 3, 3, 0, 1, -1], "REsus4": [-1, -1, 0, 2, 3, 3], "MIsus4": [0, 2, 2, 2, 0, 0], "FAsus4": [1, 3, 3, 3, 1, 1], "SOLsus4": [3, 5, 5, 5, 3, 3], "LAsus4": [-1, 0, 2, 2, 3, 0], "SIsus4": [-1, 2, 4, 4, 5, 2], 
-        "DOsus2": [-1, 3, 0, 0, 1, -1], "REsus2": [-1, -1, 0, 2, 3, 0], "MIsus2": [0, 2, 4, 4, 0, 0], "FAsus2": [-1, -1, 3, 0, 1, 1], "SOLsus2": [-1, -1, 5, 7, 8, 5], "LAsus2": [-1, 0, 2, 2, 0, 0], "SIsus2": [-1, 2, 4, 4, 2, 2], 
-        "DO7sus4": [-1, 3, 3, 3, 1, -1], "RE7sus4": [-1, -1, 0, 2, 1, 3], "MI7sus4": [0, 2, 0, 2, 0, 0], "FA7sus4": [1, 3, 1, 3, 1, 1], "SOL7sus4": [3, 5, 3, 5, 3, 3], "LA7sus4": [-1, 0, 2, 0, 3, 0], "SI7sus4": [-1, 2, 4, 2, 5, 2], 
-        "SI9sus4": [-1, 2, 4, 2, 2, 2],
-
-        // Sostenidos Suspendidos (#sus4 / #sus2)
-        "DO#sus4": [-1, 4, 6, 6, 7, 4], "RE#sus4": [-1, 6, 8, 8, 9, 6], "FA#sus4": [2, 4, 4, 4, 2, 2], "SOL#sus4": [4, 6, 6, 6, 4, 4], "LA#sus4": [-1, 1, 3, 3, 4, 1],
-        "DO#sus2": [-1, 3, 0, 0, 1, -1], "RE#sus2": [-1, -1, 1, 3, 4, 1],
-        "DO#7sus4": [-1, 4, 6, 4, 7, 4], "RE#7sus4": [-1, 6, 8, 6, 9, 6], 
-
-        // Añadidos (add)
-        "DOadd9": [-1, 3, 2, 0, 3, 0], "REadd9": [-1, -1, 0, 2, 3, 0], "MIadd9": [-1, -1, 2, 4, 5, 2], "FAadd9": [-1, -1, 3, 5, 6, 3], "SOLadd9": [3, 2, 0, 2, 0, 3],
-
-        // Sostenidos Añadidos (#add)
-        "DO#add9": [-1, 4, 6, 6, 4, 4], "RE#add9": [-1, -1, 1, 3, 4, 1],
-
-        // Acordes Alterados
-        "DO9(#11)": [-1, 3, 4, 2, 3, 0], "RE9(#11)": [-1, 5, 4, 5, 5, 4], "MI9(#11)": [-1, 7, 6, 7, 7, 6], "SOL9(#11)": [3, -1, 0, 2, 2, -1],
-        "LAmaj7(#11)": [-1, 0, 2, 1, 4, 0],
-        "DO9+": [-1, 3, 2, 1, 3, -1], "RE9+": [-1, 5, 4, 3, 5, -1], "MI9+": [0, -1, 0, 1, 1, 2], "SI9+": [-1, 2, 1, 2, 3, -1], "REmajb5": [-1, -1, 0, 1, 2, 2], "SIdim7+": [-1, 2, 3, 3, 3, -1],
-
-        // Acordes Sostenidos Alterados
-        "DO#9(#11)": [-1, 4, 3, 4, 4, 3], "RE#9(#11)": [-1, 6, 5, 6, 6, 5],
-        "DO#9+": [-1, 4, 3, 2, 4, -1], "RE#9+": [-1, 6, 5, 4, 6, -1],
-
-        // Disminuidos (dim) y Semidisminuidos (m7b5)
-        "DOdim": [-1, 3, 4, 5, 4, -1], "REdim": [-1, -1, 0, 1, 3, 1], "MIdim": [-1, -1, 2, 3, 2, 3], "FAdim": [1, 2, 3, 1, -1, -1], "SIdim": [-1, 2, 3, 4, 3, -1], 
-        "DOdim7": [-1, 3, 4, 2, 4, -1], "REdim7": [-1, -1, 0, 1, 0, 1], "MIdim7": [-1, -1, 2, 3, 2, 3], "FAdim7": [1, 2, 3, 1, 3, 1], "SOLdim7": [-1, 1, 2, 0, 2, -1], "SIdim7": [-1, 2, 3, 1, 3, -1],
-        "DOm7b5": [-1, 3, 4, 3, 4, -1], "REm7b5": [-1, -1, 0, 1, 1, 1], "MIm7b5": [-1, -1, 2, 3, 3, 3],
-
-        // Sostenidos Disminuidos (#dim) y Semidisminuidos (#m7b5)
-        "DO#dim": [-1, 4, 5, 6, 5, -1], "RE#dim": [-1, -1, 1, 2, 1, 2], "FA#dim": [-1, -1, 4, 5, 4, 5], "SOL#dim": [-1, -1, 6, 7, 6, 7],
-        "DO#dim7": [-1, 5, 6, 4, 6, -1], "RE#dim7": [-1, -1, 1, 2, 1, 2],
-        "DO#m7b5": [-1, 4, 5, 4, 5, -1], "RE#m7b5": [-1, 6, 7, 6, 7, -1],
-
-        // Acordes con Bajo Distinto (Slash Chords Mayores)
-        "DO/MI": [0, 3, 2, 0, 1, 0], "RE/FA#": [2, 0, 0, 2, 3, 2], "MI/SOL#": [4, -1, 2, 1, 0, 0],
-        "SOL/SI": [-1, 2, 0, 0, 3, 3], "LA/DO#": [-1, 4, 2, 2, 2, 0],
-        "DO/SOL": [3, 3, 2, 0, 1, 0], "RE/LA": [-1, 0, 0, 2, 3, 2], "SOL/RE": [-1, -1, 0, 0, 3, 3],
-        "DOmaj7/SOL": [3, 3, 2, 0, 0, 0], "FAmaj13/DO": [-1, 3, 3, 2, 3, 0],
-        "LA9/FA#": [2, 0, 2, 2, 0, 0], "LA9+/SI": [-1, 2, 2, 2, 2, 4], "LA9/DO#": [-1, 4, 2, 4, 2, 0],
-        "FA9/DO": [-1, 3, 3, 0, 1, 0], "DO9/MI": [-1, -1, 2, 0, 3, 3],
-        "DO/RE": [-1, -1, 0, 0, 1, 0], "LA/MI": [0, -1, 2, 2, 2, 0],
-        "LA/SOL#": [4, -1, 2, 2, 2, 0], "MI/RE#": [-1, -1, 1, 1, 0, 0],
-        "SI/FA#": [2, 2, 4, 4, 4, 2], "SI/DO#": [-1, 4, 4, 4, 4, 2],
-        "SI/MI": [0, 2, 4, 4, 4, 2], "REmaj7/FA#": [2, -1, 0, 2, 2, 0],
-        "MI/DO#": [-1, 4, 2, 1, 0, 0], "MI/FA#": [2, 2, 2, 1, 0, 0],
-        "FAmaj7/SOL": [3, -1, 3, 2, 1, 0], "RE/DO#": [-1, 4, 0, 2, 3, 2],
-        "SOLmaj7/SI": [-1, 2, -1, 0, 3, 2],
-
-        // Acordes menores con Bajo Distinto (Slash Chords Menores y Raros)
-        "LAm/SOL": [3, 0, 2, 2, 1, 0], "SIm/LA": [-1, 0, 4, 4, 3, 2], "MIm/RE": [-1, -1, 0, 0, 0, 0],
-        "DOm/SOL": [3, 3, 5, 5, 4, 3], "REm/LA": [-1, 0, 0, 2, 3, 1],
-        "LAm7/FA": [1, 0, 2, 0, 1, 0], "LAm7/SOL": [3, 0, 2, 0, 1, 0], "SIm/SOL#": [4, -1, 4, 4, 3, -1], "LAm9/DO": [-1, 3, 2, 4, 1, 0],
-        "DO#m/SI": [7, 4, 6, 4, 5, 4], "SIm11+/LA": [-1, 0, 3, 4, 3, 0],
-        "SIm11+": [-1, 2, 3, 2, 3, -1]
-    };
+    // Novena Suspendida (9sus4)
+    "DO9sus4": [-1, 3, 3, 3, 3, 3], "DO#9sus4": [-1, 4, 4, 4, 4, 4], "RE9sus4": [-1, 5, 5, 5, 5, 5], 
+    "RE#9sus4": [-1, 6, 6, 6, 6, 6], "MI9sus4": [0, 2, 0, 2, 0, 2], "FA9sus4": [1, 1, 1, 3, 1, 3], 
+    "FA#9sus4": [2, 2, 2, 4, 2, 4], "SOL9sus4": [3, 3, 3, 5, 3, 5], "SOL#9sus4": [4, 4, 4, 6, 4, 6], 
+    "LA9sus4": [-1, 0, 0, 0, 0, 0], "LA#9sus4": [-1, 1, 1, 1, 1, 1], "SI9sus4": [-1, 2, 4, 2, 2, 2]
+};
 
     // 4. Función mágica que dibuja el mástil usando HTML
     function generarDibujoAcorde(posiciones) {

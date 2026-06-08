@@ -1,0 +1,160 @@
+<div class="d-inline-flex align-items-center flex-wrap gap-3 p-1 px-2 ms-md-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+    
+    <div class="d-flex align-items-center gap-1">
+        <i class="fas fa-stopwatch text-muted me-1"></i>
+        <button class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" id="bpmMenosInline" style="width: 26px; height: 26px; padding: 0;"><i class="fas fa-minus" style="font-size: 10px;"></i></button>
+        <span id="bpmDisplayInline" class="fw-bold" style="min-width: 32px; text-align: center; color: #009F98;">120</span>
+        <button class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" id="bpmMasInline" style="width: 26px; height: 26px; padding: 0;"><i class="fas fa-plus" style="font-size: 10px;"></i></button>
+        <button class="btn btn-sm btn-primary ms-1" id="startMetronomoInline"><i class="fas fa-play" style="font-size: 12px;"></i></button>
+    </div>
+
+    <div class="vr"></div> <div class="d-flex align-items-center gap-1">
+        <i class="fas fa-music text-muted me-1"></i>
+        <div class="btn-group btn-group-sm shadow-sm" role="group">
+            <button type="button" class="btn btn-outline-info btn-nota-inline fw-bold px-2" data-nota="E2">E</button>
+            <button type="button" class="btn btn-outline-info btn-nota-inline fw-bold px-2" data-nota="A2">A</button>
+            <button type="button" class="btn btn-outline-info btn-nota-inline fw-bold px-2" data-nota="D3">D</button>
+            <button type="button" class="btn btn-outline-info btn-nota-inline fw-bold px-2" data-nota="G3">G</button>
+            <button type="button" class="btn btn-outline-info btn-nota-inline fw-bold px-2" data-nota="B3">B</button>
+            <button type="button" class="btn btn-outline-info btn-nota-inline fw-bold px-2" data-nota="E4">e</button>
+        </div>
+    </div>
+</div>
+
+<script src="tools.js"></script>
+
+
+<!--TOOLS.JS-->
+/* ===================================================
+   LÓGICA MUSICAL INLINE (Web Audio API)
+   =================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    // =========================================
+    // 1. MINI AFINADOR
+    // =========================================
+    let currentOscillator = null;
+    const noteFrequencies = {
+        'E2': 82.41, 'A2': 110.00, 'D3': 146.83,
+        'G3': 196.00, 'B3': 246.94, 'E4': 329.63
+    };
+
+    function playNote(frequency, btnElement) {
+        initAudio();
+        stopNote(); // Frena la nota anterior si tocás rápido otra
+
+        currentOscillator = audioCtx.createOscillator();
+        currentOscillator.type = 'triangle'; // Mejor sonido para graves
+        currentOscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); // Suena 3 segundos
+
+        currentOscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        currentOscillator.start();
+        currentOscillator.stop(audioCtx.currentTime + 3);
+
+        // Efecto visual de botón apretado
+        document.querySelectorAll('.btn-nota-inline').forEach(b => b.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        setTimeout(() => {
+            btnElement.classList.remove('active');
+        }, 3000);
+    }
+
+    function stopNote() {
+        if (currentOscillator) {
+            currentOscillator.stop();
+            currentOscillator = null;
+        }
+    }
+
+    document.querySelectorAll('.btn-nota-inline').forEach(btn => {
+        btn.addEventListener('click', function() {
+            playNote(noteFrequencies[this.dataset.nota], this);
+        });
+    });
+
+    // =========================================
+    // 2. MINI METRÓNOMO
+    // =========================================
+    let isMetronomeRunning = false;
+    let metronomeInterval = null;
+    let currentBpm = 120;
+
+    const bpmDisplay = document.getElementById('bpmDisplayInline');
+    const bpmMas = document.getElementById('bpmMasInline');
+    const bpmMenos = document.getElementById('bpmMenosInline');
+    const startMetronomoBtn = document.getElementById('startMetronomoInline');
+
+    function playClick() {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
+        
+        gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function updateBpm(newBpm) {
+        currentBpm = Math.max(40, Math.min(220, newBpm));
+        bpmDisplay.textContent = currentBpm;
+        
+        // Si ya está sonando, reinicia el tempo al vuelo
+        if (isMetronomeRunning) {
+            stopMetronome();
+            startMetronome();
+        }
+    }
+
+    function startMetronome() {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const intervalMs = (60 / currentBpm) * 1000;
+        playClick(); // Primer click
+        metronomeInterval = setInterval(playClick, intervalMs);
+        
+        // Cambia el ícono a Stop y color rojo
+        startMetronomoBtn.innerHTML = '<i class="fas fa-stop" style="font-size: 12px;"></i>';
+        startMetronomoBtn.classList.replace('btn-primary', 'btn-danger');
+        isMetronomeRunning = true;
+    }
+
+    function stopMetronome() {
+        clearInterval(metronomeInterval);
+        metronomeInterval = null;
+        
+        // Vuelve a ícono de Play y color principal
+        startMetronomoBtn.innerHTML = '<i class="fas fa-play" style="font-size: 12px;"></i>';
+        startMetronomoBtn.classList.replace('btn-danger', 'btn-primary');
+        isMetronomeRunning = false;
+    }
+
+    bpmMas.addEventListener('click', () => updateBpm(parseInt(currentBpm) + 1));
+    bpmMenos.addEventListener('click', () => updateBpm(parseInt(currentBpm) - 1));
+
+    startMetronomoBtn.addEventListener('click', () => {
+        isMetronomeRunning ? stopMetronome() : startMetronome();
+    });
+});
