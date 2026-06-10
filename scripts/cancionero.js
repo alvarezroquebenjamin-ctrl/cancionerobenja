@@ -201,6 +201,7 @@ window.canciones = {
     "Meditación": {
         "A Él la Gloria": { ruta: "meditacion/a-el-la-gloria.html", tono: "SOL", capo: 2 },
         "A Ti Te Alabo": { ruta: "meditacion/a-ti-te-alabo.html", tono: "DO", capo: 3 },
+        "A tus pies": { ruta: "meditacion/a-tus-pies.html", tono: "SOL", capo: 3 },
         "Abramos": { ruta: "meditacion/abramos.html", tono: "RE", capo: 1 },
         "Acógeme": { ruta: "meditacion/acogeme.html", tono: "RE", capo: 1 },
         "Acuérdate de mí": { ruta: "comunion/acuerdate-de-mi.html", tono: "LA", capo: 0 },
@@ -293,11 +294,13 @@ window.canciones = {
         "No hay amor más grande": { ruta: "comunion/no-hay-amor-mas-grande.html", tono: "DO", capo: 0 },
         "No mueras hermano": { ruta: "meditacion/no-mueras-hermano.html", tono: "SOL", capo: 0 },
         "No os preocupeis": { ruta: "meditacion/no-os-preocupeis.html", tono: "SOL", capo: 0 },
+        "No te canses": { ruta: "meditacion/no-te-canses.html", tono: "SOL", capo: 4 },
         "No tienen vino": { ruta: "meditacion/no-tienen-vino.html", tono: "DO", capo: 0 },
         "Noche": { ruta: "meditacion/noche.html", tono: "FA", capo: 0 },
         "Oh Padre": { ruta: "ofertorio/oh-padre.html", tono: "DO", capo: 0 },
         "Oración de confianza": { ruta: "meditacion/oracion-de-confianza.html", tono: "DO", capo: 0 },
         "Paz": { ruta: "meditacion/paz.html", tono: "LA", capo: 0 },
+        "Perdón (Helena)": { ruta: "meditacion/perdon-helena.html", tono: "DO", capo: 0 },
         "Perfume A Tus Pies": { ruta: "comunion/perfume-a-tus-pies.html", tono: "MI", capo: 0 },
         "Permanecer en ti": { ruta: "meditacion/permanecer-en-ti.html", tono: "SOL", capo: 0 },
         "Pescador de hombres": { ruta: "comunion/pescador-de-hombres.html", tono: "DO", capo: 0 },
@@ -556,6 +559,7 @@ window.canciones = {
         "Stabat": { ruta: "meditacion/stabat.html", tono: "LA", capo: 0 }
     },
     "JF":{
+        "Abrazo de Padre": {ruta:"jf/abrazo-de-padre.html", tono: "DO", capo: 1 },
         "Generación fundadora": {ruta:"jf/generacion-fundadora.html", tono: "SOL", capo: 0 },
         "Talita Kum": {ruta:"jf/talita-kum.html", tono: "DO", capo: 0 }
     },
