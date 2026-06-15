@@ -644,7 +644,7 @@ window.canciones = {
         "Hijos": { ruta: "como-un-niño/hijos.html", tono: "RE", capo: 0 },
         "Asemejanos a ti": { ruta: "como-un-niño/asemejanos-a-ti.html", tono: "RE", capo: 0 },
         "Vuela": { ruta: "como-un-niño/vuela.html", tono: "RE", capo: 0 },
-        "Padre nuestro": { ruta: "como-un-niño/padre-nuestro.html", tono: "RE", capo: 2 },
+        "Padre nuestro": { ruta: "como-un-niño/padre-nuestro-cun.html", tono: "RE", capo: 2 },
         "Como un niño": { ruta: "comunion/como-un-niño.html", tono: "SOL", capo: 0 }
     },
     "Porta": {
