@@ -653,3 +653,33 @@ body.modo-oscuro .album-card small {
 body.modo-oscuro .subtitulo-tonalidad {
     color: #ffffff !important; /* Blanco puro brillante */
 }
+
+/* ==========================================
+   CÍRCULO VISUAL FIJO (EFECTO LED REAL)
+   ========================================== */
+.metronomo-circulo {
+    width: 25px; 
+    height: 25px;
+    border-radius: 50%;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    
+    /* Estado Apagado */
+    background-color: #333; 
+    border: 2px solid #111;
+    
+    /* Transición suave SOLO para cuando se APAGA */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; 
+}
+
+/* Estado Encendido (Luz de semáforo pura) */
+#metronomo-visual.flash {
+    background: #00ff00 !important; /* Usamos 'background' a secas para matar cualquier color oscuro */
+    border-color: #00ff00 !important;
+    box-shadow: 0 0 15px 5px rgba(0, 255, 0, 0.9) !important; 
+    
+    /* EL SECRETO: Sin transición para que el encendido sea un latigazo instantáneo */
+    transition: none !important; 
+}

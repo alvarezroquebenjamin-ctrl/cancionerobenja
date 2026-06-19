@@ -123,38 +123,52 @@
       const lista = document.getElementById("programa-lista");
       lista.innerHTML = "";
 
+      // 1. INYECTAMOS REGLAS RESPONSIVAS (Móvil vs PC)
+      if (!document.getElementById("estilo-repertorio")) {
+          document.head.insertAdjacentHTML('beforeend', `
+            <style id="estilo-repertorio">
+              /* En celulares: Título arriba, botones abajo separados parejo */
+              .fila-programa { flex-direction: column; align-items: stretch; text-align: left; }
+              .controles-programa { width: 100%; justify-content: space-between; margin-top: 12px; }
+              
+              /* En PC: Todo en un solo renglón, botones a la derecha */
+              @media (min-width: 768px) {
+                  .fila-programa { flex-direction: row; align-items: center; }
+                  .controles-programa { width: auto; margin-top: 0; justify-content: flex-end; gap: 20px; }
+              }
+            </style>
+          `);
+      }
+
       programa.forEach((item, index) => {
         if (item.capo === undefined) item.capo = 0;
 
         const li = document.createElement("li");
-        li.classList.add("programa-item"); // Mantiene tu CSS original
-        li.style.display = "flex";
-        li.style.justifyContent = "space-between";
-        li.style.alignItems = "center";
-        li.style.marginBottom = "10px";
-        li.style.borderBottom = "1px solid #eee";
-        li.style.paddingBottom = "5px";
+        // Le sacamos los estilos fijos y le ponemos las clases inteligentes
+        li.className = "programa-item d-flex fila-programa mb-3 pb-3 border-bottom";
 
+        // EL TÍTULO (Piso 1)
         const textoSpan = document.createElement("span");
+        textoSpan.className = "fw-bold text-start";
         textoSpan.textContent = `${item.seccion}: ${item.nombre}`;
         li.appendChild(textoSpan);
 
+        // LOS CONTROLES (Piso 2)
         const buttonGroup = document.createElement('div');
-        buttonGroup.className = 'd-inline-flex align-items-center flex-wrap justify-content-end';
+        buttonGroup.className = 'd-flex flex-wrap align-items-center controles-programa gap-2';
 
-        // TONALIDAD (Usando tus clases originales)
+        // TONALIDAD
         const contTono = document.createElement("span");
-        contTono.classList.add("control-tono");
+        contTono.className = "control-tono d-flex align-items-center text-nowrap";
         contTono.innerHTML = `
-          <span class="flecha-tono" onclick="cambiarTono(${index}, -1)" style="cursor:pointer; color:#007bff;">◀</span>
-          <span class="tono-actual" style="margin: 0 5px;">${item.tono}</span>
-          <span class="flecha-tono" onclick="cambiarTono(${index}, 1)" style="cursor:pointer; color:#007bff;">▶</span>
+          <span class="flecha-tono" onclick="cambiarTono(${index}, -1)" style="cursor:pointer; color:#007bff; font-size:18px;">◀</span>
+          <span class="tono-actual text-center" style="min-width: 35px; font-weight: bold;">${item.tono}</span>
+          <span class="flecha-tono" onclick="cambiarTono(${index}, 1)" style="cursor:pointer; color:#007bff; font-size:18px;">▶</span>
         `;
         buttonGroup.appendChild(contTono);
 
         // CAPO
         const contCapo = document.createElement("span");
-        contCapo.style.marginLeft = "15px";
         let opcionesCapo = "";
         for(let i=0; i<=12; i++) {
             let texto = i === 0 ? "Sin Capo" : "Capo " + i;
@@ -162,15 +176,15 @@
             opcionesCapo += `<option value="${i}" ${seleccionado}>${texto}</option>`;
         }
         contCapo.innerHTML = `
-          <select class="form-select form-select-sm" style="width: auto; cursor:pointer; display:inline-block;" onchange="cambiarCapo(${index}, this.value)">
+          <select class="form-select form-select-sm" style="width: auto; cursor:pointer;" onchange="cambiarCapo(${index}, this.value)">
              ${opcionesCapo}
           </select>
         `;
         buttonGroup.appendChild(contCapo);
 
-        // BOTONES DE ACCIÓN
+        // BOTONES DE ACCIÓN (Mover y borrar)
         const divAcciones = document.createElement("div");
-        divAcciones.className = "btn-group ms-3";
+        divAcciones.className = "btn-group";
         divAcciones.innerHTML = `
           <button class="btn btn-outline-info btn-sm" onclick="moverCancion(${index}, -1)">↑</button>
           <button class="btn btn-outline-info btn-sm" onclick="moverCancion(${index}, 1)">↓</button>

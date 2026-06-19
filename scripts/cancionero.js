@@ -44,6 +44,8 @@ window.canciones = {
         "El Dios de la vida": { ruta: "entrada/el-dios-de-la-vida.html", tono: "DO", capo: 0 },
         "El pulso de Dios": { ruta: "entrada/el-pulso-de-dios.html", tono: "MI", capo: 1 },
         "En el nombre de Dios": { ruta: "entrada/en-el-nombre-de-dios.html", tono: "DO", capo: 0 },
+        "En el nombre del Padre": { ruta: "entrada/en-el-nombre-del-padre.html", tono: "SOL", capo: 0 },
+        "Que lindo llegar cantando": { ruta: "entrada/que-lindo-llegar-cantando.html", tono: "DO", capo: 0 },
         "Un nuevo sol": { ruta: "entrada/un-nuevo-sol.html", tono: "MI", capo: 2 }
     },
     "Perdón": {
@@ -1098,7 +1100,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // =============================================================================
-// 3. SÚPER MENÚ Y LÓGICA DE HERRAMIENTAS
+// 3. SÚPER MENÚ Y LÓGICA DE HERRAMIENTAS (CON METRÓNOMO INCLUIDO)
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function() {
     
@@ -1107,12 +1109,23 @@ document.addEventListener("DOMContentLoaded", function() {
     const modoGuardado = localStorage.getItem('cancionero_orden') || 'seccion';
     const esModoAlfabetico = modoGuardado === 'alfabetico';
 
+    // 1. INYECTAMOS EL CÍRCULO VISUAL Y EL MENÚ AL MISMO TIEMPO
     const menuHTML = `
+        <div id="metronomo-visual" class="metronomo-circulo"></div>
+
         <div id="super-menu-container">
             <div id="menu-content">
                 <div class="menu-row"><span class="menu-label">Favoritos</span><div style="display:flex; gap:5px;"><button class="mini-btn" id="fav-toggle">🤍</button><button class="mini-btn" id="fav-view">📂</button></div></div>
-                <div class="menu-row"><span class="menu-label">Orden</span><div style="display:flex; gap:5px;"><button class="mini-btn ${!esModoAlfabetico?'active':''}" id="mode-sec">Sección</button><button class="mini-btn ${esModoAlfabetico?'active':''}" id="mode-az">A-Z</button></div></div>
                 <div class="menu-row"><span class="menu-label">AutoScroll</span><div style="display:flex; gap:5px; align-items:center;"><button class="mini-btn" id="scroll-minus">－</button><span id="scroll-speed-display" style="font-size:14px; width:20px; text-align:center;">3</span><button class="mini-btn" id="scroll-plus">＋</button><button class="mini-btn" id="scroll-play" style="font-weight:bold;">▶</button></div></div>
+                
+                <div class="menu-row">
+                    <span class="menu-label">Metrónomo</span>
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <input type="number" id="bpm-number" min="40" max="220" value="120" style="width: 55px; text-align: center; border: 1px solid #ddd; border-radius: 5px; font-weight: bold; height: 35px; outline: none;">
+                        <button class="mini-btn" id="btn-metronomo" style="width: 40px; padding: 0;">▶</button>
+                    </div>
+                </div>
+                
                 <div class="menu-row"><span class="menu-label">Letra</span><div><button class="mini-btn" id="font-minus">A-</button><button class="mini-btn" id="font-plus">A+</button></div></div>
                 <div class="menu-row"><span class="menu-label">Tema</span><button class="mini-btn" id="toggle-theme">🌙</button></div>
             </div>
@@ -1124,10 +1137,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const menuTrigger = document.getElementById("menu-trigger");
     const menuContent = document.getElementById("menu-content");
     menuTrigger.onclick = () => { menuContent.classList.toggle("activo"); menuTrigger.innerHTML = menuContent.classList.contains("activo") ? "✖" : "☰"; };
-
-    // CAMBIO DE MODO
-    document.getElementById("mode-sec").onclick = () => { localStorage.setItem('cancionero_orden', 'seccion'); location.reload(); };
-    document.getElementById("mode-az").onclick = () => { localStorage.setItem('cancionero_orden', 'alfabetico'); location.reload(); };
 
     // FAVORITOS
     let favorites = JSON.parse(localStorage.getItem('cancionero_favoritos')) || [];
@@ -1161,7 +1170,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const closeFav = () => { document.getElementById("fav-modal").style.display="none"; document.getElementById("fav-overlay").style.display="none"; };
     document.getElementById("fav-close").onclick = closeFav; document.getElementById("fav-overlay").onclick = closeFav;
 
-    // AUTOSCROLL, LETRA, TEMA
+    // AUTOSCROLL
     let scrollSpeed=3, isScrolling=false, scrollInterval;
     const stopScroll = () => { clearInterval(scrollInterval); isScrolling=false; document.getElementById("scroll-play").innerHTML="▶"; document.getElementById("scroll-play").classList.remove("active"); document.documentElement.style.scrollBehavior="smooth"; };
     const startScroll = () => { clearInterval(scrollInterval); document.documentElement.style.scrollBehavior="auto"; const delay = 275-(scrollSpeed*20); scrollInterval=setInterval(()=>{ if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight) stopScroll(); else window.scrollTo(0,window.pageYOffset+1); }, delay); document.getElementById("scroll-play").innerHTML="⏸"; document.getElementById("scroll-play").classList.add("active"); isScrolling=true; };
@@ -1170,23 +1179,20 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed<10) { scrollSpeed++; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
     document.getElementById("scroll-minus").onclick = () => { if(scrollSpeed>1) { scrollSpeed--; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
 
-    // --- LÓGICA DE TAMAÑO DE LETRA (ADAPTADA PARA REPERTORIOS) ---
+    // TAMAÑO DE LETRA
     let fontSize = 100;
-    
-    // Esta función busca tanto la canción individual como las listas del repertorio
     const obtenerLetras = () => document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra");
 
-    // Aplicar el tamaño inicial y el interlineado
     setTimeout(() => {
         obtenerLetras().forEach(el => {
             el.style.fontSize = fontSize + "%";
             el.style.lineHeight = "1.5";
         });
-    }, 500); // Le damos medio segundo para que cargue el repertorio primero
+    }, 500); 
 
     const updFont = (v) => { 
         const letras = obtenerLetras();
-        if(letras.length === 0) return; // Si no hay letras en pantalla, no hace nada
+        if(letras.length === 0) return; 
         
         fontSize += v; 
         if(fontSize < 60) fontSize = 60; 
@@ -1200,6 +1206,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("font-plus").onclick = () => updFont(10);
     document.getElementById("font-minus").onclick = () => updFont(-10);
 
+    // TEMA MODO OSCURO
     const isDark = localStorage.getItem("cancionero_darkmode") === "true";
     const applyTheme = (d) => { 
         d ? document.body.classList.add("modo-oscuro") : document.body.classList.remove("modo-oscuro"); 
@@ -1211,6 +1218,70 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const oldBtn = document.getElementById("toggleChordsButton");
     if(oldBtn) oldBtn.onclick = function() { const c = document.querySelectorAll(".c"); if(c.length) { const v = c[0].style.display!=="none"; c.forEach(el=>el.style.display=v?"none":"inline"); }};
+
+    // -------------------------------------------------------------------------
+    // LÓGICA DEL METRÓNOMO INTEGRADA DE FORMA SEGURA
+    // -------------------------------------------------------------------------
+    let metronomoIntervalo = null;
+    let sonando = false;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const visual = document.getElementById('metronomo-visual');
+    const btnMetronomo = document.getElementById('btn-metronomo');
+    const bpmInput = document.getElementById('bpm-number');
+
+    function hacerBip() {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.type = "sine"; 
+        osc.frequency.value = 800; 
+        
+        gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.05);
+
+        // Hace parpadear el círculo
+    if(visual) {
+        visual.classList.add('flash');
+        // Le damos 100ms para que el color verde explote bien antes de apagarse
+        setTimeout(() => { visual.classList.remove('flash'); }, 100);
+    }
+    }
+
+    btnMetronomo.addEventListener('click', function() {
+        const bpm = bpmInput.value;
+        const milisegundos = 60000 / bpm; 
+
+        if (sonando) {
+            clearInterval(metronomoIntervalo);
+            btnMetronomo.innerHTML = "▶";
+            btnMetronomo.classList.remove("active"); // Usa el estilo nativo de tus mini-btn
+            sonando = false;
+            if(visual) visual.classList.remove('flash'); 
+        } else {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            
+            hacerBip(); 
+            metronomoIntervalo = setInterval(hacerBip, milisegundos);
+            
+            btnMetronomo.innerHTML = "⏹";
+            btnMetronomo.classList.add("active"); // Se pone azul oscuro
+            sonando = true;
+        }
+    });
+
+    bpmInput.addEventListener('input', function() {
+        let nuevoValor = this.value;
+        if (nuevoValor >= 40 && nuevoValor <= 220 && sonando) {
+            btnMetronomo.click(); 
+            btnMetronomo.click(); 
+        }
+    });
 });
 
 // =============================================================================
