@@ -1049,34 +1049,31 @@ document.addEventListener("DOMContentLoaded", function() {
             cursor: pointer;
         }
 
-        /* --- ADAPTACIÓN AL MODO OSCURO --- */
-        body.modo-oscuro .capo-selector-div label {
-            color: #e0e0e0;
-        }
-
-        body.modo-oscuro { background-color: #121212 !important; color: #e0e0e0 !important; }
+        /* --- ADAPTACIÓN AL MODO OSCURO (SOLO FONDOS OLED) --- */
+        body.modo-oscuro .capo-selector-div label { color: #e0e0e0; }
+        body.modo-oscuro { background-color: #000000 !important; color: #e0e0e0 !important; }
         body.modo-oscuro .texto { color: #e0e0e0 !important; }
         body.modo-oscuro a, body.modo-oscuro a:visited { color: #90caf9 !important; }
         body.modo-oscuro nav a, body.modo-oscuro .navbar a, body.modo-oscuro .nav-link, body.modo-oscuro .navbar-brand, body.modo-oscuro .dropdown-toggle { color: #ffffff !important; }
         body.modo-oscuro .card, body.modo-oscuro .list-group-item, body.modo-oscuro .btn, body.modo-oscuro a.btn, body.modo-oscuro .card a { color: #ffffff !important; }
-        body.modo-oscuro .card, body.modo-oscuro .list-group-item { background-color: #1e1e1e !important; border-color: #333 !important; }
-        body.modo-oscuro .btn:not(.btn-primary):not(.azul) { background-color: #1e1e1e !important; border-color: #333 !important; }
+        body.modo-oscuro .card, body.modo-oscuro .list-group-item { background-color: #000000 !important; border-color: #333 !important; }
+        body.modo-oscuro .btn:not(.btn-primary):not(.azul) { background-color: #000000 !important; border-color: #333 !important; }
         body.modo-oscuro .btn-primary, body.modo-oscuro .azul { color: #ffffff !important; }
-        body.modo-oscuro input, body.modo-oscuro .form-control { background-color: #222 !important; color: #fff !important; border-color: #444 !important; }
+        body.modo-oscuro input, body.modo-oscuro .form-control { background-color: #000000 !important; color: #fff !important; border-color: #444 !important; }
         
         /* Asegurar que el selector de Capo también se ponga oscuro */
-        body.modo-oscuro select.capo-dropdown { background-color: #222 !important; color: #90caf9 !important; border-color: #444 !important; }
+        body.modo-oscuro select.capo-dropdown { background-color: #000000 !important; color: #90caf9 !important; border-color: #444 !important; }
         
-        body.modo-oscuro #listaGlobal, body.modo-oscuro .dropdown-menu, body.modo-oscuro #fav-modal { background-color: #222 !important; border: 1px solid #444 !important; color: #fff !important; }
+        body.modo-oscuro #listaGlobal, body.modo-oscuro .dropdown-menu, body.modo-oscuro #fav-modal { background-color: #000000 !important; border: 1px solid #444 !important; color: #fff !important; }
         body.modo-oscuro #listaGlobal a, body.modo-oscuro .dropdown-item, body.modo-oscuro .fav-item a { border-bottom: 1px solid #333 !important; color: #e0e0e0 !important; }
-        body.modo-oscuro #listaGlobal a:hover, body.modo-oscuro .dropdown-item:hover { background-color: #333 !important; color: #fff !important; }
+        body.modo-oscuro #listaGlobal a:hover, body.modo-oscuro .dropdown-item:hover { background-color: #333 !important; color: #fff !important; } /* Mantenemos este en gris para que se note al tocar */
         body.modo-oscuro span.c, body.modo-oscuro .c { color: red !important; font-weight: bold; }
-        body.modo-oscuro #menu-content { background: #222; border-color: #444; }
+        body.modo-oscuro #menu-content { background: #000000; border-color: #444; }
         body.modo-oscuro .menu-label { color: #ccc; }
-        body.modo-oscuro .mini-btn { background: #333; border-color: #555; color: #fff; }
+        body.modo-oscuro .mini-btn { background: #000000; border-color: #555; color: #fff; }
         body.modo-oscuro #menu-trigger { background: #fff; color: #000; }
-        body.modo-oscuro .transpose-keys a { background-color: #000 !important; color: #fff !important; border: 1px solid #444 !important; }
-        body.modo-oscuro .transpose-keys a.selected { background-color: #444 !important; border-color: #fff !important; }
+        body.modo-oscuro .transpose-keys a { background-color: #000000 !important; color: #fff !important; border: 1px solid #444 !important; }
+        body.modo-oscuro .transpose-keys a.selected { background-color: #444 !important; border-color: #fff !important; } /* Mantenemos este en gris para saber qué tono elegiste */
 
         /* --- ARREGLO PARA QUE EL REPERTORIO SEA UNA SOLA PÁGINA --- */
         #letra, .zona-letra {
@@ -1106,32 +1103,47 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // =============================================================================
-// 3. SÚPER MENÚ Y LÓGICA DE HERRAMIENTAS (CON METRÓNOMO INCLUIDO)
+// 3. SÚPER MENÚ Y LÓGICA DE HERRAMIENTAS (VERSIÓN UNIFICADA)
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function() {
     
+    // --- 1. CONFIGURACIÓN INICIAL ---
     const esPaginaIndice = window.location.pathname.includes("indice") || window.location.pathname.includes("alfabetico");
     if (esPaginaIndice) localStorage.setItem('cancionero_orden', 'alfabetico');
     const modoGuardado = localStorage.getItem('cancionero_orden') || 'seccion';
     const esModoAlfabetico = modoGuardado === 'alfabetico';
 
-    // 1. INYECTAMOS EL CÍRCULO VISUAL Y EL MENÚ AL MISMO TIEMPO
+    // --- 2. INYECTAR EL MENÚ CON TODAS LAS HERRAMIENTAS ---
     const menuHTML = `
         <div id="metronomo-visual" class="metronomo-circulo"></div>
-
         <div id="super-menu-container">
             <div id="menu-content">
                 <div class="menu-row"><span class="menu-label">Favoritos</span><div style="display:flex; gap:5px;"><button class="mini-btn" id="fav-toggle">🤍</button><button class="mini-btn" id="fav-view">📂</button></div></div>
-                <div class="menu-row"><span class="menu-label">AutoScroll</span><div style="display:flex; gap:5px; align-items:center;"><button class="mini-btn" id="scroll-minus">－</button><span id="scroll-speed-display" style="font-size:14px; width:20px; text-align:center;">3</span><button class="mini-btn" id="scroll-plus">＋</button><button class="mini-btn" id="scroll-play" style="font-weight:bold;">▶</button></div></div>
                 
                 <div class="menu-row">
-                    <span class="menu-label">Metrónomo</span>
+                    <span class="menu-label">Tempo</span>
                     <div style="display:flex; gap:5px; align-items:center;">
                         <input type="number" id="bpm-number" min="40" max="220" value="120" style="width: 55px; text-align: center; border: 1px solid #ddd; border-radius: 5px; font-weight: bold; height: 35px; outline: none;">
                         <button class="mini-btn" id="btn-metronomo" style="width: 40px; padding: 0;">▶</button>
                     </div>
                 </div>
+
+                <div class="menu-row" style="flex-direction: column; align-items: flex-start;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
+                        <span class="menu-label">Afinador</span>
+                        <button class="mini-btn" id="btn-stop-tuner" style="padding: 2px 10px; font-size: 12px; display: none; background: #dc3545; color: white; border: none;">Silenciar</button>
+                    </div>
+                    <div style="display:flex; gap:5px; width: 100%; justify-content: space-between;">
+                        <button class="mini-btn btn-cuerda" data-freq="82.41">E</button>
+                        <button class="mini-btn btn-cuerda" data-freq="110.00">A</button>
+                        <button class="mini-btn btn-cuerda" data-freq="146.83">D</button>
+                        <button class="mini-btn btn-cuerda" data-freq="196.00">G</button>
+                        <button class="mini-btn btn-cuerda" data-freq="246.94">B</button>
+                        <button class="mini-btn btn-cuerda" data-freq="329.63">e</button>
+                    </div>
+                </div>
                 
+                <div class="menu-row"><span class="menu-label">AutoScroll</span><div style="display:flex; gap:5px; align-items:center;"><button class="mini-btn" id="scroll-minus">－</button><span id="scroll-speed-display" style="font-size:14px; width:20px; text-align:center;">3</span><button class="mini-btn" id="scroll-plus">＋</button><button class="mini-btn" id="scroll-play" style="font-weight:bold;">▶</button></div></div>
                 <div class="menu-row"><span class="menu-label">Letra</span><div><button class="mini-btn" id="font-minus">A-</button><button class="mini-btn" id="font-plus">A+</button></div></div>
                 <div class="menu-row"><span class="menu-label">Tema</span><button class="mini-btn" id="toggle-theme">🌙</button></div>
             </div>
@@ -1144,7 +1156,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const menuContent = document.getElementById("menu-content");
     menuTrigger.onclick = () => { menuContent.classList.toggle("activo"); menuTrigger.innerHTML = menuContent.classList.contains("activo") ? "✖" : "☰"; };
 
-    // FAVORITOS
+    // --- 3. FAVORITOS ---
     let favorites = JSON.parse(localStorage.getItem('cancionero_favoritos')) || [];
     const currentUrl = window.location.pathname;
     const currentTitle = document.title.split("-")[0].trim(); 
@@ -1172,11 +1184,11 @@ document.addEventListener("DOMContentLoaded", function() {
         menuContent.classList.remove("activo"); menuTrigger.innerHTML = "☰";
     };
     window.eliminarFav = (i) => { favorites.splice(i,1); localStorage.setItem('cancionero_favoritos', JSON.stringify(favorites)); document.getElementById("fav-view").click(); checkFav(); };
-    
     const closeFav = () => { document.getElementById("fav-modal").style.display="none"; document.getElementById("fav-overlay").style.display="none"; };
-    document.getElementById("fav-close").onclick = closeFav; document.getElementById("fav-overlay").onclick = closeFav;
+    document.getElementById("fav-close").onclick = closeFav; 
+    document.getElementById("fav-overlay").onclick = closeFav;
 
-    // AUTOSCROLL
+    // --- 4. AUTOSCROLL, FUENTE Y TEMA ---
     let scrollSpeed=3, isScrolling=false, scrollInterval;
     const stopScroll = () => { clearInterval(scrollInterval); isScrolling=false; document.getElementById("scroll-play").innerHTML="▶"; document.getElementById("scroll-play").classList.remove("active"); document.documentElement.style.scrollBehavior="smooth"; };
     const startScroll = () => { clearInterval(scrollInterval); document.documentElement.style.scrollBehavior="auto"; const delay = 275-(scrollSpeed*20); scrollInterval=setInterval(()=>{ if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight) stopScroll(); else window.scrollTo(0,window.pageYOffset+1); }, delay); document.getElementById("scroll-play").innerHTML="⏸"; document.getElementById("scroll-play").classList.add("active"); isScrolling=true; };
@@ -1185,34 +1197,21 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed<10) { scrollSpeed++; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
     document.getElementById("scroll-minus").onclick = () => { if(scrollSpeed>1) { scrollSpeed--; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
 
-    // TAMAÑO DE LETRA
     let fontSize = 100;
     const obtenerLetras = () => document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra");
-
-    setTimeout(() => {
-        obtenerLetras().forEach(el => {
-            el.style.fontSize = fontSize + "%";
-            el.style.lineHeight = "1.5";
-        });
-    }, 500); 
+    setTimeout(() => { obtenerLetras().forEach(el => { el.style.fontSize = fontSize + "%"; el.style.lineHeight = "1.5"; }); }, 500); 
 
     const updFont = (v) => { 
         const letras = obtenerLetras();
         if(letras.length === 0) return; 
-        
         fontSize += v; 
         if(fontSize < 60) fontSize = 60; 
         if(fontSize > 250) fontSize = 250; 
-        
-        letras.forEach(el => {
-            el.style.fontSize = fontSize + "%"; 
-        });
+        letras.forEach(el => { el.style.fontSize = fontSize + "%"; });
     };
-
     document.getElementById("font-plus").onclick = () => updFont(10);
     document.getElementById("font-minus").onclick = () => updFont(-10);
 
-    // TEMA MODO OSCURO
     const isDark = localStorage.getItem("cancionero_darkmode") === "true";
     const applyTheme = (d) => { 
         d ? document.body.classList.add("modo-oscuro") : document.body.classList.remove("modo-oscuro"); 
@@ -1225,12 +1224,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const oldBtn = document.getElementById("toggleChordsButton");
     if(oldBtn) oldBtn.onclick = function() { const c = document.querySelectorAll(".c"); if(c.length) { const v = c[0].style.display!=="none"; c.forEach(el=>el.style.display=v?"none":"inline"); }};
 
-    // -------------------------------------------------------------------------
-    // LÓGICA DEL METRÓNOMO INTEGRADA DE FORMA SEGURA
-    // -------------------------------------------------------------------------
+    // --- 5. MOTOR DE AUDIO SEGURO (METRÓNOMO Y AFINADOR) ---
+    // Agregamos este "inicializador" para evitar que el celular bloquee el sonido
+    let audioCtx;
+    function initAudio() {
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+    }
+
+    // Lógica del Metrónomo
     let metronomoIntervalo = null;
     let sonando = false;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const visual = document.getElementById('metronomo-visual');
     const btnMetronomo = document.getElementById('btn-metronomo');
     const bpmInput = document.getElementById('bpm-number');
@@ -1238,56 +1245,95 @@ document.addEventListener("DOMContentLoaded", function() {
     function hacerBip() {
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
-        
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        
         osc.type = "sine"; 
         osc.frequency.value = 800; 
-        
         gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-        
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.05);
-
-        // Hace parpadear el círculo
-    if(visual) {
-        visual.classList.add('flash');
-        // Le damos 100ms para que el color verde explote bien antes de apagarse
-        setTimeout(() => { visual.classList.remove('flash'); }, 100);
-    }
+        if(visual) {
+            visual.classList.add('flash');
+            setTimeout(() => { visual.classList.remove('flash'); }, 100);
+        }
     }
 
-    btnMetronomo.addEventListener('click', function() {
-        const bpm = bpmInput.value;
-        const milisegundos = 60000 / bpm; 
+    if (btnMetronomo && bpmInput) {
+        btnMetronomo.addEventListener('click', function() {
+            initAudio(); // Habilita el sonido en el primer click
+            const bpm = bpmInput.value;
+            const milisegundos = 60000 / bpm; 
+            if (sonando) {
+                clearInterval(metronomoIntervalo);
+                btnMetronomo.innerHTML = "▶";
+                btnMetronomo.classList.remove("active"); 
+                sonando = false;
+                if(visual) visual.classList.remove('flash'); 
+            } else {
+                hacerBip(); 
+                metronomoIntervalo = setInterval(hacerBip, milisegundos);
+                btnMetronomo.innerHTML = "⏹";
+                btnMetronomo.classList.add("active"); 
+                sonando = true;
+            }
+        });
 
-        if (sonando) {
-            clearInterval(metronomoIntervalo);
-            btnMetronomo.innerHTML = "▶";
-            btnMetronomo.classList.remove("active"); // Usa el estilo nativo de tus mini-btn
-            sonando = false;
-            if(visual) visual.classList.remove('flash'); 
-        } else {
-            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-            
-            hacerBip(); 
-            metronomoIntervalo = setInterval(hacerBip, milisegundos);
-            
-            btnMetronomo.innerHTML = "⏹";
-            btnMetronomo.classList.add("active"); // Se pone azul oscuro
-            sonando = true;
+        bpmInput.addEventListener('input', function() {
+            if (this.value >= 40 && this.value <= 220 && sonando) {
+                btnMetronomo.click(); btnMetronomo.click(); 
+            }
+        });
+    }
+
+    // Lógica del Afinador
+    let afinadorOscilador = null;
+    let afinadorGanancia = null;
+    const btnStopTuner = document.getElementById('btn-stop-tuner');
+    const botonesCuerdas = document.querySelectorAll('.btn-cuerda');
+
+    function detenerAfinador() {
+        if (afinadorOscilador && audioCtx) {
+            afinadorGanancia.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            afinadorOscilador.stop(audioCtx.currentTime + 0.1);
+            afinadorOscilador = null;
         }
+        botonesCuerdas.forEach(b => b.classList.remove('active'));
+        if (btnStopTuner) btnStopTuner.style.display = 'none';
+    }
+
+    botonesCuerdas.forEach(boton => {
+        boton.addEventListener('click', function() {
+            initAudio(); // Habilita el sonido en el primer click
+            
+            if (this.classList.contains('active')) {
+                detenerAfinador();
+                return;
+            }
+            
+            detenerAfinador();
+            this.classList.add('active');
+            if (btnStopTuner) btnStopTuner.style.display = 'block';
+
+            const frecuencia = parseFloat(this.getAttribute('data-freq'));
+            afinadorOscilador = audioCtx.createOscillator();
+            afinadorGanancia = audioCtx.createGain();
+            
+            afinadorOscilador.connect(afinadorGanancia);
+            afinadorGanancia.connect(audioCtx.destination);
+            afinadorOscilador.type = "triangle"; 
+            afinadorOscilador.frequency.value = frecuencia;
+            
+            afinadorGanancia.gain.setValueAtTime(0, audioCtx.currentTime);
+            afinadorGanancia.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.1);
+            
+            afinadorOscilador.start();
+        });
     });
 
-    bpmInput.addEventListener('input', function() {
-        let nuevoValor = this.value;
-        if (nuevoValor >= 40 && nuevoValor <= 220 && sonando) {
-            btnMetronomo.click(); 
-            btnMetronomo.click(); 
-        }
-    });
+    if (btnStopTuner) {
+        btnStopTuner.addEventListener('click', detenerAfinador);
+    }
 });
 
 // =============================================================================

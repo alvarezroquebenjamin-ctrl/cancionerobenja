@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v11'; 
+const CACHE_NAME = 'cancionero-v12'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -358,6 +358,7 @@ const urlsToCache = [
 '/cancionerobenja/espiritu-santo/ven-espiritu-santo.html',
 '/cancionerobenja/comunion/ven-jesus-de-nazareth.html',
 '/cancionerobenja/comunion/ven-pastor.html',
+'/cancionerobenja/salida/ven-y-reina-madre-de-dios.html',
 '/cancionerobenja/meditacion/ven-y-sigueme.html',
 '/cancionerobenja/meditacion/ven-y-veras.html',
 '/cancionerobenja/meditacion/vengan-a-mi.html',
