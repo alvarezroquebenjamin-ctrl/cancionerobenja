@@ -1130,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <div class="menu-row" style="flex-direction: column; align-items: flex-start;">
                     <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                        <span class="menu-label">Afinador</span>
+                        <span class="menu-label">Afinadorx</span>
                         <button class="mini-btn" id="btn-stop-tuner" style="padding: 2px 10px; font-size: 12px; display: none; background: #dc3545; color: white; border: none;">Silenciar</button>
                     </div>
                     <div style="display:flex; gap:5px; width: 100%; justify-content: space-between;">
@@ -1225,14 +1225,38 @@ document.addEventListener("DOMContentLoaded", function() {
     if(oldBtn) oldBtn.onclick = function() { const c = document.querySelectorAll(".c"); if(c.length) { const v = c[0].style.display!=="none"; c.forEach(el=>el.style.display=v?"none":"inline"); }};
 
     // --- 5. MOTOR DE AUDIO SEGURO (METRÓNOMO Y AFINADOR) ---
-    // Agregamos este "inicializador" para evitar que el celular bloquee el sonido
-    let audioCtx;
+    let audioCtx = null;
+    let safariDesbloqueado = false;
+
+    // La llave maestra para iOS: un buffer vacío al primer toque
+    function unlockAppleAudio() {
+        if (safariDesbloqueado) return;
+        
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx) audioCtx = new AudioContext();
+        
+        // Creamos un sonido de 0 segundos (silencio absoluto) y lo reproducimos
+        const buffer = audioCtx.createBuffer(1, 1, 22050);
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(audioCtx.destination);
+        source.start(0);
+        
+        audioCtx.resume();
+        safariDesbloqueado = true;
+        
+        // Una vez desbloqueado, dejamos de escuchar los toques
+        document.removeEventListener('touchstart', unlockAppleAudio);
+        document.removeEventListener('click', unlockAppleAudio);
+    }
+
+    // Le decimos a la página: "Apenas el usuario toque CUALQUIER cosa, desbloqueá el audio"
+    document.addEventListener('touchstart', unlockAppleAudio, { once: true });
+    document.addEventListener('click', unlockAppleAudio, { once: true });
+
     function initAudio() {
-        if (!audioCtx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-        }
-        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        if (!audioCtx) unlockAppleAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
     // Lógica del Metrónomo
@@ -1243,6 +1267,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const bpmInput = document.getElementById('bpm-number');
 
     function hacerBip() {
+        if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         osc.connect(gainNode);
@@ -1261,7 +1286,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (btnMetronomo && bpmInput) {
         btnMetronomo.addEventListener('click', function() {
-            initAudio(); // Habilita el sonido en el primer click
+            initAudio(); 
             const bpm = bpmInput.value;
             const milisegundos = 60000 / bpm; 
             if (sonando) {
@@ -1273,7 +1298,7 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 hacerBip(); 
                 metronomoIntervalo = setInterval(hacerBip, milisegundos);
-                btnMetronomo.innerHTML = "⏹";
+                btnMetronomo.innerHTML = "⏸";
                 btnMetronomo.classList.add("active"); 
                 sonando = true;
             }
@@ -1304,7 +1329,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     botonesCuerdas.forEach(boton => {
         boton.addEventListener('click', function() {
-            initAudio(); // Habilita el sonido en el primer click
+            initAudio(); 
             
             if (this.classList.contains('active')) {
                 detenerAfinador();
