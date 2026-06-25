@@ -1131,7 +1131,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             @media (max-width: 768px) {
                 #super-menu-container {
-                    bottom: 80px !important;
+                    bottom: 20px !important;
                     right: 15px !important;
                 }
             }
