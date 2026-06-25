@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v13'; 
+const CACHE_NAME = 'cancionero-v14'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -221,6 +221,7 @@ const urlsToCache = [
 '/cancionerobenja/meditacion/lo-que-importa-es-el-amor.html',
 '/cancionerobenja/meditacion/magnificat.html',
 '/cancionerobenja/comunion/mais-longe.html',
+'/cancionerobenja/comunion/mais-longe-español.html',
 '/cancionerobenja/salida/mar-adentro.html',
 '/cancionerobenja/espiritu-santo/maranatha.html',
 '/cancionerobenja/meditacion/maravillas-hizo-en-mi.html',
@@ -396,7 +397,7 @@ const urlsToCache = [
 '/cancionerobenja/quiero-construirte-una-casa-señor/ofrenda.html',
 '/cancionerobenja/quiero-construirte-una-casa-señor/venid-a-mi.html',
 '/cancionerobenja/quiero-construirte-una-casa-señor/siervo-de-dios.html',
-'/cancionerobenja/quiero-construirte-una-casa-señor/ven-y-veras.html',
+'/cancionerobenja/quiero-construirte-una-casa-señor/ven-y-veras-qcucs.html',
 '/cancionerobenja/quiero-construirte-una-casa-señor/pasas-madre.html',
 '/cancionerobenja/quiero-construirte-una-casa-señor/encuentro.html',
 '/cancionerobenja/quiero-construirte-una-casa-señor/con-la-vuelta-del-sol.html',

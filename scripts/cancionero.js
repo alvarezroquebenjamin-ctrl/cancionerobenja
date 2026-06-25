@@ -59,7 +59,7 @@ window.canciones = {
         "Gloria 1 (Clásico)": { ruta: "gloria/gloria-1.html", tono: "RE", capo: 1 },
         "Gloria 2 (con respuesta)": { ruta: "gloria/gloria-2.html", tono: "DO", capo: 0 },
         "Gloria 3 (Litúrgico)": { ruta: "gloria/gloria-3.html", tono: "SOL", capo: 3 },
-        "Gloria 4 (Nortino)": { ruta: "gloria/gloria-4.html", tono: "FA", capo: 0 },
+        "Gloria 4 (Nortino)": { ruta: "gloria/gloria-4.html", tono: "FA", capo: 2 },
         "Letanías": { ruta: "gloria/letanias.html", tono: "RE", capo: 0 },
         "Pregón Pascual": { ruta: "gloria/pregon-pascual.html", tono: "DO", capo: 0 }
     },
@@ -162,6 +162,7 @@ window.canciones = {
         "La niña de tus ojos": { ruta: "comunion/la-niña-de-tus-ojos.html", tono: "MI", capo: 0 },
         "Labor del apostol": { ruta: "comunion/labor-del-apostol.html", tono: "DO", capo: 0 },
         "Mais Longe": { ruta: "comunion/mais-longe.html", tono: "SOL", capo: 0 },
+        "Mais Longe (Español": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
         "María (Servus Mariae)": { ruta: "marianos/maria-servus-mariae.html", tono: "SOL", capo: 0 },
         "María Madre": { ruta: "comunion/maria-madre.html", tono: "MI", capo: 0 },
         "María tierra del Padre": { ruta: "comunion/maria-tierra-del-padre.html", tono: "LA", capo: 0 },
@@ -283,6 +284,7 @@ window.canciones = {
         "Lo que importa es el amor": { ruta: "meditacion/lo-que-importa-es-el-amor.html", tono: "RE", capo: 0 },
         "Magnificat (Portugués)": { ruta: "meditacion/magnificat.html", tono: "DO", capo: 0 },
         "Mais Longe": { ruta: "comunion/mais-longe.html", tono: "SOL", capo: 0 },
+        "Mais Longe (Español": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
         "Maranatha": { ruta: "espiritu-santo/maranatha.html", tono: "SOL", capo: 1 },
         "Maravillas hizo en mi": { ruta: "meditacion/maravillas-hizo-en-mi.html", tono: "DO", capo: 0 },
         "María (Servus Mariae)": { ruta: "marianos/maria-servus-mariae.html", tono: "SOL", capo: 0 },
@@ -596,7 +598,7 @@ window.canciones = {
         "Ofrenda (Trilla y Vendimia)": { ruta: "quiero-construirte-una-casa-señor/ofrenda.html", tono: "DO", capo: 0 },
         "Venid a mi": { ruta: "quiero-construirte-una-casa-señor/venid-a-mi.html", tono: "LA", capo: 3 },
         "Siervo de Dios": { ruta: "quiero-construirte-una-casa-señor/siervo-de-dios.html", tono: "RE", capo: 0 },
-        "Ven y verás": { ruta: "quiero-construirte-una-casa-señor/ven-y-veras.html", tono: "SOL", capo: 0 },
+        "Ven y verás": { ruta: "quiero-construirte-una-casa-señor/ven-y-veras-qcucs.html", tono: "SOL", capo: 0 },
         "Pasas Madre": { ruta: "quiero-construirte-una-casa-señor/pasas-madre.html", tono: "DO", capo: 0 },
         "Encuentro": { ruta: "quiero-construirte-una-casa-señor/encuentro.html", tono: "MI", capo: 1 },
         "Con la vuelta del Sol": { ruta: "quiero-construirte-una-casa-señor/con-la-vuelta-del-sol.html", tono: "DO", capo: 1 },
@@ -1113,39 +1115,249 @@ document.addEventListener("DOMContentLoaded", function() {
     const modoGuardado = localStorage.getItem('cancionero_orden') || 'seccion';
     const esModoAlfabetico = modoGuardado === 'alfabetico';
 
-    // --- 2. INYECTAR EL MENÚ CON TODAS LAS HERRAMIENTAS ---
+    // --- 2. INYECTAR EL MENÚ CON TODAS LAS HERRAMIENTAS (DISEÑO BLINDADO iOS/OLED) ---
     const menuHTML = `
+        <style>
+            /* Asegurar la posición fija del contenedor del menú */
+            #super-menu-container {
+                position: fixed !important;
+                bottom: 30px !important;
+                right: 20px !important;
+                z-index: 2147483647 !important;
+                font-family: sans-serif !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-end !important;
+            }
+            @media (max-width: 768px) {
+                #super-menu-container {
+                    bottom: 80px !important;
+                    right: 15px !important;
+                }
+            }
+
+            /* EL CIRCULITO (BOTÓN TRIGGER) - 100% BLINDADO */
+            #menu-trigger {
+                width: 50px !important;
+                height: 50px !important;
+                border-radius: 50% !important;
+                background-color: #0A2846 !important;
+                color: white !important;
+                border: none !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important;
+                font-size: 24px !important;
+                cursor: pointer !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+                transition: transform 0.2s !important;
+            }
+            @media (max-width: 768px) {
+                #menu-trigger {
+                    width: 55px !important;
+                    height: 55px !important;
+                }
+            }
+            #menu-trigger:active { transform: scale(0.95) !important; }
+            body.modo-oscuro #menu-trigger {
+                background: #ffffff !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+            }
+
+            /* Contenedor del contenido del menú */
+            #menu-content { 
+                display: none !important;
+                flex-direction: column;
+                background: white;
+                border-radius: 18px; 
+                padding: 12px 18px; 
+                gap: 5px;
+                border: 1px solid #eee;
+                margin-bottom: 10px;
+                min-width: 200px;
+            }
+            #menu-content.activo { 
+                display: flex !important; 
+            }
+            body.modo-oscuro #menu-content { 
+                background-color: #000000 !important; 
+                border-color: #2C2C2E !important; 
+            }
+            
+            /* Separadores de fila súper sutiles */
+            .menu-row { 
+                border-bottom: 1px solid #f0f0f0; 
+                padding: 12px 0; 
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            body.modo-oscuro .menu-row { 
+                border-bottom-color: #1C1C1E; 
+            }
+            .menu-row:last-child { border-bottom: none; }
+            
+            /* Etiquetas con jerarquía visual (tipo Apple) */
+            .menu-label { 
+                font-size: 12px !important; 
+                font-weight: 700 !important; 
+                text-transform: uppercase; 
+                letter-spacing: 0.8px; 
+                color: #8E8E93 !important; 
+                margin-right: 10px;
+            }
+            
+            /* Píldoras agrupadoras (Segmented Controls) */
+            .pildora { 
+                display: flex; 
+                align-items: center; 
+                background: #F2F2F7; 
+                border-radius: 10px; 
+                padding: 3px; 
+            }
+            body.modo-oscuro .pildora { background: #1C1C1E; }
+            
+            /* Botones dentro de la píldora */
+            .btn-pildora { 
+                background: transparent; 
+                border: none; 
+                border-radius: 8px; 
+                padding: 6px 14px; 
+                font-weight: 700; 
+                font-size: 15px; 
+                color: #1C1C1E;
+                transition: background 0.2s;
+            }
+            body.modo-oscuro .btn-pildora { color: #FFFFFF; }
+            .btn-pildora:active, .btn-pildora.active { background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            body.modo-oscuro .btn-pildora:active, body.modo-oscuro .btn-pildora.active { background: #2C2C2E; box-shadow: none; }
+            
+            /* Botones independientes (Favoritos, Luna) */
+            .btn-suelto { 
+                background: #F2F2F7; 
+                border: none; 
+                border-radius: 10px; 
+                padding: 8px 14px; 
+                font-weight: bold; 
+                color: #1C1C1E;
+                transition: transform 0.1s;
+            }
+            body.modo-oscuro .btn-suelto { background: #1C1C1E; color: #FFFFFF; }
+            .btn-suelto:active { transform: scale(0.95); }
+
+            /* Afinador: Teclas circulares */
+            .btn-circulo {
+                width: 38px; 
+                height: 38px; 
+                border-radius: 50%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                background: #F2F2F7; 
+                border: none; 
+                font-weight: 700; 
+                font-size: 14px; 
+                color: #1C1C1E;
+                padding: 0;
+            }
+            body.modo-oscuro .btn-circulo { background: #1C1C1E; color: #FFFFFF; }
+            .btn-circulo.active { background: #0A2846; color: #fff; }
+            body.modo-oscuro .btn-circulo.active { background: #0A84FF; color: #fff; }
+
+            /* Input Numérico Transparente */
+            .input-invisible { 
+                background: transparent; 
+                border: none; 
+                text-align: center; 
+                font-weight: 700; 
+                font-size: 16px; 
+                width: 45px; 
+                outline: none; 
+                color: #1C1C1E;
+            }
+            body.modo-oscuro .input-invisible { color: #FFFFFF; }
+            
+            /* Rayita separadora en píldoras */
+            .separador-pildora {
+                width: 1px; 
+                background: #C7C7CC; 
+                margin: 0 2px; 
+                align-self: stretch; 
+                opacity: 0.6;
+            }
+            body.modo-oscuro .separador-pildora { background: #38383A; }
+            body.modo-oscuro .divisor-tema { background: #1C1C1E !important; }
+        </style>
+
         <div id="metronomo-visual" class="metronomo-circulo"></div>
         <div id="super-menu-container">
             <div id="menu-content">
-                <div class="menu-row"><span class="menu-label">Favoritos</span><div style="display:flex; gap:5px;"><button class="mini-btn" id="fav-toggle">🤍</button><button class="mini-btn" id="fav-view">📂</button></div></div>
                 
                 <div class="menu-row">
-                    <span class="menu-label">Tempo</span>
-                    <div style="display:flex; gap:5px; align-items:center;">
-                        <input type="number" id="bpm-number" min="40" max="220" value="120" style="width: 55px; text-align: center; border: 1px solid #ddd; border-radius: 5px; font-weight: bold; height: 35px; outline: none;">
-                        <button class="mini-btn" id="btn-metronomo" style="width: 40px; padding: 0;">▶</button>
+                    <span class="menu-label">Favoritos</span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-suelto" id="fav-toggle">🤍</button>
+                        <button class="btn-suelto" id="fav-view">📂</button>
                     </div>
                 </div>
 
-                <div class="menu-row" style="flex-direction: column; align-items: flex-start;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
-                        <span class="menu-label">Afinadorx</span>
-                        <button class="mini-btn" id="btn-stop-tuner" style="padding: 2px 10px; font-size: 12px; display: none; background: #dc3545; color: white; border: none;">Silenciar</button>
+                <div class="menu-row">
+                    <span class="menu-label">Modo Offline</span>
+                        <button class="btn-suelto" id="btn-descargar-todo">⬇️ Bajar Todo</button>
+                </div>
+
+                <div class="menu-row">
+                    <span class="menu-label">Tempo</span>
+                    <div class="pildora">
+                        <input type="number" id="bpm-number" class="input-invisible" min="40" max="220" value="120">
+                        <div class="separador-pildora"></div>
+                        <button class="btn-pildora" id="btn-metronomo" style="padding: 6px 14px;">▶</button>
                     </div>
-                    <div style="display:flex; gap:5px; width: 100%; justify-content: space-between;">
-                        <button class="mini-btn btn-cuerda" data-freq="82.41">E</button>
-                        <button class="mini-btn btn-cuerda" data-freq="110.00">A</button>
-                        <button class="mini-btn btn-cuerda" data-freq="146.83">D</button>
-                        <button class="mini-btn btn-cuerda" data-freq="196.00">G</button>
-                        <button class="mini-btn btn-cuerda" data-freq="246.94">B</button>
-                        <button class="mini-btn btn-cuerda" data-freq="329.63">e</button>
+                </div>
+
+                <div class="menu-row" style="flex-direction: column; align-items: flex-start; border-bottom: 1px solid transparent;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 12px;">
+                        <span class="menu-label">Afinador</span>
+                        <button class="btn-suelto" id="btn-stop-tuner" style="padding: 2px 10px; font-size: 12px; display: none; color: #FF453A; background: transparent;">Silenciar</button>
+                    </div>
+                    <div style="display:flex; width: 100%; justify-content: space-between; gap: 4px;">
+                        <button class="btn-circulo btn-cuerda" data-freq="82.41">E</button>
+                        <button class="btn-circulo btn-cuerda" data-freq="110.00">A</button>
+                        <button class="btn-circulo btn-cuerda" data-freq="146.83">D</button>
+                        <button class="btn-circulo btn-cuerda" data-freq="196.00">G</button>
+                        <button class="btn-circulo btn-cuerda" data-freq="246.94">B</button>
+                        <button class="btn-circulo btn-cuerda" data-freq="329.63">e</button>
                     </div>
                 </div>
                 
-                <div class="menu-row"><span class="menu-label">AutoScroll</span><div style="display:flex; gap:5px; align-items:center;"><button class="mini-btn" id="scroll-minus">－</button><span id="scroll-speed-display" style="font-size:14px; width:20px; text-align:center;">3</span><button class="mini-btn" id="scroll-plus">＋</button><button class="mini-btn" id="scroll-play" style="font-weight:bold;">▶</button></div></div>
-                <div class="menu-row"><span class="menu-label">Letra</span><div><button class="mini-btn" id="font-minus">A-</button><button class="mini-btn" id="font-plus">A+</button></div></div>
-                <div class="menu-row"><span class="menu-label">Tema</span><button class="mini-btn" id="toggle-theme">🌙</button></div>
+                <div style="width: 100%; height: 1px; background: #f0f0f0; margin-bottom: 0;" class="divisor-tema"></div>
+
+                <div class="menu-row">
+                    <span class="menu-label">Auto Scroll</span>
+                    <div class="pildora">
+                        <button class="btn-pildora" id="scroll-minus">－</button>
+                        <span id="scroll-speed-display" class="input-invisible" style="width:25px; line-height:30px;">3</span>
+                        <button class="btn-pildora" id="scroll-plus">＋</button>
+                        <div class="separador-pildora"></div>
+                        <button class="btn-pildora" id="scroll-play">▶</button>
+                    </div>
+                </div>
+
+                <div class="menu-row">
+                    <span class="menu-label">Letra</span>
+                    <div class="pildora">
+                        <button class="btn-pildora" id="font-minus">A-</button>
+                        <div class="separador-pildora"></div>
+                        <button class="btn-pildora" id="font-plus">A+</button>
+                    </div>
+                </div>
+
+                <div class="menu-row">
+                    <span class="menu-label">Tema</span>
+                    <button class="btn-suelto" id="toggle-theme">🌙</button>
+                </div>
+
             </div>
             <button id="menu-trigger">☰</button>
         </div>
@@ -1362,23 +1574,40 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 // =============================================================================
-// 4. NAVEGACIÓN ENTRE CANCIONES (CORREGIDO)
+// 4. NAVEGACIÓN ENTRE CANCIONES (CORREGIDO DEFINITIVO Y BLINDADO)
 // =============================================================================
 document.addEventListener("DOMContentLoaded", function() {
     if (!document.getElementById("letra")) return;
 
-    let esModoAlfabetico = localStorage.getItem('cancionero_orden') === 'alfabetico';
     const pathCompleto = window.location.pathname;
     const archivoActual = decodeURI(pathCompleto.split("/").pop()); 
     const carpetaActual = decodeURI(pathCompleto.split("/").slice(-2, -1)[0]); 
+    const carpetaLimpia = carpetaActual.replace(/-/g, " ").toLowerCase();
     const hasBaseTag = document.getElementsByTagName('base').length > 0;
 
-    let playlist = [];
-    
-    // NUEVO: Verificamos si venimos navegando dentro de una sección específica
+    // 1. LEER LA URL: El Autocorrector nos manda un mensaje secreto por la URL
     const params = new URLSearchParams(window.location.search);
     const seccionFijada = params.get('seccion');
+    
+    // 2. CURA PARA EL "BUG": Decidir el modo sin quedarse trabado en la memoria vieja
+    let esModoAlfabetico = localStorage.getItem('cancionero_orden') === 'alfabetico';
+    
+    if (seccionFijada) {
+        // Si el click vino desde el Índice Alfabético...
+        if (seccionFijada.toLowerCase().includes("alfab")) {
+            esModoAlfabetico = true;
+            localStorage.setItem('cancionero_orden', 'alfabetico'); // Refresca la memoria
+        } 
+        // Si el click vino desde CUALQUIER otro lado (Un álbum o sección)...
+        else {
+            esModoAlfabetico = false;
+            localStorage.setItem('cancionero_orden', 'seccion'); // Destraba la memoria
+        }
+    }
 
+    let playlist = [];
+
+    // 3. ARMAR LA LISTA DE CANCIONES SEGÚN EL MODO
     if (esModoAlfabetico) {
         let todasLasCanciones = [];
         for (const [seccion, objCanciones] of Object.entries(window.canciones)) {
@@ -1394,17 +1623,15 @@ document.addEventListener("DOMContentLoaded", function() {
         for (const [nombreSeccion, cancionesDeSeccion] of Object.entries(window.canciones)) {
             const listaDeSeccion = Object.entries(cancionesDeSeccion).map(([k, v]) => ({ t: k, ...v, sec: nombreSeccion }));
             
-            // FIX: Usamos split('/').pop() para buscar la coincidencia EXACTA del archivo
             const estaAqui = listaDeSeccion.some(c => c.ruta.split('/').pop() === archivoActual);
             
             if (estaAqui) {
-                // Si la URL nos dice en qué sección estamos, le damos prioridad absoluta
                 if (seccionFijada && seccionFijada === nombreSeccion) {
                     playlist = listaDeSeccion;
-                    break;
+                    break; // Coincidencia absoluta por la URL, ¡dejamos de buscar!
                 }
-                // Si no, intentamos adivinar por la carpeta
-                const coincideCarpeta = nombreSeccion.toLowerCase().includes(carpetaActual.toLowerCase());
+                // Plan B por si el usuario tipeó el link a mano y no hay "seccionFijada"
+                const coincideCarpeta = nombreSeccion.toLowerCase().includes(carpetaLimpia);
                 if (coincideCarpeta || playlist.length === 0) { 
                     playlist = listaDeSeccion; 
                 }
@@ -1414,7 +1641,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (playlist.length === 0) return;
 
-    // FIX: Volvemos a usar la coincidencia EXACTA para encontrar el índice de la canción
     let indiceActual = playlist.findIndex(c => c.ruta.split('/').pop() === archivoActual);
     if (indiceActual === -1) return;
 
@@ -1424,10 +1650,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let htmlBotones = "";
     
-    // Función para armar el link y pasarle la sección de forma invisible
+    // 4. ARMAR LOS LINKS (Arrastrando la memoria de la sección para el siguiente click)
     const getLink = (rutaDestino, seccion) => {
         let link = hasBaseTag ? rutaDestino : "../" + rutaDestino;
-        if (!esModoAlfabetico && seccion) {
+        
+        if (esModoAlfabetico) {
+            link += "?seccion=Índice%20alfabético";
+        } else if (seccionFijada) {
+            link += `?seccion=${encodeURIComponent(seccionFijada)}`;
+        } else if (seccion) {
             link += `?seccion=${encodeURIComponent(seccion)}`;
         }
         return link;
@@ -1838,4 +2069,85 @@ const dbAcordes = {
     };
     document.getElementById("acorde-close").onclick = cerrarAcorde;
     document.getElementById("acorde-overlay").onclick = cerrarAcorde;
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const btnDescargar = document.getElementById("btn-descargar-todo");
+    if (!btnDescargar) return;
+
+    btnDescargar.addEventListener("click", async function() {
+        const btn = this;
+        
+        btn.innerText = "⏳ Bajando...";
+        btn.disabled = true;
+
+        try {
+            const cache = await caches.open('cancionero-cache-v1'); 
+            let rutasParaBajar = [];
+            
+            // Forzamos la raíz de tu proyecto para que no se pierda en GitHub Pages
+            const baseRepo = "/cancionerobenja/"; 
+
+            // 1. Recolectamos todas las canciones
+            for (const seccion in window.canciones) {
+                for (const cancion in window.canciones[seccion]) {
+                    const ruta = window.canciones[seccion][cancion].ruta;
+                    // Armamos la ruta absoluta perfecta
+                    const rutaAbsoluta = ruta.startsWith(baseRepo) ? ruta : baseRepo + ruta;
+                    
+                    if (!rutasParaBajar.includes(rutaAbsoluta)) {
+                        rutasParaBajar.push(rutaAbsoluta);
+                    }
+                }
+            }
+
+            // 2. Agregamos archivos extra manualmente (tu imagen, por ejemplo)
+            rutasParaBajar.push(baseRepo + 'comunion/files/hasta-que-el-mundo-arda-por-el-tab.png');
+            // Por las dudas aseguramos el CSS y el JS
+            rutasParaBajar.push(baseRepo + 'css/cancionero.css');
+            rutasParaBajar.push(baseRepo + 'scripts/cancionero.js'); 
+
+            let descargadas = 0;
+            let fallidas = 0;
+
+            // 3. LA MAGIA: Bajamos UNA POR UNA. Si una falla, no corta el resto.
+            await Promise.all(rutasParaBajar.map(async (ruta) => {
+                try {
+                    const response = await fetch(ruta);
+                    if (response.ok) {
+                        await cache.put(ruta, response);
+                        descargadas++;
+                    } else {
+                        console.warn("⚠️ Archivo no encontrado (ignorado):", ruta);
+                        fallidas++;
+                    }
+                } catch (err) {
+                    console.warn("⚠️ Fallo de red al bajar:", ruta);
+                    fallidas++;
+                }
+            }));
+
+            console.log(`✅ Finalizado: ${descargadas} descargadas. ❌ ${fallidas} no encontradas.`);
+
+            // 4. Mostramos el resultado en el botón
+            if (fallidas === 0) {
+                btn.innerText = "✅ ¡Todo Guardado!";
+            } else {
+                btn.innerText = `⚠️ Bajó con ${fallidas} faltantes`;
+            }
+            
+            setTimeout(() => {
+                btn.innerText = "⬇️ Bajar Todo";
+                btn.disabled = false;
+            }, 4000);
+
+        } catch (error) {
+            console.error("Error crítico al interactuar con el caché:", error);
+            btn.innerText = "❌ Error crítico";
+            setTimeout(() => {
+                btn.innerText = "⬇️ Reintentar";
+                btn.disabled = false;
+            }, 3000);
+        }
+    });
 });

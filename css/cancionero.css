@@ -683,3 +683,179 @@ body.modo-oscuro .subtitulo-tonalidad {
     /* EL SECRETO: Sin transición para que el encendido sea un latigazo instantáneo */
     transition: none !important; 
 }
+
+
+
+/* ===================================================
+   NUEVO TEMA: FOGÓN MODERNO (Plano y Limpio)
+   =================================================== */
+
+/* 1. Importamos las fuentes modernas de Google */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Outfit:wght@500;700;800&display=swap');
+
+/* 2. Paleta de Colores Global "Sierras" */
+:root {
+    --color-fondo: #FDFBF7; /* Hueso/Papel muy cálido */
+    --color-texto: #2C3E50; /* Azul noche */
+    --color-fogon: #E24E1B; /* Naranja arcilla */
+    --color-pino: #2A9D8F;  /* Verde naturaleza */
+    --color-acordes: #ff0000; /* Rojo intenso */
+}
+
+/* 3. Tipografías y Fondos Diurnos */
+body {
+    background-color: var(--color-fondo) !important;
+    color: var(--color-texto) !important;
+    font-family: 'Nunito', sans-serif !important;
+}
+
+h1, h2, h3, .titulo, .seccion, .nuevotitulo {
+    font-family: 'Outfit', sans-serif !important;
+    color: var(--color-texto) !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+}
+
+/* TITULO PRINCIPAL (CANCIONERO CATÓLICO...) SIEMPRE BLANCO */
+.portada {
+    color: #ffffff !important;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8) !important; /* Sombrita solo al texto para que lea contra la foto */
+}
+
+/* 4. Estilo de Acordes (Sin marco, sin fondo, 100% texto limpio) */
+span.c {
+    font-family: 'Iosevka Term Web', monospace !important;
+    color: var(--color-acordes) !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    font-weight: bold;
+    /* Chau al text-transform para que respeten la 'm' minúscula */
+}
+
+body.modo-oscuro span.c {
+    background-color: transparent !important;
+    color: #ff6b81 !important;
+}
+
+/* 5. Modernización de Botones (Estilo Pill, Flat Design - 0 Sombras) */
+.btn {
+    border-radius: 50px !important; 
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    transition: background-color 0.2s ease, transform 0.1s ease !important;
+    box-shadow: none !important; /* ELIMINA TODAS LAS SOMBRAS */
+}
+
+/* Botones de la lista de canciones (Visibles en ambos modos) */
+.btn-outline-primary {
+    background-color: rgba(42, 157, 143, 0.08) !important; /* Un fondecito verde muuuuy transparente */
+    color: var(--color-texto) !important;
+    border: 2px solid var(--color-pino) !important; /* Marco verde pino visible */
+    box-shadow: none !important;
+    font-weight: 700 !important;
+}
+
+body.modo-oscuro .btn-outline-primary {
+    background-color: rgba(42, 157, 143, 0.15) !important; /* Un poco más de fondo para la noche */
+    color: #ffffff !important; /* Letra blanca */
+    border: 2px solid var(--color-pino) !important;
+}
+
+/* Efecto al tocar la canción */
+.btn-outline-primary:hover, .btn-outline-primary:active {
+    background-color: var(--color-pino) !important;
+    color: #ffffff !important;
+}
+
+/* Botones principales sólidos (Los que no son de la lista) */
+.btn-primary, .btn-info, .btn-outline-info {
+    background-color: var(--color-pino) !important;
+    color: white !important;
+    border: none !important; 
+    box-shadow: none !important; 
+}
+
+/* 6. BOTONES ANTERIOR / SIGUIENTE (Con marcos visibles) */
+.btn-outline-secondary {
+    background-color: transparent !important;
+    color: var(--color-texto) !important;
+    border: 2px solid #cbd5e1 !important; /* MARCO GRIS VISIBLE DE DÍA */
+    box-shadow: none !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f1f5f9 !important;
+    color: var(--color-texto) !important;
+}
+
+body.modo-oscuro .btn-outline-secondary {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: 2px solid #555555 !important; /* MARCO GRIS VISIBLE DE NOCHE */
+}
+
+body.modo-oscuro .btn-outline-secondary:hover {
+    background-color: #222222 !important;
+    color: #ffffff !important;
+}
+
+/* Suavizado general de la letra de la canción */
+.texto, pre {
+    color: var(--color-texto) !important;
+}
+body.modo-oscuro .texto, body.modo-oscuro pre {
+    color: #e0e0e0 !important;
+}
+
+/* ===================================================
+   CORRECCIONES DE VISIBILIDAD Y ACCESIBILIDAD
+   =================================================== */
+
+/* 1. Títulos legibles y contrastantes en Modo Oscuro */
+body.modo-oscuro h1, 
+body.modo-oscuro h2, 
+body.modo-oscuro h3, 
+body.modo-oscuro .titulo, 
+body.modo-oscuro .seccion, 
+body.modo-oscuro .nuevotitulo {
+    color: #00979f !important;
+}
+
+/* 2. Marcos visibles para los botones de "Arma tu repertorio" (Flechas y X) */
+.cancion-item .btn, .programa-item .btn {
+    border: 2px solid #cbd5e1 !important; /* Marco gris clarito de día */
+    background-color: transparent !important;
+    color: var(--color-texto) !important;
+    border-radius: 8px !important; /* Un poco redondeados para que hagan juego */
+}
+
+body.modo-oscuro .cancion-item .btn, body.modo-oscuro .programa-item .btn {
+    border-color: #555555 !important; /* Marco gris oscuro de noche */
+    color: #ffffff !important;
+}
+
+/* Efecto al pasar el mouse por las flechitas */
+.cancion-item .btn:hover, .programa-item .btn:hover {
+    background-color: rgba(128, 128, 128, 0.15) !important;
+}
+
+/* Blindaje para que el título de portada sea SIEMPRE blanco, incluso en modo oscuro */
+body.modo-oscuro .portada,
+body.modo-oscuro h1.portada,
+body.modo-oscuro .portada h1 {
+    color: #ffffff !important;
+}
+
+.contenedor-pdf {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.img-fluid {
+    width: 100%;
+    height: auto; /* Esto es vital para que no se deforme */
+    display: block;
+}
