@@ -2151,3 +2151,70 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+// =============================================================================
+// 6. EASTER EGG: RULETA DE CANCIONES
+// =============================================================================
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // Función que hace girar la ruleta
+    function tocarCancionRandom(e) {
+        if(e) e.preventDefault();
+        
+        let todosLosTemas = [];
+        
+        for (const seccion in window.canciones) {
+            for (const titulo in window.canciones[seccion]) {
+                todosLosTemas.push({ 
+                    titulo: titulo, 
+                    ruta: window.canciones[seccion][titulo].ruta 
+                });
+            }
+        }
+        
+        if (todosLosTemas.length > 0) {
+            const random = Math.floor(Math.random() * todosLosTemas.length);
+            const temaElegido = todosLosTemas[random];
+            
+            alert("🕊️ El Espíritu Santo sopló esta canción: " + temaElegido.titulo);
+            
+            const hasBaseTag = document.getElementsByTagName('base').length > 0;
+            const path = window.location.pathname;
+            const esRaiz = path.endsWith("index.html") || path.endsWith("/") || !path.includes(".html");
+            
+            window.location.href = hasBaseTag ? temaElegido.ruta : (esRaiz ? temaElegido.ruta : "../" + temaElegido.ruta);
+        }
+    }
+
+    // --- ESCONDITE 1: TRIPLE CLICK EN LA PORTADA ---
+    const tituloPortada = document.querySelector(".portada");
+    if (tituloPortada) {
+        let contadorClicks = 0;
+        let temporizador;
+
+        tituloPortada.addEventListener("click", function(e) {
+            contadorClicks++;
+            
+            // Si es el primer click, arranca el cronómetro (medio segundo para hacer los 3 clicks)
+            if (contadorClicks === 1) {
+                temporizador = setTimeout(() => { 
+                    contadorClicks = 0; // Si tardaste mucho, se resetea
+                }, 500); 
+            }
+            
+            // ¡Si metió el triple click a tiempo, premio!
+            if (contadorClicks === 3) {
+                clearTimeout(temporizador);
+                contadorClicks = 0;
+                tocarCancionRandom(e);
+            }
+        });
+    }
+
+    // --- ESCONDITE 2: EL DADO INVISIBLE EN EL SÚPER MENÚ ---
+    // (Buscamos si creaste el botón con ID "dado-secreto")
+    const dadoSecreto = document.getElementById("dado-secreto");
+    if (dadoSecreto) {
+        dadoSecreto.addEventListener("click", tocarCancionRandom);
+    }
+});
