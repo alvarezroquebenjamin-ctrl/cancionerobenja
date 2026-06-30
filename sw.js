@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v14'; 
+const CACHE_NAME = 'cancionero-v15'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -34,6 +34,8 @@ const urlsToCache = [
     '/cancionerobenja/18-jf.html',
     '/cancionerobenja/19-indice-alfabetico.html',
     '/cancionerobenja/20-albumes.html',
+    '/cancionerobenja/donaciones.html',
+    '/cancionerobenja/sugerencias.html',
   
   // 2. Las páginas de los álbumes
   '/cancionerobenja/20-albumes.html',

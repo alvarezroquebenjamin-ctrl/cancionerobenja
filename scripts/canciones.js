@@ -52,7 +52,7 @@ const canciones = {
         "Santo 1 (Hacia el Padre)": { ruta: "santo/santo1.html", tono: "DO" },
         "Santo 2 (Hosanna)": { ruta: "santo/santo2.html", tono: "SOL" },
         "Santo 3 (Clásico)": { ruta: "santo/santo3.html", tono: "DO" },
-        "Santo 4 (Nuevo)": { ruta: "santo/santo4.html", tono: "RE" },
+        "Santo 4 (Tucumano)": { ruta: "santo/santo4.html", tono: "RE" },
         "Santo 5 (Saaanto)": { ruta: "santo/santo5.html", tono: "LA" }
     },
     "Padrenuestro": {

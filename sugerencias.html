@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base href="/cancionerobenja/">
+  
+  <link rel="icon" href="images/logo-schoenstatt-png.png" type="image/png">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JT9R1R0NHX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JT9R1R0NHX');
+</script>
+<meta charset="utf-8">
+<title>Sugerencias</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://alvarezroquebenjamin-ctrl.github.io/cancionerobenja/sugerencias.html">
+<link rel="stylesheet" type="text/css" href="css/cancionero.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<!-- PEGÁ ESTO ACÁ -->
+<style>
+    .formulario-estilos .form-control, 
+    .formulario-estilos .form-select {
+        background-color: #ffffff !important;
+        color: #333333 !important;
+        border: 1px solid #cccccc !important;
+    }
+    .formulario-estilos .form-control:focus, 
+    .formulario-estilos .form-select:focus {
+        background-color: #ffffff !important;
+        color: #333333 !important;
+        border-color: #00979f !important;
+        box-shadow: 0 0 5px rgba(0, 151, 159, 0.5) !important;
+    }
+    .formulario-estilos .form-control::placeholder {
+        color: #888888 !important;
+    }
+</style>
+<!-- FIN DE LO QUE TENÉS QUE PEGAR -->
+
+</head>
+
+<body>
+  
+<div id="nav-placeholder"></div>
+<script>
+$(function(){
+  $("#nav-placeholder").load("navbar.html");
+});
+</script>
+
+
+<div class="titulo">
+  <h1>💡 Sugerencias</h1>
+</div>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 text-center">
+            
+            <h2 class="mb-4" style="color: #00979f;">Buzón de Sugerencias</h2>
+            
+            <p class="mb-4" style="font-size: 1.1rem; line-height: 1.6;">
+                ¿Encontraste un error en un acorde, querés proponer una canción nueva o mejorar algo del cancionero? Llená este formulario y el mensaje nos llega directo.
+            </p>
+
+            <!-- FORMULARIO CONECTADO A FORMSPREE -->
+            <form action="https://formspree.io/f/xnjkzyjk" method="POST" class="p-4 shadow-sm text-start" style="background-color: var(--nav-bg, #fff); border-radius: 12px; border: 1px solid rgba(128,128,128,0.2);">
+                
+                <div class="mb-3">
+                    <label class="form-label" style="font-weight: bold; color: var(--text-color, #333);">¿De qué trata tu sugerencia?</label>
+                    <select name="tipo_sugerencia" id="tipo-sugerencia" class="form-select" style="background-color: #ffffff !important; color: #333333 !important; border: 1px solid #ccc;" required>
+                        <option value="" disabled selected>Elegí una opción...</option>
+                        <option value="Sugerencia sobre una canción">🎵 Sugerencia sobre una canción de la lista</option>
+                        <option value="Canción nueva">✨ Sugerir una canción nueva</option>
+                        <option value="Sugerencia general">🛠️ Sugerencia general sobre la página</option>
+                    </select>
+                </div>
+
+                <!-- CONTENEDOR DEL BUSCADOR DE CANCIONES (Oculto por defecto) -->
+                <div class="mb-3" id="contenedor-buscar-cancion" style="display: none; position: relative;">
+                    <label class="form-label" style="font-weight: bold; color: var(--text-color, #333);">Buscá la canción:</label>
+                    <input type="text" id="input-cancion" name="cancion_especifica" class="form-control" placeholder="Escribí para buscar la canción..." autocomplete="off" style="background-color: #ffffff !important; color: #333333 !important; border: 1px solid #ccc;">
+                    
+                    <div id="lista-sugerencias" style="position: absolute; width: 100%; z-index: 1000; max-height: 200px; overflow-y: auto; display: none; background-color: #ffffff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" style="font-weight: bold; color: var(--text-color, #333);">Tu nombre (Opcional)</label>
+                    <input type="text" name="nombre" class="form-control" style="background-color: #ffffff !important; color: #333333 !important; border: 1px solid #ccc;">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label" style="font-weight: bold; color: var(--text-color, #333);">Tu comentario / sugerencia</label>
+                    <textarea name="mensaje" class="form-control" rows="4" placeholder="Ej: En el estribillo me parece que va un Re menor en vez de un Sol..." style="background-color: #ffffff !important; color: #333333 !important; border: 1px solid #ccc;" required></textarea>
+                </div>
+
+                <button type="submit" class="btn text-white w-100 py-3 mt-2" style="background-color: #00979f; font-weight: bold; font-size: 1.1rem; border-radius: 10px; border: none;">
+                    📤 Enviar Sugerencia
+                </button>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+<script src="scripts/cancionero.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectTipo = document.getElementById("tipo-sugerencia");
+        const contenedorBuscar = document.getElementById("contenedor-buscar-cancion");
+        const inputCancion = document.getElementById("input-cancion");
+        const listaSugerencias = document.getElementById("lista-sugerencias");
+        
+        // 1. Mostrar/Ocultar el buscador según lo que se elija
+        if (selectTipo) {
+            selectTipo.addEventListener("change", function() {
+                if (this.value === "Sugerencia sobre una canción") {
+                    contenedorBuscar.style.display = "block";
+                    inputCancion.setAttribute("required", "required");
+                } else {
+                    contenedorBuscar.style.display = "none";
+                    inputCancion.removeAttribute("required");
+                    inputCancion.value = ""; 
+                    listaSugerencias.style.display = "none";
+                }
+            });
+        }
+
+        // 2. Lógica del buscador con ultra-deduplicación
+        if (contenedorBuscar && window.canciones) {
+            let listaTitulos = [];
+            let llavesUnicas = []; // Array auxiliar para comparar textos puros
+
+            for (const seccion in window.canciones) {
+                for (const titulo in window.canciones[seccion]) {
+                    const tituloLimpio = titulo.trim(); // Saca espacios vacíos al inicio y final
+                    
+                    // Creamos una "llave" idéntica: todo en minúsculas y sin tildes
+                    const llaveNormalizada = tituloLimpio.toLowerCase()
+                                                         .normalize("NFD")
+                                                         .replace(/[\u0300-\u036f]/g, "");
+
+                    // Si esa llave única no la procesamos antes, guardamos la canción
+                    if (!llavesUnicas.includes(llaveNormalizada)) {
+                        llavesUnicas.push(llaveNormalizada);
+                        listaTitulos.push(tituloLimpio); // Guarda el título lindo original
+                    }
+                }
+            }
+            
+            // Ordenamos alfabéticamente de forma perfecta
+            listaTitulos.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+
+            // Función para limpiar lo que escribe el usuario en tiempo real
+            function limpiarTexto(texto) {
+                return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[,.():-]/g, "").toLowerCase().trim();
+            }
+
+            // Evento de escritura
+            inputCancion.addEventListener("input", function() {
+                const textoBuscado = limpiarTexto(this.value);
+                listaSugerencias.innerHTML = ""; 
+
+                if (textoBuscado === "") {
+                    listaSugerencias.style.display = "none";
+                    return;
+                }
+
+                // Filtramos ignorando tildes y mayúsculas
+                const resultados = listaTitulos.filter(titulo => limpiarTexto(titulo).includes(textoBuscado));
+
+                if (resultados.length > 0) {
+                    listaSugerencias.style.display = "block";
+                    
+                    resultados.forEach(titulo => {
+                        const boton = document.createElement("button");
+                        boton.type = "button";
+                        boton.textContent = titulo;
+                        
+                        // Estilos fijos para las opciones
+                        boton.style.cssText = "width: 100%; text-align: left; padding: 12px 15px; background: #ffffff; color: #333333; border: none; border-bottom: 1px solid #eee; font-size: 1rem; transition: background 0.1s;";
+                        
+                        // Efectos visuales de selección
+                        boton.addEventListener("mouseover", () => boton.style.background = "#f1f3f4");
+                        boton.addEventListener("mouseout", () => boton.style.background = "#ffffff");
+                        
+                        boton.addEventListener("click", function() {
+                            inputCancion.value = titulo;
+                            listaSugerencias.style.display = "none";
+                        });
+                        
+                        listaSugerencias.appendChild(boton);
+                    });
+                } else {
+                    listaSugerencias.style.display = "none";
+                }
+            });
+
+            // Ocultar si hacen clic afuera
+            document.addEventListener("click", function(evento) {
+                if (!contenedorBuscar.contains(evento.target)) {
+                    listaSugerencias.style.display = "none";
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

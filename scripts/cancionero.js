@@ -102,7 +102,7 @@ window.canciones = {
         "Santo 1 (Hacia el Padre)": { ruta: "santo/santo1.html", tono: "DO", capo: 0 },
         "Santo 2 (Hosanna)": { ruta: "santo/santo2.html", tono: "SOL", capo: 0 },
         "Santo 3 (Clásico)": { ruta: "santo/santo3.html", tono: "DO", capo: 0 },
-        "Santo 4 (Nuevo)": { ruta: "santo/santo4.html", tono: "RE", capo: 0 },
+        "Santo 4 (Tucumano)": { ruta: "santo/santo4.html", tono: "RE", capo: 0 },
         "Santo 5 (Saaanto)": { ruta: "santo/santo5.html", tono: "LA", capo: 0 },
         "Santo 6 (Santo es)": { ruta: "santo/santo6.html", tono: "SOL", capo: 0 },
         "Santo 7 (No Pasará)": { ruta: "santo/santo7.html", tono: "FA", capo: 0 }
@@ -162,7 +162,7 @@ window.canciones = {
         "La niña de tus ojos": { ruta: "comunion/la-niña-de-tus-ojos.html", tono: "MI", capo: 0 },
         "Labor del apostol": { ruta: "comunion/labor-del-apostol.html", tono: "DO", capo: 0 },
         "Mais Longe": { ruta: "comunion/mais-longe.html", tono: "SOL", capo: 0 },
-        "Mais Longe (Español": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
+        "Mais Longe (Español)": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
         "María (Servus Mariae)": { ruta: "marianos/maria-servus-mariae.html", tono: "SOL", capo: 0 },
         "María Madre": { ruta: "comunion/maria-madre.html", tono: "MI", capo: 0 },
         "María tierra del Padre": { ruta: "comunion/maria-tierra-del-padre.html", tono: "LA", capo: 0 },
@@ -284,7 +284,7 @@ window.canciones = {
         "Lo que importa es el amor": { ruta: "meditacion/lo-que-importa-es-el-amor.html", tono: "RE", capo: 0 },
         "Magnificat (Portugués)": { ruta: "meditacion/magnificat.html", tono: "DO", capo: 0 },
         "Mais Longe": { ruta: "comunion/mais-longe.html", tono: "SOL", capo: 0 },
-        "Mais Longe (Español": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
+        "Mais Longe (Español)": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
         "Maranatha": { ruta: "espiritu-santo/maranatha.html", tono: "SOL", capo: 1 },
         "Maravillas hizo en mi": { ruta: "meditacion/maravillas-hizo-en-mi.html", tono: "DO", capo: 0 },
         "María (Servus Mariae)": { ruta: "marianos/maria-servus-mariae.html", tono: "SOL", capo: 0 },
@@ -2103,6 +2103,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // 2. Agregamos archivos extra manualmente (tu imagen, por ejemplo)
             rutasParaBajar.push(baseRepo + 'comunion/files/hasta-que-el-mundo-arda-por-el-tab.png');
+            rutasParaBajar.push(baseRepo + 'comunion/files/mais-longe-tab.png');
+            rutasParaBajar.push(baseRepo + 'donaciones.html');
             // Por las dudas aseguramos el CSS y el JS
             rutasParaBajar.push(baseRepo + 'css/cancionero.css');
             rutasParaBajar.push(baseRepo + 'scripts/cancionero.js'); 
