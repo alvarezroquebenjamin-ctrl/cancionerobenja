@@ -1317,7 +1317,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <div class="menu-row">
                     <span class="menu-label">Tempo</span>
                     <div class="pildora">
-                        <input type="number" id="bpm-number" class="input-invisible" min="40" max="220" value="120">
+                        <input type="number" id="bpm-number" class="input-invisible" min="30" max="240" value="120">
                         <div class="separador-pildora"></div>
                         <button class="btn-pildora" id="btn-metronomo" style="padding: 6px 14px;">▶</button>
                     </div>
@@ -1521,7 +1521,20 @@ document.addEventListener("DOMContentLoaded", function() {
     if (btnMetronomo && bpmInput) {
         btnMetronomo.addEventListener('click', function() {
             initAudio(); 
-            const bpm = bpmInput.value;
+            
+            // --- VALIDACIÓN DE MÍNIMO Y MÁXIMO ---
+            let bpm = parseInt(bpmInput.value);
+            
+            if (isNaN(bpm) || bpm < 30) {
+                bpm = 30; // Límite inferior
+            }
+            if (bpm > 250) {
+                bpm = 250; // Límite superior
+            }
+            
+            bpmInput.value = bpm; // Actualiza el número en la pantallita
+            // -------------------------------------
+            
             const milisegundos = 60000 / bpm; 
             
             if (sonando) {
@@ -1542,13 +1555,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 sonando = true;
             }
         });
+}
 
-        bpmInput.addEventListener('input', function() {
-            if (this.value >= 40 && this.value <= 220 && sonando) {
-                btnMetronomo.click(); btnMetronomo.click(); 
+// ==========================================
+// APAGAR METRÓNOMO TOCANDO LAS BOLITAS
+// ==========================================
+if (contenedorBolitas) {
+    // Le ponemos el cursor de "manito" para que se note que es un botón
+    contenedorBolitas.style.cursor = 'pointer'; 
+    
+    contenedorBolitas.addEventListener('click', function() {
+        if (sonando) {
+            clearInterval(metronomoIntervalo);
+            if (btnMetronomo) {
+                btnMetronomo.innerHTML = "▶";
+                btnMetronomo.classList.remove("active"); 
             }
-        });
-    }
+            sonando = false;
+            tiempoActual = 1; 
+            contenedorBolitas.style.display = 'none'; 
+        }
+    });
+}
 
     // Lógica del Afinador
     let afinadorOscilador = null;
@@ -2256,5 +2284,29 @@ document.addEventListener("DOMContentLoaded", function() {
     const dadoSecreto = document.getElementById("dado-secreto");
     if (dadoSecreto) {
         dadoSecreto.addEventListener("click", tocarCancionRandom);
+    }
+});
+
+// ==========================================
+// CERRAR SÚPER MENÚ AL HACER CLIC AFUERA
+// ==========================================
+document.addEventListener('click', function(event) {
+    const menuContent = document.getElementById('menu-content');
+    const menuTrigger = document.getElementById('menu-trigger');
+
+    // Verificamos que el menú y el botón existan en la página
+    if (menuContent && menuTrigger) {
+        // Solo actuamos si el menú está actualmente abierto
+        if (menuContent.classList.contains('activo')) {
+            // Revisamos si el clic fue adentro del menú o en el botón mismo
+            const clicEnMenu = menuContent.contains(event.target);
+            const clicEnBoton = menuTrigger.contains(event.target);
+
+            // Si el clic fue afuera de ambos, cerramos el menú
+            if (!clicEnMenu && !clicEnBoton) {
+                menuContent.classList.remove('activo');
+                menuTrigger.innerHTML = "☰"; // Restauramos el ícono del botón
+            }
+        }
     }
 });
