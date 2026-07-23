@@ -560,6 +560,7 @@ window.canciones = {
         "Estandarte": { ruta: "comunion/estandarte.html", tono: "RE", capo: 0 },
         "Hasta que el mundo arda por Él": { ruta: "comunion/hasta-que-el-mundo-arda-por-el.html", tono: "SOL", capo: 0 },
         "Herencia (José Engling)": { ruta: "jm/herencia.html", tono: "DO", capo: 0 },
+        "Himno de José Engling": { ruta: "jm/himno-de-jose-engling.html", tono: "FA", capo: 1 },
         "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
         "Mi 110%": { ruta: "meditacion/mi-110.html", tono: "FA", capo: 0 },
         "Oración de Franz Reinisch": { ruta: "jm/oracion-de-franz-reinisch.html", tono: "SOL", capo: 0 },
@@ -1290,7 +1291,13 @@ document.addEventListener("DOMContentLoaded", function() {
             body.modo-oscuro .divisor-tema { background: #1C1C1E !important; }
         </style>
 
-        <div id="metronomo-visual" class="metronomo-circulo"></div>
+        <!-- CONTENEDOR DE LAS 4 BOLITAS -->
+        <div id="contenedor-bolitas" style="display:none; position:fixed; top:30px; right:30px; gap:8px; z-index:2147483647; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 20px; align-items: center;">
+            <div id="bolita-1" style="width:20px; height:20px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
+            <div id="bolita-2" style="width:15px; height:15px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
+            <div id="bolita-3" style="width:15px; height:15px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
+            <div id="bolita-4" style="width:15px; height:15px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
+        </div>
         <div id="super-menu-container">
             <div id="menu-content">
                 
@@ -1471,10 +1478,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    // Lógica del Metrónomo
+    // Lógica del Metrónomo de 4 tiempos
     let metronomoIntervalo = null;
     let sonando = false;
-    const visual = document.getElementById('metronomo-visual');
+    let tiempoActual = 1; // Arranca en el tiempo 1
+
+    const contenedorBolitas = document.getElementById('contenedor-bolitas');
     const btnMetronomo = document.getElementById('btn-metronomo');
     const bpmInput = document.getElementById('bpm-number');
 
@@ -1485,15 +1494,28 @@ document.addEventListener("DOMContentLoaded", function() {
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         osc.type = "sine"; 
-        osc.frequency.value = 800; 
+        
+        // Magia del sonido: Si es el tiempo 1, suena más agudo (1200), sino normal (800)
+        osc.frequency.value = (tiempoActual === 1) ? 1200 : 800; 
+        
         gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + 0.05);
-        if(visual) {
-            visual.classList.add('flash');
-            setTimeout(() => { visual.classList.remove('flash'); }, 100);
+
+        // Magia visual: Pintamos las bolitas
+        if (contenedorBolitas) {
+            // 1. Apagamos todas las bolitas (las ponemos grises)
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById('bolita-' + i).style.background = '#ccc';
+            }
+            // 2. Prendemos la que toca (Rojo para el 1, Azul para las demás)
+            let bolitaActiva = document.getElementById('bolita-' + tiempoActual);
+            bolitaActiva.style.background = (tiempoActual === 1) ? '#FF3B30' : '#0A84FF';
         }
+
+        // Pasamos al siguiente tiempo. Si llegó a 4, vuelve a empezar en 1.
+        tiempoActual = (tiempoActual === 4) ? 1 : tiempoActual + 1;
     }
 
     if (btnMetronomo && bpmInput) {
@@ -1501,13 +1523,18 @@ document.addEventListener("DOMContentLoaded", function() {
             initAudio(); 
             const bpm = bpmInput.value;
             const milisegundos = 60000 / bpm; 
+            
             if (sonando) {
+                // APAGAR
                 clearInterval(metronomoIntervalo);
                 btnMetronomo.innerHTML = "▶";
                 btnMetronomo.classList.remove("active"); 
                 sonando = false;
-                if(visual) visual.classList.remove('flash'); 
+                tiempoActual = 1; // Reseteamos para que la próxima arranque en 1
+                if (contenedorBolitas) contenedorBolitas.style.display = 'none'; // Ocultamos bolitas
             } else {
+                // PRENDER
+                if (contenedorBolitas) contenedorBolitas.style.display = 'flex'; // Mostramos bolitas
                 hacerBip(); 
                 metronomoIntervalo = setInterval(hacerBip, milisegundos);
                 btnMetronomo.innerHTML = "⏸";
@@ -1550,7 +1577,6 @@ document.addEventListener("DOMContentLoaded", function() {
             
             detenerAfinador();
             this.classList.add('active');
-            if (btnStopTuner) btnStopTuner.style.display = 'block';
 
             const frecuencia = parseFloat(this.getAttribute('data-freq'));
             afinadorOscilador = audioCtx.createOscillator();
@@ -1564,7 +1590,19 @@ document.addEventListener("DOMContentLoaded", function() {
             afinadorGanancia.gain.setValueAtTime(0, audioCtx.currentTime);
             afinadorGanancia.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.1);
             
+            // 1. Arranca a sonar
             afinadorOscilador.start();
+            
+            // 2. Le decimos que baje el volumen suavemente a los 2.5 segundos
+            afinadorGanancia.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
+            
+            // 3. Corta el oscilador totalmente a los 3 segundos
+            afinadorOscilador.stop(audioCtx.currentTime + 3);
+
+            // 4. Se destilda el botón solo cuando termina
+            setTimeout(() => {
+                detenerAfinador();
+            }, 3000);
         });
     });
 
