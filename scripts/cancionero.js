@@ -161,6 +161,7 @@ window.canciones = {
         "Juremos con gloria morir": { ruta: "comunion/juremos-con-gloria-morir.html", tono: "SOL", capo: 0 },
         "La niña de tus ojos": { ruta: "comunion/la-niña-de-tus-ojos.html", tono: "MI", capo: 0 },
         "Labor del apostol": { ruta: "comunion/labor-del-apostol.html", tono: "DO", capo: 0 },
+        "Lienzo": { ruta: "comunion/lienzo.html", tono: "SOL", capo: 4 },
         "Mais Longe": { ruta: "comunion/mais-longe.html", tono: "SOL", capo: 0 },
         "Mais Longe (Español)": { ruta: "comunion/mais-longe-español.html", tono: "SOL", capo: 0 },
         "María (Servus Mariae)": { ruta: "marianos/maria-servus-mariae.html", tono: "SOL", capo: 0 },
@@ -1942,7 +1943,7 @@ const dbAcordes = {
     "MIm11": [0, 0, 0, 0, 0, 0], "FAm11": [1, 1, 1, 1, 1, 1], "FA#m11": [-1, 4, 4, 2, 0, 0], "SOLm11": [3, 3, 3, 3, 3, 3],
     "SOL#m11": [4, 4, 4, 4, 4, 4], "LAm11": [-1, 0, 2, 0, 3, 0], "LA#m11": [-1, 1, 3, 1, 4, 1], "SIm11": [-1, 2, 4, 2, 5, 2],
 
-    "FAmaj9": [-1, -1, 3, 0, 1, 0], "LAmaj9": [-1, 0, 2, 1, 0, 0], "SOLmaj9": [3, -1, 4, 2, 3, 0], 
+    "FAmaj9": [-1, -1, 3, 0, 1, 0], "LAmaj9": [-1, 0, 2, 1, 0, 0], "SOLmaj9": [3, -1, 4, 2, 3, 0], "REmaj9/FA#": [2, -1, -1, 2, 2, 0], 
     "LA6+": [-1, 0, 4, 4, 0, 0], "MIb6+": [-1, -1, 1, 0, 1, -1], "SIb6(11)": [-1, 1, -1, 0, 3, 0], "MI6(9)": [-1, -1, 1, 0, 1, 1], 
     "DOm6": [-1, 3, -1, 5, 4, 5], "LAm79": [5, 5, 5, 5, 5, 7],
     "FA#7(11)": [2, 4, 4, 3, 0, 0], "FA#m7(11)": [2, -1, 2, 2, 0, 0],
@@ -1981,6 +1982,7 @@ const dbAcordes = {
     // ==========================================
     // ACORDES FALTANTES (Alterados, Dim y Sus4)
     // ==========================================
+    "DO4": [-1, 3, 4, 0, 5, -1],
     "FA9(#11)": [1, -1, 1, 2, 0, -1],
     "FA9+": [1, -1, 1, 2, 2, -1],
     "FA#7sus4": [2, 4, 2, 4, 2, 2],
@@ -2002,6 +2004,7 @@ const dbAcordes = {
     "LA#9(#11)": [-1, 1, 2, 1, 1, -1],
     "LA#9+": [-1, 1, 0, 1, 2, -1],
         
+    "SIbdim": [-1, 1, 2, 0, 2, 0],
     "SI9(#11)": [-1, 2, 1, 2, 2, 1],
     "FA/LA": [-1, 0, 3, 2, 1, 1],
     "SIm6(9)": [-1, 2, 0, 1, 2, 2],

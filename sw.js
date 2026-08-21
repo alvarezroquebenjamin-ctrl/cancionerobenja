@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v16'; 
+const CACHE_NAME = 'cancionero-v17'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -221,6 +221,7 @@ const urlsToCache = [
 '/cancionerobenja/comunion/la-niña-de-tus-ojos.html',
 '/cancionerobenja/comunion/labor-del-apostol.html',
 '/cancionerobenja/gloria/letanias.html',
+'/cancionerobenja/comunion/lienzo.html',
 '/cancionerobenja/meditacion/llevame-a-la-cruz-nadie-igual.html',
 '/cancionerobenja/meditacion/lo-que-importa-es-el-amor.html',
 '/cancionerobenja/meditacion/magnificat.html',
