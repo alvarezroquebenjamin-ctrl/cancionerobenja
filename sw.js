@@ -1,5 +1,5 @@
 // ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v17'; 
+const CACHE_NAME = 'cancionero-v18'; 
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -289,6 +289,7 @@ const urlsToCache = [
 '/cancionerobenja/marianos/reina-y-madre.html',
 '/cancionerobenja/comunion/renace-la-vida-y-el-corazon.html',
 '/cancionerobenja/meditacion/restauranos.html',
+'/cancionerobenja/comunion/rompe-el-silencio.html',
 '/cancionerobenja/comunion/sal-y-luz.html',
 '/cancionerobenja/salmos/salmo-18.html',
 '/cancionerobenja/salmos/salmo-28.html',
@@ -311,6 +312,7 @@ const urlsToCache = [
 '/cancionerobenja/comunion/sentidos.html',
 '/cancionerobenja/meditacion/señor-de-la-paz.html',
 '/cancionerobenja/comunion/sera-dios.html',
+'/cancionerobenja/comunion/si-amo-mi-vida.html',
 '/cancionerobenja/comunion/si-quieres-te-acompaño-en-el-camino.html',
 '/cancionerobenja/meditacion/si-rasgaras.html',
 '/cancionerobenja/meditacion/siempre-has-sido-tu.html',

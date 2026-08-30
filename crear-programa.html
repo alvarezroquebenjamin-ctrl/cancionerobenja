@@ -216,8 +216,12 @@
     };
 
     document.getElementById("limpiar-programa").addEventListener("click", () => {
-        programa = [];
-        guardarPrograma(); mostrarPrograma();
+        let seguro = confirm("¿Estás seguro de que querés borrar todo el repertorio?");
+        if (seguro) {
+            programa = [];
+            guardarPrograma(); 
+            mostrarPrograma();
+        }
     });
 
     document.getElementById("compartir-programa").addEventListener("click", () => {
