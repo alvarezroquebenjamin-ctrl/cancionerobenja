@@ -143,6 +143,7 @@ window.canciones = {
         "El que muere por mi": { ruta: "comunion/el-que-muere-por-mi.html", tono: "DO", capo: 2 },
         "El sale a tu encuentro": { ruta: "comunion/el-sale-a-tu-encuentro.html", tono: "MI", capo: 0 },
         "Emaús": { ruta: "comunion/emaus.html", tono: "RE", capo: 0 },
+        "En Cristo somos uno": { ruta: "comunion/en-cristo-somos-uno.html", tono: "MI", capo: 0 },
         "En mi Getsemani": { ruta: "comunion/en-mi-getsemani.html", tono: "DO", capo: 0 },
         "En tus ojos": { ruta: "comunion/en-tus-ojos.html", tono: "SOL", capo: 0 },
         "Enciende nuestra misión": { ruta: "comunion/enciende-nuestra-mision.html", tono: "MI", capo: 0 },

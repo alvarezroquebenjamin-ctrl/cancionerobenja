@@ -164,6 +164,7 @@ const urlsToCache = [
 '/cancionerobenja/comunion/el-que-muere-por-mi.html',
 '/cancionerobenja/comunion/el-sale-a-tu-encuentro.html',
 '/cancionerobenja/comunion/emaus.html',
+'/cancionerobenja/comunion/en-cristo-somos-uno.html',
 '/cancionerobenja/entrada/en-el-nombre-de-dios.html',
 '/cancionerobenja/entrada/en-el-nombre-del-padre.html',
 '/cancionerobenja/comunion/en-mi-getsemani.html',
