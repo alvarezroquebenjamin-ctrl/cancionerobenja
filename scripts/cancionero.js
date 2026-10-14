@@ -189,7 +189,7 @@ window.canciones = {
         "Si amo mi vida": { ruta: "comunion/si-amo-mi-vida.html", tono: "SOL", capo: 3 },
         "Si quieres te acompaño en el camino": { ruta: "comunion/si-quieres-te-acompaño-en-el-camino.html", tono: "DO", capo: 0 },
         "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
-        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 3 },
+        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 4 },
         "Sin fronteras": { ruta: "comunion/sin-fronteras.html", tono: "SOL", capo: 0 },
         "Sobre el mar (Berit II)": { ruta: "comunion/sobre-el-mar-berit2.html", tono: "DO", capo: 0 },
         "Somos JM, somos iglesia": { ruta: "comunion/somos-jm-somos-iglesia.html", tono: "SOL", capo: 0 },
@@ -336,7 +336,7 @@ window.canciones = {
         "Siempre has sido Tú": { ruta: "meditacion/siempre-has-sido-tu.html", tono: "LA", capo: 0 },
         "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
         "Sigueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
-        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 3 },
+        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 4 },
         "Silencio en la cruz": { ruta: "meditacion/silencio-en-la-cruz.html", tono: "SOL", capo: 0 },
         "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 },
         "Sobre el mar (Berit II)": { ruta: "comunion/sobre-el-mar-berit2.html", tono: "DO", capo: 0 },
@@ -534,7 +534,7 @@ window.canciones = {
         "Si rasgaras": { ruta: "meditacion/si-rasgaras.html", tono: "SOL", capo: 4 },
         "Siempre para ti": { ruta: "comunion/siempre-para-ti.html", tono: "RE", capo: 0 },
         "Sígueme": { ruta: "meditacion/sigueme.html", tono: "MI", capo: 0 },
-        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 3 },
+        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 4 },
         "Silencio en la cruz": { ruta: "meditacion/silencio-en-la-cruz.html", tono: "SOL", capo: 0 },
         "Silencio fecundo": { ruta: "meditacion/silencio-fecundo.html", tono: "SOL", capo: 0 },
         "Sobre el mar (Berit II)": { ruta: "comunion/sobre-el-mar-berit2.html", tono: "DO", capo: 0 },
@@ -867,6 +867,20 @@ window.canciones = {
         "Quiero adorarte": { ruta: "meditacion/quiero-adorarte.html", tono: "DO", capo: 3 },
         "Solo Tú": { ruta: "meditacion/solo-tu.html", tono: "SOL", capo: 1 },
         "Esperanza": { ruta: "meditacion/esperanza.html", tono: "SOL", capo: 3 }
+    },
+    "Él me amó primero": {
+        "Transformación en Pentecostes": { ruta: "meditacion/transformacion-en-pentecostes.html", tono: "MI", capo: 0 },
+        "Abrazo de Padre": {ruta:"jf/abrazo-de-padre.html", tono: "DO", capo: 1 },
+        "Silencio en el calvario": { ruta: "comunion/silencio-en-el-calvario.html", tono: "DO", capo: 4 },
+        "En tu misericordia": { ruta: "meditacion/en-tu-misericordia.html", tono: "RE", capo: 0 },
+        "Lienzo": { ruta: "comunion/lienzo.html", tono: "SOL", capo: 4 },
+        "Cristo Rey (con subida)": { ruta: "meditacion/cristo-rey-con-subida.html", tono: "DO", capo: 2 },
+        "Permanecer en ti": { ruta: "meditacion/permanecer-en-ti.html", tono: "SOL", capo: 0 },
+        "Me quieres?": { ruta: "meditacion/me-quieres.html", tono: "MI", capo: 3 },
+        "Labor del apostol": { ruta: "comunion/labor-del-apostol.html", tono: "LA", capo: 1 },
+        "María de la Alianza": { ruta: "salida/maria-de-la-alianza.html", tono: "SOL", capo: 1 },
+        "La de siempre": { ruta: "salida/la-de-siempre.html", tono: "MI", capo: 0 },
+        "Misioneros": { ruta: "salida/misioneros.html", tono: "LA", capo: 0 },
     }
 };
 
