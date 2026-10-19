@@ -1793,7 +1793,22 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/cancionerobenja/service-worker.js')
+        navigator.serviceWorker.register('/cancionerobenja/sw.js')
+            .then(registration => {
+                // ¡LA MAGIA! Fuerza al celular a revisar en GitHub si publicaste algo nuevo hoy
+                registration.update();
+                
+                // Si encuentra una versión nueva instalándose, recarga la página solo 1 vez para aplicarla
+                registration.onupdatefound = () => {
+                    const instalando = registration.installing;
+                    instalando.onstatechange = () => {
+                        if (instalando.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log("¡Nueva versión detectada! Recargando...");
+                            window.location.reload();
+                        }
+                    };
+                };
+            })
             .catch(err => console.log('Fallo al registrar Offline:', err));
     });
 }
@@ -2333,3 +2348,16 @@ document.addEventListener('click', function(event) {
         }
     }
 });
+
+// Oculta la caja de video ("Pista en ...") en las canciones que todavía
+// no tienen un link de video cargado (cuando dice LINK en vez de una dirección).
+(function () {
+  document.querySelectorAll('iframe[src="LINK"]').forEach(function (video) {
+    var caja = video.parentElement;
+    if (caja && caja.querySelectorAll('iframe').length === 1) {
+      caja.style.display = 'none';
+    } else {
+      video.style.display = 'none';
+    }
+  });
+})();

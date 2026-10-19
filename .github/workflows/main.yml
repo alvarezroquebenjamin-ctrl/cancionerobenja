@@ -19,7 +19,7 @@ jobs:
       id: sitemap
       uses: cicirello/generate-sitemap@v1
       with:
-        base-url-path: https://www.juventudschoenstatt.ar/
+        base-url-path: https://alvarezroquebenjamin-ctrl.github.io/cancionerobenja/
     
     - name: Output stats
       run: |

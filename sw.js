@@ -1,5 +1,5 @@
-// ACORDATE: Cambiá este número cada vez que agregues o modifiques un archivo
-const CACHE_NAME = 'cancionero-v18'; 
+// Número de versión de la copia guardada en el celular.
+const CACHE_NAME = 'cancionero-v19';
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -510,57 +510,105 @@ const urlsToCache = [
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js'
 ];
 
-// --- 1. INSTALACIÓN ANTI-BOMBAS ---
-// En vez de cancelar todo si hay un error de tipeo, 
-// descarga una por una y si una falla, la ignora y sigue con el resto.
+// --- 1. INSTALACIÓN ---
+// Descarga la lista una por una; si una falla, la ignora y sigue con el resto.
+// skipWaiting() hace que la versión nueva se active enseguida (sin esperar
+// a que la persona cierre todas las pestañas).
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('Empezando a descargar la lista gigante...');
-      return Promise.all(
-        urlsToCache.map(url => {
-          return cache.add(url).catch(error => {
-            console.error('Che, esta ruta falló y no se guardó:', url);
-          });
-        })
-      );
-    })
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(
+        urlsToCache.map(url =>
+          cache.add(url).catch(() => console.error('No se pudo guardar:', url))
+        )
+      )
+    )
   );
 });
 
-// --- 2. INTERCEPTOR (CON SALVAVIDAS PARA SAFARI) ---
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    // ¡ESTA ES LA LÍNEA CLAVE!
-    caches.match(event.request, { ignoreSearch: true })
-      .then(response => {
-        if (response) {
-          return response; 
-        }
-
-        // Si no está, va a internet
-        return fetch(event.request).then(networkResponse => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
-          }
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          return networkResponse;
-          
-        }).catch(() => {
-          // EL SALVAVIDAS: Si no hay internet y no estaba en la mochila, 
-          // le devolvemos una mini página a Safari para que no tire el error "null".
-          return new Response(
-            '<div style="text-align:center; padding:50px; font-family:sans-serif;">' +
-            '<h2>¡Ups! Estás sin internet</h2>' +
-            '<p>Y parece que esta canción todavía no se guardó en el celular.</p>' +
-            '<a href="/cancionerobenja/">Volver al inicio</a></div>',
-            { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
-          );
-        });
-      })
+// --- 2. ACTIVACIÓN: BORRAR LAS MOCHILAS VIEJAS ---
+// Antes las versiones viejas nunca se borraban y el celular seguía
+// mostrando la copia vieja. Ahora se borra todo lo que no sea la versión actual.
+// Excepción: 'cancionero-cache-v1' es donde guarda el botón "Bajar Todo";
+// se respeta para no borrarle a la gente lo que bajó a propósito.
+const CACHES_A_CONSERVAR = [CACHE_NAME, 'cancionero-cache-v1'];
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(nombres => Promise.all(
+        nombres.filter(n => !CACHES_A_CONSERVAR.includes(n)).map(n => caches.delete(n))
+      ))
+      .then(() => self.clients.claim())
   );
+});
+
+// --- 3. INTERCEPTOR ---
+const MENSAJE_SIN_INTERNET = new Response(
+  '<div style="text-align:center; padding:50px; font-family:sans-serif;">' +
+  '<h2>¡Ups! Estás sin internet</h2>' +
+  '<p>Y parece que esta canción todavía no se guardó en el celular.</p>' +
+  '<a href="/cancionerobenja/">Volver al inicio</a></div>',
+  { headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+);
+const sinInternet = () => MENSAJE_SIN_INTERNET.clone();
+
+// Espera máxima (en ms) a internet antes de usar la copia guardada.
+// Útil en una misa con mala señal: si internet tarda, se muestra lo guardado.
+const ESPERA_MAXIMA = 3000;
+
+function esCodigoDeLaPagina(url, request) {
+  return request.mode === 'navigate' ||
+    /\.(html|js|css|json)$/i.test(url.pathname) ||
+    url.pathname.endsWith('/');
+}
+
+// Páginas, estilos y scripts: primero internet (así siempre ves la última
+// versión); si no hay señal o tarda mucho, se usa la copia guardada.
+async function primeroInternet(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const red = fetch(request, { cache: 'no-cache' }).then(respuesta => {
+    if (respuesta && respuesta.status === 200) cache.put(request, respuesta.clone());
+    return respuesta;
+  });
+  const limite = new Promise(resolver => setTimeout(() => resolver(null), ESPERA_MAXIMA));
+  const rapida = await Promise.race([red.catch(() => null), limite]);
+  if (rapida) return rapida;
+
+  // Sin internet (o muy lenta): primero la copia de esta versión, y si no
+  // está, lo que haya bajado el botón "Bajar Todo".
+  const guardada = (await cache.match(request, { ignoreSearch: true })) ||
+                   (await caches.match(request, { ignoreSearch: true }));
+  if (guardada) return guardada;
+  return red.catch(() => sinInternet());
+}
+
+// Imágenes, fuentes, audios, PDFs y librerías: primero lo guardado
+// (no cambian seguido y pesan más).
+async function primeroGuardado(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const guardada = (await cache.match(request, { ignoreSearch: true })) ||
+                   (await caches.match(request, { ignoreSearch: true }));
+  if (guardada) return guardada;
+  try {
+    const respuesta = await fetch(request);
+    if (respuesta && respuesta.status === 200) cache.put(request, respuesta.clone());
+    return respuesta;
+  } catch (e) {
+    return sinInternet();
+  }
+}
+
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  if (request.headers.has('range')) return;          // audio/video: que lo maneje el navegador
+  const url = new URL(request.url);
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+
+  if (url.origin === self.location.origin && esCodigoDeLaPagina(url, request)) {
+    event.respondWith(primeroInternet(request));
+  } else {
+    event.respondWith(primeroGuardado(request));
+  }
 });
