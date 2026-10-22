@@ -1187,28 +1187,3 @@ body.modo-oscuro .btn-letra-abc.activo {
     }
 }
 
-/* =============================================================================
-   COLUMNAS AUTOMÁTICAS AL REDUCIR TAMAÑO DE LETRA (PANTALLA)
-   ============================================================================= */
-.letra-dos-columnas {
-    column-count: 2 !important;
-    column-gap: 28px !important;
-    column-rule: 1px dashed rgba(42, 157, 143, 0.4) !important;
-    column-fill: balance !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    display: block !important;
-    text-align: left !important;
-    margin: 0 auto !important;
-}
-
-.letra-dos-columnas-padre {
-    max-width: 100% !important;
-    width: 100% !important;
-    flex: 0 0 100% !important;
-}
-
-body.modo-oscuro .letra-dos-columnas {
-    column-rule-color: rgba(255, 255, 255, 0.25) !important;
-}
-
