@@ -26,14 +26,25 @@
     display: block !important; 
   }
 
-  /* Asegura que los botones y el capo ocupen todo el renglón y se centren */
-  .transpose-keys, .capo-selector-div {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-    flex-wrap: wrap !important; /* Para que los botones bajen de línea si no entran en el celu */
-    clear: both !important; 
+  /* Asegura que los botones y el capo ocupen todo el renglón y se centren en pantalla */
+  @media screen {
+    .transpose-keys, .capo-selector-div {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      width: 100% !important;
+      flex-wrap: wrap !important; /* Para que los botones bajen de línea si no entran en el celu */
+      clear: both !important; 
+    }
+  }
+
+  /* AL IMPRIMIR / PDF: Ocultar botones de tonalidad, capo, menús flotantes y botones */
+  @media print {
+    .transpose-keys, .capo-selector-div,
+    #super-menu-container, #menu-trigger, #menu-content,
+    #nav-placeholder, nav, .no-print, button, .btn {
+      display: none !important;
+    }
   }
 
   /* LA MAGIA: Obliga a la letra a ir abajo, elimina el scroll y centra el bloque */

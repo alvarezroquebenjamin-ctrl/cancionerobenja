@@ -1012,9 +1012,6 @@ window.canciones = {
     });
 
     window.actualizarBotonesCifrado(sistema);
-    if (typeof window.actualizarResumenAcordesActivo === 'function') {
-      try { window.actualizarResumenAcordesActivo(); } catch(e) {}
-    }
   };
 
   window.toggleSistemaCifrado = function() {
@@ -1212,12 +1209,6 @@ window.canciones = {
                           </button>
                   `;
 
-                  var botonAcordesHTML = esPaginaPrograma ? "" : `
-                          <button type="button" class="btn-toggle-diagramas" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #0A2846; background:rgba(10,40,70,0.08); color:#0A2846; font-size:12px; font-weight:700; cursor:pointer;" title="Ver todos los acordes utilizados en esta canción">
-                              🎸 Acordes usados
-                          </button>
-                  `;
-
                   var capoHTML = `
                       <div class="capo-selector-div" style="flex-wrap:wrap; gap:6px;">
                           <label>🎸 Capo: </label>
@@ -1229,7 +1220,6 @@ window.canciones = {
                           </button>
                           ${botonCompartirHTML}
                           ${botonCifradoHTML}
-                          ${botonAcordesHTML}
                       </div>
                   `;
                   if (keysDiv.length > 0) {
@@ -1239,109 +1229,6 @@ window.canciones = {
                       $letra.before(capoHTML);
                       var $capoDiv = $letra.prev('.capo-selector-div');
                   }
-
-                  // Inyectar contenedor del resumen de acordes debajo del capo en páginas de canciones
-                  if (!esPaginaPrograma) {
-                      var panelAcordesHTML = `
-                          <div class="panel-resumen-acordes" style="display:none; width:100%; max-width:850px; margin: 10px auto 25px auto; padding: 14px 12px; background: #fbfbfb; border: 1.5px solid #d0d7de; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center;">
-                              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #eaeaea;">
-                                  <span class="panel-acordes-titulo" style="font-weight:700; color:#0A2846; font-size:15px;">🎸 Acordes de la canción</span>
-                                  <button type="button" class="btn-cerrar-panel-acordes" style="background:transparent; border:none; font-size:18px; color:#888; cursor:pointer; line-height:1;" title="Cerrar panel">✕</button>
-                              </div>
-                              <div class="panel-acordes-grilla" style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px;"></div>
-                          </div>
-                      `;
-                      $capoDiv.after(panelAcordesHTML);
-                  }
-
-                  var $panelAcordes = $capoDiv.next('.panel-resumen-acordes');
-                  var $btnToggleDiagramas = $capoDiv.find('.btn-toggle-diagramas');
-
-                  function actualizarPanelAcordes() {
-                      if (esPaginaPrograma || !$panelAcordes.length) return;
-                      var $grilla = $panelAcordes.find('.panel-acordes-grilla');
-                      $grilla.empty();
-
-                      if (!window.dbAcordes || !window.generarDibujoAcorde) {
-                          $grilla.html('<p style="color:#888; font-size:13px; margin:10px 0;">Cargando diccionario de acordes...</p>');
-                          setTimeout(actualizarPanelAcordes, 200);
-                          return;
-                      }
-
-                      var acordesVistos = new Set();
-                      var listaAcordes = [];
-                      $letra.find('span.c').each(function() {
-                          var acordeTexto = $(this).text().trim();
-                          if (!acordeTexto) return;
-                          if (!acordesVistos.has(acordeTexto)) {
-                              acordesVistos.add(acordeTexto);
-                              listaAcordes.push(acordeTexto);
-                          }
-                      });
-
-                      if (listaAcordes.length === 0) {
-                          $grilla.html('<p style="color:#888; font-size:13px; margin:10px 0;">No se encontraron acordes en esta canción.</p>');
-                          return;
-                      }
-
-                      var encontrados = 0;
-                      listaAcordes.forEach(function(acorde) {
-                          var nombreLatino = window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(acorde) : acorde;
-                          var posiciones = null;
-                          var notaBajo = "";
-
-                          if (window.dbAcordes[nombreLatino]) {
-                              posiciones = window.dbAcordes[nombreLatino];
-                          } else {
-                              var partes = nombreLatino.split("/");
-                              if (window.dbAcordes[partes[0]]) {
-                                  posiciones = window.dbAcordes[partes[0]];
-                                  var acordeBaseOrig = acorde.split("/")[0];
-                                  notaBajo = `<span style="font-size:11px; color:#666; display:block; margin-bottom:2px;">(Base: ${acordeBaseOrig})</span>`;
-                              }
-                          }
-
-                          if (posiciones) {
-                              encontrados++;
-                              var svgDibujo = window.generarDibujoAcorde(posiciones);
-                              var tarjeta = $(`
-                                  <div class="tarjeta-acorde-resumen" style="display:flex; flex-direction:column; align-items:center; background:white; border-radius:10px; padding:10px 6px; box-shadow:0 2px 6px rgba(0,0,0,0.06); border:1px solid #e2e8f0; min-width:130px;">
-                                      <div style="font-weight:700; font-size:16px; color:#0A2846; margin-bottom:4px;">${acorde}</div>
-                                      ${notaBajo}
-                                      <div style="transform: scale(0.92); transform-origin: top center; margin-top:2px;">
-                                          ${svgDibujo}
-                                      </div>
-                                  </div>
-                              `);
-                              $grilla.append(tarjeta);
-                          }
-                      });
-
-                      $panelAcordes.find('.panel-acordes-titulo').text(`🎸 Acordes utilizados (${encontrados}):`);
-                  }
-
-                  window.actualizarResumenAcordesActivo = function() {
-                      if ($panelAcordes && $panelAcordes.is(':visible')) {
-                          actualizarPanelAcordes();
-                      }
-                  };
-
-                  $btnToggleDiagramas.on('click', function(e) {
-                      e.preventDefault();
-                      if ($panelAcordes.is(':visible')) {
-                          $panelAcordes.slideUp(200);
-                          $(this).removeClass('activo');
-                      } else {
-                          actualizarPanelAcordes();
-                          $panelAcordes.slideDown(250);
-                          $(this).addClass('activo');
-                      }
-                  });
-
-                  $panelAcordes.find('.btn-cerrar-panel-acordes').on('click', function() {
-                      $panelAcordes.slideUp(200);
-                      $btnToggleDiagramas.removeClass('activo');
-                  });
 
                   var $selectCapo = $capoDiv.find('select.capo-dropdown');
                   var $btnReset = $capoDiv.find('.btn-reset-tono');
@@ -1406,9 +1293,6 @@ window.canciones = {
                       var capoActual = $selectCapo.val();
                       guardarPrefCancion(nuevoTono, capoActual, origKey, defaultCapo);
                       actualizarBotonReset();
-                      if ($panelAcordes && $panelAcordes.is(':visible')) {
-                          setTimeout(actualizarPanelAcordes, 50);
-                      }
                   });
 
                   // Guardar automáticamente cuando el usuario cambia el capo
@@ -1433,9 +1317,6 @@ window.canciones = {
                       $selectCapo.val(String(defaultCapo));
                       guardarPrefCancion(origKey, defaultCapo, origKey, defaultCapo);
                       actualizarBotonReset();
-                      if ($panelAcordes && $panelAcordes.is(':visible')) {
-                          setTimeout(actualizarPanelAcordes, 50);
-                      }
                   });
 
                   // Botón para compartir la canción con el Tono y Capo elegidos
@@ -1508,6 +1389,11 @@ document.addEventListener("DOMContentLoaded", function() {
             .container, .container-fluid, .navbar { padding-left: 5px !important; padding-right: 5px !important; }
             .navbar-nav .dropdown-menu { position: absolute !important; float: none !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; background-color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: auto !important; min-width: 180px; z-index: 10000 !important; }
             .navbar, .navbar-collapse { overflow: visible !important; }
+        }
+        @media print {
+            #super-menu-container, #menu-trigger, #menu-content {
+                display: none !important;
+            }
         }
         #super-menu-container { position: fixed; bottom: 30px; right: 20px; z-index: 2147483647; font-family: sans-serif; font-size: 16px !important; display: flex; flex-direction: column; align-items: flex-end; }
         @media (max-width: 768px) { #super-menu-container { bottom: 80px; right: 15px; } #menu-trigger { width: 55px; height: 55px; } }
@@ -1614,6 +1500,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // --- 2. INYECTAR EL MENÚ CON TODAS LAS HERRAMIENTAS (DISEÑO BLINDADO iOS/OLED) ---
     const menuHTML = `
         <style>
+            @media print {
+                #super-menu-container, #menu-trigger, #menu-content {
+                    display: none !important;
+                }
+            }
             /* Asegurar la posición fija del contenedor del menú */
             #super-menu-container {
                 position: fixed !important;
@@ -1865,6 +1756,11 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             body.modo-oscuro .separador-pildora { background: #38383A; }
             body.modo-oscuro .divisor-tema { background: #1C1C1E !important; }
+            @media print {
+                #super-menu-container, #menu-trigger, #menu-content, #autoscroll-flotante, .btn-float-scroll, #tuner-overlay, #tuner-modal {
+                    display: none !important;
+                }
+            }
         </style>
 
         <!-- VENTANA MODAL DEL AFINADOR CON MICRÓFONO -->
@@ -1975,6 +1871,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 min-width: 20px;
                 text-align: center;
                 color: #2A9D8F;
+            }
+            @media print {
+                #autoscroll-flotante, .btn-float-scroll { display: none !important; }
             }
         </style>
         <div id="autoscroll-flotante">

@@ -1080,45 +1080,6 @@ body.modo-oscuro .btn-letra-abc.activo {
 }
 
 /* =============================================================================
-   PANEL RESUMEN DE ACORDES DE LA CANCIÓN (OPCIÓN 5)
-   ============================================================================= */
-.panel-resumen-acordes {
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-}
-
-body.modo-oscuro .panel-resumen-acordes {
-    background: #1e1e1e !important;
-    border-color: #444444 !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-}
-
-body.modo-oscuro .panel-acordes-titulo {
-    color: #90caf9 !important;
-}
-
-body.modo-oscuro .tarjeta-acorde-resumen {
-    background: #2b2b2b !important;
-    border-color: #4a4a4a !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.modo-oscuro .tarjeta-acorde-resumen > div:first-child {
-    color: #90caf9 !important;
-}
-
-body.modo-oscuro .btn-toggle-diagramas {
-    background: rgba(144, 202, 249, 0.14) !important;
-    color: #90caf9 !important;
-    border-color: #90caf9 !important;
-}
-
-body.modo-oscuro .btn-toggle-diagramas.activo {
-    background: #90caf9 !important;
-    color: #121212 !important;
-}
-
-/* =============================================================================
    ESTILOS DE IMPRESIÓN Y PDF (@media print) (OPCIÓN 3)
    ============================================================================= */
 @media print {
