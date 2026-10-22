@@ -1173,5 +1173,17 @@ body.modo-oscuro .btn-letra-abc.activo {
         color: #000000 !important;
         font-weight: 700 !important;
     }
+
+    /* MODO 2 COLUMNAS AL IMPRIMIR (OPCIÓN PARA AHORRAR PAPEL) */
+    body.imprimir-2-columnas pre,
+    body.imprimir-2-columnas pre#letra,
+    body.imprimir-2-columnas pre[id^="letra-lista"],
+    body.imprimir-2-columnas .lh-base {
+        column-count: 2 !important;
+        column-gap: 24px !important;
+        column-rule: 1px dashed #cccccc !important;
+        font-size: 9.5pt !important;
+        line-height: 1.35 !important;
+    }
 }
 

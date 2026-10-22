@@ -93,6 +93,15 @@
       max-height: none !important;
       white-space: pre-wrap !important;
     }
+
+    /* MODO 2 COLUMNAS EN IMPRESIÓN (OPCIÓN AHORRO DE PAPEL) */
+    body.imprimir-2-columnas pre[id^="letra-lista"] {
+      column-count: 2 !important;
+      column-gap: 24px !important;
+      column-rule: 1px dashed #cccccc !important;
+      font-size: 9.5pt !important;
+      line-height: 1.35 !important;
+    }
   }
   /* --- COLOR DE LOS TÍTULOS EN MODO OSCURO --- */
   body.modo-oscuro .cancion-en-lista h3 {
@@ -109,11 +118,15 @@
     });
   </script> 
 
-  <div class="text-center my-3 no-print d-flex justify-content-center align-items-center gap-2 flex-wrap">
+  <div class="text-center my-3 no-print d-flex justify-content-center align-items-center gap-3 flex-wrap">
     <span id="nombre-repertorio-badge" class="badge rounded-pill border px-3 py-2" style="font-size: 14px; font-weight: 700; color: #2A9D8F !important; background: rgba(42, 157, 143, 0.08);">📁 Repertorio</span>
     <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold" onclick="window.print()" title="Imprimir o exportar como PDF">
       🖨️ Imprimir / Guardar PDF
     </button>
+    <div class="form-check form-switch d-inline-flex align-items-center gap-1 m-0">
+      <input class="form-check-input" type="checkbox" id="toggle-2-columnas" style="cursor:pointer;" onchange="cambiarModoColumnas(this.checked)">
+      <label class="form-check-label small fw-bold" for="toggle-2-columnas" style="cursor:pointer;" title="Al imprimir, organiza la letra en 2 columnas para ahorrar papel">📑 2 Columnas</label>
+    </div>
   </div>
 
   <div id="programa-container" class="container" style="max-width: 800px; margin: 0 auto; padding-top: 10px;"></div>
@@ -126,6 +139,25 @@
   })();
   if (nombreRepertorioActivo && document.getElementById('nombre-repertorio-badge')) {
     document.getElementById('nombre-repertorio-badge').textContent = '📁 ' + nombreRepertorioActivo;
+  }
+
+  function cambiarModoColumnas(activo) {
+    if (activo) {
+      document.body.classList.add('imprimir-2-columnas');
+      localStorage.setItem('cancionero_print_2cols', 'true');
+    } else {
+      document.body.classList.remove('imprimir-2-columnas');
+      localStorage.setItem('cancionero_print_2cols', 'false');
+    }
+  }
+
+  // Comprobar parámetros de URL o preferencia guardada
+  const urlParamsCols = new URLSearchParams(window.location.search);
+  const prefCols = urlParamsCols.get('cols') === '2' || localStorage.getItem('cancionero_print_2cols') === 'true';
+  if (prefCols) {
+    document.body.classList.add('imprimir-2-columnas');
+    const chk = document.getElementById('toggle-2-columnas');
+    if (chk) chk.checked = true;
   }
 
   const programa = JSON.parse(localStorage.getItem('programaMisa'));
