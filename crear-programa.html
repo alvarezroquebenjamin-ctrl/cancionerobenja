@@ -510,18 +510,35 @@
           `);
       }
 
+      let notasGlobales = {};
+      try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+
       programa.forEach((item, index) => {
         if (item.capo === undefined) item.capo = 0;
+        const notaItem = (item.nota !== undefined) ? item.nota : (notasGlobales[item.cancion] || "");
 
         const li = document.createElement("li");
         // Le sacamos los estilos fijos y le ponemos las clases inteligentes
         li.className = "programa-item d-flex fila-programa mb-3 pb-3 border-bottom";
 
         // EL TÍTULO (Piso 1)
+        const bloqueTitulo = document.createElement("div");
+        bloqueTitulo.className = "text-start";
+
         const textoSpan = document.createElement("span");
-        textoSpan.className = "fw-bold text-start";
+        textoSpan.className = "fw-bold";
         textoSpan.textContent = `${item.seccion}: ${item.nombre}`;
-        li.appendChild(textoSpan);
+        bloqueTitulo.appendChild(textoSpan);
+
+        if (notaItem) {
+          const divNota = document.createElement("div");
+          divNota.className = "small fst-italic mt-1";
+          divNota.style.color = "#d97706";
+          divNota.innerHTML = `📝 <b>Nota:</b> ${notaItem}`;
+          bloqueTitulo.appendChild(divNota);
+        }
+
+        li.appendChild(bloqueTitulo);
 
         // LOS CONTROLES (Piso 2)
         const buttonGroup = document.createElement('div');
@@ -552,10 +569,11 @@
         `;
         buttonGroup.appendChild(contCapo);
 
-        // BOTONES DE ACCIÓN (Mover y borrar)
+        // BOTONES DE ACCIÓN (Nota, Mover y borrar)
         const divAcciones = document.createElement("div");
         divAcciones.className = "btn-group";
         divAcciones.innerHTML = `
+          <button class="btn ${notaItem ? 'btn-warning text-white' : 'btn-outline-warning'} btn-sm" onclick="editarNotaPrograma(${index})" title="${notaItem ? 'Editar recordatorio: ' + notaItem : 'Agregar recordatorio'}">📝</button>
           <button class="btn btn-outline-info btn-sm" onclick="moverCancion(${index}, -1)">↑</button>
           <button class="btn btn-outline-info btn-sm" onclick="moverCancion(${index}, 1)">↓</button>
           <button class="btn btn-outline-danger btn-sm" onclick="eliminarCancion(${index})">✕</button>
@@ -566,6 +584,24 @@
         lista.appendChild(li);
       });
     }
+
+    window.editarNotaPrograma = function(index) {
+      let notas = {};
+      try { notas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+      const actual = (programa[index].nota !== undefined) ? programa[index].nota : (notas[programa[index].cancion] || "");
+      const nueva = prompt(`Recordatorio para "${programa[index].nombre}":\n(ej: Repetir coro al final, arpegio suave, entrar en 2ª estrofa...)`, actual);
+      if (nueva === null) return;
+      const limpia = nueva.trim();
+      programa[index].nota = limpia;
+      guardarPrograma();
+      if (limpia) {
+        notas[programa[index].cancion] = limpia;
+      } else {
+        delete notas[programa[index].cancion];
+      }
+      localStorage.setItem("cancionero_notas", JSON.stringify(notas));
+      mostrarPrograma();
+    };
 
     window.cambiarTono = (index, delta) => {
       programa[index].tono = transponerTono(programa[index].tono, delta);

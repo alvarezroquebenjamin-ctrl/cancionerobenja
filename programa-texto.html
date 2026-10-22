@@ -164,8 +164,9 @@
       return output;
     }
 
-    async function cargarCancion(ruta) {
+    async function cargarCancion(item) {
       try {
+        const ruta = typeof item === 'string' ? item : item.cancion;
         const response = await fetch(ruta);
         if (!response.ok) {
           throw new Error('Error al cargar la canción');
@@ -176,8 +177,13 @@
         const preContent = doc.querySelector('pre').innerHTML;
         const title = doc.querySelector('title').innerText;
 
+        let notasGlobales = {};
+        try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+        const notaCancion = (item && item.nota !== undefined) ? item.nota : (notasGlobales[ruta] || "");
+        const notaHTML = notaCancion ? `<div class="nota-cancion-impresion text-center mb-2 fst-italic" style="color:#b45309; font-size:13.5px;">📝 <b>Nota:</b> ${notaCancion}</div>` : '';
+
         const contenidoProcesado = procesarCancion(preContent);
-        return `<h2>${title}</h2><pre class="lh-base">${contenidoProcesado}</pre>`;
+        return `<h2>${title}</h2>${notaHTML}<pre class="lh-base">${contenidoProcesado}</pre>`;
       } catch (error) {
         console.error('Error:', error);
         return '<p>Error al cargar la canción. Inténtalo de nuevo más tarde.</p>';
@@ -186,8 +192,8 @@
 
     async function mostrarProgramaCompleto() {
       const programaContainer = document.getElementById('programa-completo-container');
-      for (const cancion of canciones) {
-        const contenidoCancion = await cargarCancion(cancion);
+      for (const item of programa) {
+        const contenidoCancion = await cargarCancion(item);
         const divCancion = document.createElement('div');
         divCancion.className = 'cancion-content align-self-lg-center';
         divCancion.innerHTML = contenidoCancion;

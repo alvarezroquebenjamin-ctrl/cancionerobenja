@@ -1209,6 +1209,18 @@ window.canciones = {
                           </button>
                   `;
 
+                  var todasLasNotas = {};
+                  try {
+                      todasLasNotas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}");
+                  } catch(e) { todasLasNotas = {}; }
+                  var notaActual = (claveCancionActual && todasLasNotas[claveCancionActual]) ? todasLasNotas[claveCancionActual] : "";
+
+                  var botonNotaHTML = esPaginaPrograma ? "" : `
+                      <button type="button" class="btn-nota-cancion" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #d97706; background:${notaActual ? '#d97706' : 'rgba(217,119,6,0.12)'}; color:${notaActual ? '#ffffff' : '#d97706'}; font-size:12px; font-weight:700; cursor:pointer;" title="Agregar o editar un recordatorio personal para esta canción">
+                          📝 <span class="lbl-nota-cancion">${notaActual ? 'Nota activa' : 'Nota'}</span>
+                      </button>
+                  `;
+
                   var capoHTML = `
                       <div class="capo-selector-div" style="flex-wrap:wrap; gap:6px;">
                           <label>🎸 Capo: </label>
@@ -1217,6 +1229,7 @@ window.canciones = {
                           </select>
                           ${botonCompartirHTML}
                           ${botonCifradoHTML}
+                          ${botonNotaHTML}
                           <button type="button" class="btn-reset-tono" style="display:none; margin-left:6px; padding:4px 10px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Volver al tono y capo original de fábrica">
                               ↺ Original
                           </button>
@@ -1228,6 +1241,27 @@ window.canciones = {
                   } else {
                       $letra.before(capoHTML);
                       var $capoDiv = $letra.prev('.capo-selector-div');
+                  }
+
+                  if (!esPaginaPrograma && claveCancionActual) {
+                      var cajaNotaHTML = `
+                          <div class="caja-nota-cancion" style="max-width:650px; width:100%; margin:0 auto 15px auto; padding:8px 14px; border-radius:10px; background:rgba(217,119,6,0.1); border:1px solid #d97706; color:#92400e; font-size:14px; display:${notaActual ? 'flex' : 'none'}; justify-content:space-between; align-items:center; gap:10px; box-sizing:border-box;">
+                              <div class="texto-caja-nota" style="text-align:left; flex-grow:1;"><b style="color:#b45309;">📝 Recordatorio:</b> <span class="contenido-nota">${notaActual}</span></div>
+                              <button type="button" class="btn-editar-nota-banner" style="background:transparent; border:none; color:#d97706; font-weight:700; font-size:13px; cursor:pointer; text-decoration:underline;">Editar</button>
+                          </div>
+                      `;
+                      $capoDiv.after(cajaNotaHTML);
+
+                      $capoDiv.on('click', '.btn-nota-cancion', function() {
+                          if (typeof window.abrirModalNotaCancion === 'function') {
+                              window.abrirModalNotaCancion(claveCancionActual);
+                          }
+                      });
+                      $capoDiv.next('.caja-nota-cancion').on('click', '.btn-editar-nota-banner', function() {
+                          if (typeof window.abrirModalNotaCancion === 'function') {
+                              window.abrirModalNotaCancion(claveCancionActual);
+                          }
+                      });
                   }
 
                   var $selectCapo = $capoDiv.find('select.capo-dropdown');
@@ -1472,6 +1506,30 @@ document.addEventListener("DOMContentLoaded", function() {
             height: auto !important;
             overflow: visible !important;
         }
+
+        body.modo-oscuro .caja-nota-cancion {
+            background: rgba(217, 119, 6, 0.18) !important;
+            border-color: #d97706 !important;
+            color: #fef3c7 !important;
+        }
+        body.modo-oscuro .caja-nota-cancion b {
+            color: #f59e0b !important;
+        }
+        body.modo-oscuro #modal-nota-cancion > div {
+            background: #18181b !important;
+            border-color: #d97706 !important;
+            color: #ffffff !important;
+        }
+        body.modo-oscuro #texto-nota-cancion-input {
+            background: #09090b !important;
+            color: #ffffff !important;
+            border-color: #3f3f46 !important;
+        }
+        body.modo-oscuro #btn-cancelar-modal-nota {
+            background: #27272a !important;
+            color: #ffffff !important;
+            border-color: #3f3f46 !important;
+        }
     `;
     document.head.appendChild(style);
 
@@ -1484,6 +1542,89 @@ document.addEventListener("DOMContentLoaded", function() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    const modalNotaHTML = `
+        <div id="modal-nota-cancion" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2147483647; justify-content:center; align-items:center; padding:15px;">
+            <div style="background:#fff; border-radius:16px; padding:20px; max-width:440px; width:100%; border:2px solid #d97706; box-shadow:0 8px 30px rgba(0,0,0,0.3); font-family:sans-serif;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h5 style="margin:0; color:#d97706; font-weight:800; font-size:16px;">📝 Recordatorio de la canción</h5>
+                    <button type="button" id="btn-close-nota-x" style="background:transparent; border:none; font-size:20px; cursor:pointer; color:#888;">✕</button>
+                </div>
+                <p style="font-size:13px; color:#666; margin-bottom:10px;">Escribí cualquier indicación que quieras recordar (ej: <i>Repetir coro al final, empezar suave arpegiado, entrar en 2ª estrofa...</i>):</p>
+                <textarea id="texto-nota-cancion-input" rows="3" style="width:100%; border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; box-sizing:border-box; outline:none; font-family:sans-serif;" placeholder="Escribí tu nota aquí..."></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+                    <button type="button" id="btn-borrar-nota-cancion" style="background:transparent; border:none; color:#dc2626; font-size:13px; font-weight:700; cursor:pointer;">🗑️ Borrar nota</button>
+                    <div style="display:flex; gap:8px;">
+                        <button type="button" id="btn-cancelar-modal-nota" style="background:#f3f4f6; border:1px solid #ccc; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">Cancelar</button>
+                        <button type="button" id="btn-guardar-modal-nota" style="background:#d97706; color:#fff; border:none; padding:6px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalNotaHTML);
+
+    let cancionActivaParaNota = "";
+    window.abrirModalNotaCancion = function(clave) {
+        cancionActivaParaNota = clave || (decodeURI(window.location.pathname).replace(/^\/?cancionerobenja\//, ""));
+        let notas = {};
+        try { notas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+        const actual = (cancionActivaParaNota && notas[cancionActivaParaNota]) ? notas[cancionActivaParaNota] : "";
+        const input = document.getElementById("texto-nota-cancion-input");
+        if (input) input.value = actual;
+        const modal = document.getElementById("modal-nota-cancion");
+        if (modal) modal.style.display = "flex";
+        if (input) setTimeout(() => input.focus(), 100);
+    };
+
+    window.cerrarModalNotaCancion = function() {
+        const modal = document.getElementById("modal-nota-cancion");
+        if (modal) modal.style.display = "none";
+    };
+
+    window.guardarNotaCancion = function(texto) {
+        if (!cancionActivaParaNota) return;
+        let notas = {};
+        try { notas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+        texto = (texto || "").trim();
+        if (texto) {
+            notas[cancionActivaParaNota] = texto;
+        } else {
+            delete notas[cancionActivaParaNota];
+        }
+        localStorage.setItem("cancionero_notas", JSON.stringify(notas));
+        
+        // Actualizar UI en la página
+        const $banner = $('.caja-nota-cancion');
+        const $btn = $('.btn-nota-cancion');
+        if (texto) {
+            $banner.find('.contenido-nota').text(texto);
+            $banner.css('display', 'flex');
+            $btn.css({ background: '#d97706', color: '#ffffff' });
+            $btn.find('.lbl-nota-cancion').text('Nota activa');
+        } else {
+            $banner.css('display', 'none');
+            $btn.css({ background: 'rgba(217,119,6,0.12)', color: '#d97706' });
+            $btn.find('.lbl-nota-cancion').text('Nota');
+        }
+        cerrarModalNotaCancion();
+    };
+
+    setTimeout(() => {
+        const btnCloseX = document.getElementById("btn-close-nota-x");
+        const btnCancel = document.getElementById("btn-cancelar-modal-nota");
+        const btnGuardar = document.getElementById("btn-guardar-modal-nota");
+        const btnBorrar = document.getElementById("btn-borrar-nota-cancion");
+        if (btnCloseX) btnCloseX.onclick = cerrarModalNotaCancion;
+        if (btnCancel) btnCancel.onclick = cerrarModalNotaCancion;
+        if (btnGuardar) btnGuardar.onclick = () => {
+            const val = document.getElementById("texto-nota-cancion-input").value;
+            guardarNotaCancion(val);
+        };
+        if (btnBorrar) btnBorrar.onclick = () => {
+            guardarNotaCancion("");
+        };
+    }, 100);
 });
 
 // =============================================================================

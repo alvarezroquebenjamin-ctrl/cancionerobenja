@@ -1185,5 +1185,23 @@ body.modo-oscuro .btn-letra-abc.activo {
         font-size: 9.5pt !important;
         line-height: 1.35 !important;
     }
+
+    .nota-cancion-impresion {
+        color: #333333 !important;
+        font-size: 10pt !important;
+        font-style: italic !important;
+        margin-bottom: 6px !important;
+        margin-top: 0 !important;
+        text-align: center !important;
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+    }
+}
+
+.nota-cancion-impresion {
+    color: #b45309;
+    font-size: 13.5px;
+    margin-bottom: 8px;
+    text-align: center;
 }
 

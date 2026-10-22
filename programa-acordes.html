@@ -179,8 +179,13 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(contenido, 'text/html');
         
+        let notasGlobales = {};
+        try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+        const notaCancion = (item.nota !== undefined) ? item.nota : (notasGlobales[item.cancion] || "");
+        const notaHTML = notaCancion ? `<div class="nota-cancion-impresion text-center mb-2 fst-italic" style="color:#b45309; font-size:13.5px;">📝 <b>Nota:</b> ${notaCancion}</div>` : '';
+
         // Título de la canción, forzado al centro
-        const tituloHTML = `<h3 class="mt-4 mb-3 text-center" style="color:#0A2846; font-weight:bold;">${item.nombre}</h3>`;
+        const tituloHTML = `<h3 class="mt-4 mb-3 text-center" style="color:#0A2846; font-weight:bold;">${item.nombre}</h3>` + notaHTML;
         
         const letraPre = doc.querySelector('#letra') || doc.querySelector('.zona-letra') || doc.querySelector('pre');
         
