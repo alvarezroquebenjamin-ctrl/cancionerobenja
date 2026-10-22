@@ -16,6 +16,7 @@
   <meta name="robots" content="noindex">
   <link rel="stylesheet" type="text/css" href="css/cancionero.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="scripts/cancionero.js"></script>
 </head>
 
 <body>
@@ -26,9 +27,25 @@
     });
   </script> 
 
-  <div id="programa-completo-container" class="d-flex flex-column justify-content-center text-center mt-5"></div>
+  <div class="text-center mt-4 mb-2 no-print d-flex justify-content-center align-items-center gap-2 flex-wrap">
+    <span id="nombre-repertorio-badge" class="badge rounded-pill border px-3 py-2" style="font-size: 14px; font-weight: 700; color: #2A9D8F !important; background: rgba(42, 157, 143, 0.08);">📁 Repertorio</span>
+    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold" onclick="window.print()" title="Imprimir o exportar como PDF">
+      🖨️ Imprimir / Guardar PDF
+    </button>
+  </div>
+
+  <div id="programa-completo-container" class="d-flex flex-column justify-content-center text-center mt-3"></div>
 
   <script>
+    const nombreRepertorioActivo = (function() {
+      try {
+        return localStorage.getItem('programaMisaNombre') || '';
+      } catch(e) { return ''; }
+    })();
+    if (nombreRepertorioActivo && document.getElementById('nombre-repertorio-badge')) {
+      document.getElementById('nombre-repertorio-badge').textContent = '📁 ' + nombreRepertorioActivo;
+    }
+
     const programa = JSON.parse(localStorage.getItem('programaMisa'));
     if (!programa) {
       alert('No hay un programa de misa guardado.');
@@ -37,9 +54,23 @@
 
     const canciones = programa.map(item => item.cancion);
 
-    // Función para determinar si una línea es de acordes
+    const regexAcordeExacto = /^(\(?)(DO|RE|MI|FA|SOL|LA|SI)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b#]?)*(\)?)$/;
+    const regexAuxAcorde = /^([-–—\/|()xX0-9:]+|intro:?|final:?|inter:?|puente:?|bis:?)$/i;
+
+    // Función para determinar si una línea es realmente de acordes (y no una frase en mayúsculas con "LA", "MI" o "SI")
     function isChordLine(line) {
-      return /(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b#]?/.test(line);
+      const sinTags = line.replace(/<[^>]*>/g, ' ').trim();
+      if (!sinTags) return false;
+      const tokens = sinTags.split(/\s+/);
+      let cantAcordes = 0;
+      for (const tok of tokens) {
+        if (regexAcordeExacto.test(tok)) {
+          cantAcordes++;
+        } else if (!regexAuxAcorde.test(tok)) {
+          return false;
+        }
+      }
+      return cantAcordes > 0;
     }
 
     // Función para procesar el contenido de la canción
@@ -49,6 +80,10 @@
       for (let line of lines) {
         if (!isChordLine(line)) {
           output += `<span>${line}</span>\n`;
+        } else {
+          // Si la línea de acordes tenía etiquetas <b> o </b>, las conservamos para no romper la negrita del estribillo
+          const tagsNegrita = (line.match(/<\/?b>/gi) || []).join('');
+          if (tagsNegrita) output += tagsNegrita;
         }
       }
       return output;
@@ -67,7 +102,7 @@
         const title = doc.querySelector('title').innerText;
 
         const contenidoProcesado = procesarCancion(preContent);
-        return `<h2>${title}</h2><pre class="lh-base">${contenidoProcesado}</pre></div>`;
+        return `<h2>${title}</h2><pre class="lh-base">${contenidoProcesado}</pre>`;
       } catch (error) {
         console.error('Error:', error);
         return '<p>Error al cargar la canción. Inténtalo de nuevo más tarde.</p>';
@@ -85,9 +120,13 @@
       }
     }
 
-    mostrarProgramaCompleto();
+    mostrarProgramaCompleto().then(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('print') === '1' || urlParams.get('print') === 'true') {
+        setTimeout(() => { window.print(); }, 500);
+      }
+    });
   </script>
-<script src="scripts/cancionero.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

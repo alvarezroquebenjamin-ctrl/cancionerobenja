@@ -29,7 +29,13 @@
   <main class="container mt-4 text-center">
     <h1 class="titulo">ARMA TU REPERTORIO</h1>
 
-    <form id="form-seccion" class="mt-4">
+    <div class="mt-4 position-relative" id="contenedor-buscador-repertorio">
+      <label for="buscador-repertorio">Buscar canción por título:</label>
+      <input id="buscador-repertorio" type="search" class="form-control mt-1" placeholder="🔍 Escribí el título para agregarla sin buscar la sección..." oninput="filtrarCancionesRepertorio()" autocomplete="off">
+      <div id="resultados-repertorio" class="list-group position-absolute w-100 shadow text-start" style="top: 100%; left: 0; z-index: 1040; max-height: 280px; overflow-y: auto; display: none; background: #FDFBF7; border: 2px solid #2A9D8F; border-radius: 14px; padding: 8px; margin-top: 4px;"></div>
+    </div>
+
+    <form id="form-seccion" class="mt-3">
       <label for="seccion-select">Sección:</label>
       <select id="seccion-select" class="form-select" onchange="actualizarListaCanciones()"></select>
     </form>
@@ -45,20 +51,228 @@
 
     <hr>
 
+    <!-- ZONA PARA ASIGNAR NOMBRE Y GUARDAR EN BIBLIOTECA (OPCIONAL) -->
+    <div id="card-nombre-repertorio" class="card p-3 my-3 text-start shadow-sm" style="background: rgba(42, 157, 143, 0.08); border: 1px solid rgba(42, 157, 143, 0.3); border-radius: 16px;">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-1">
+        <label for="nombre-repertorio-input" class="fw-bold mb-0" style="color: #2A9D8F; font-size: 13px;">
+          🏷️ Nombre del repertorio (opcional):
+        </label>
+        <button type="button" class="btn btn-outline-secondary btn-sm fw-bold" onclick="abrirModalBiblioteca()">
+          📂 Mis repertorios guardados (<span id="contador-repertorios-guardados">0</span>)
+        </button>
+      </div>
+
+      <div class="input-group mt-2">
+        <input type="text" id="nombre-repertorio-input" class="form-control fw-bold" placeholder="Ej: Misa Domingo 20hs, Retiro de Jóvenes..." style="border-radius: 10px 0 0 10px !important;">
+        <button type="button" class="btn text-white fw-bold px-3" style="background: #2A9D8F; border-radius: 0 10px 10px 0 !important;" onclick="guardarEnBibliotecaRepertorios()">
+          💾 Guardar
+        </button>
+      </div>
+      <div id="mensaje-guardado-repertorio" class="small mt-1 text-success fw-bold" style="display:none;"></div>
+    </div>
+
     <ul id="programa-lista" class="list-unstyled mt-3"></ul>
 
     <div class="mt-4">
       <button id="programa-full" class="btn btn-outline-primary mb-3">Programa full (con acordes)</button>
       <button id="programa-acordes" class="btn btn-outline-primary mb-3">Lista canciones (con acordes)</button>
       <button id="programa-texto" class="btn btn-outline-primary mb-3">Lista canciones (sólo texto)</button>
+      <button id="btn-imprimir-repertorio" class="btn btn-outline-primary mb-3">🖨️ Imprimir / Guardar PDF</button>
       <button id="compartir-programa" class="btn btn-outline-primary mb-3">Compartir listado</button>
+    </div>
+
+    <!-- Modal Elegir Formato de Impresión / PDF -->
+    <div id="modal-imprimir-opciones" class="position-fixed top-0 start-0 w-100 h-100 justify-content-center align-items-center p-3" style="display:none; background:rgba(0,0,0,0.6); z-index:10000;">
+      <div class="card p-4 rounded-4 shadow-lg text-start" style="max-width:440px; width:100%; border:2px solid #2A9D8F;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold mb-0" style="color:#2A9D8F;">🖨️ Imprimir / Guardar en PDF</h5>
+          <button type="button" class="btn-close" onclick="cerrarModalImprimir()"></button>
+        </div>
+        <p class="text-muted small mb-3">Elegí qué versión querés exportar o imprimir en papel/PDF:</p>
+        <div class="d-grid gap-2 mb-3">
+          <button type="button" class="btn btn-outline-primary text-start p-3 rounded-3" onclick="imprimirVersion('texto')">
+            <div class="fw-bold fs-6">📄 Sólo letra (recomendado para coro y asamblea)</div>
+            <small class="text-muted">Diseño limpio y ultra compacto, gasta menos papel.</small>
+          </button>
+          <button type="button" class="btn btn-outline-primary text-start p-3 rounded-3" onclick="imprimirVersion('acordes')">
+            <div class="fw-bold fs-6">🎸 Con acordes y tonalidades</div>
+            <small class="text-muted">Incluye notas y cifrado para guitarristas y músicos.</small>
+          </button>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="cerrarModalImprimir()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Biblioteca de Repertorios Guardados -->
+    <div id="modal-biblioteca-repertorios" class="position-fixed top-0 start-0 w-100 h-100 justify-content-center align-items-center p-3" style="display:none; background:rgba(0,0,0,0.6); z-index:10000;">
+      <div class="card p-4 rounded-4 shadow-lg text-start" style="max-width:500px; width:100%; border:2px solid #2A9D8F; max-height:85vh; display:flex; flex-direction:column;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold mb-0" style="color:#2A9D8F;">📂 Mis Repertorios Guardados</h5>
+          <button type="button" class="btn-close" onclick="cerrarModalBiblioteca()"></button>
+        </div>
+        
+        <p class="text-muted small mb-3">Elegí un repertorio que hayas guardado anteriormente para cargarlo en pantalla:</p>
+        
+        <div id="lista-biblioteca-items" class="flex-grow-1 overflow-auto pe-1" style="max-height:360px;">
+          <!-- Items generados dinámicamente -->
+        </div>
+        
+        <div class="d-flex justify-content-end mt-3 pt-2 border-top">
+          <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="cerrarModalBiblioteca()">Cerrar</button>
+        </div>
+      </div>
     </div>
   </main>
 
   <script src="scripts/cancionero.js"></script>
 
   <script>
-    let programa = JSON.parse(localStorage.getItem("programaMisa")) || [];
+    // Lista de trabajo actual
+    var programa = JSON.parse(localStorage.getItem("programaMisa")) || [];
+    var nombreRepertorioActual = localStorage.getItem("programaMisaNombre") || "";
+
+    // Biblioteca de repertorios guardados por el usuario
+    var bibliotecaRepertorios = {};
+    (function inicializarBiblioteca() {
+      try {
+        bibliotecaRepertorios = JSON.parse(localStorage.getItem("cancionero_biblioteca_repertorios")) || {};
+        // Si había repertorios creados con el formato previo, los migramos a la biblioteca
+        const prevMulti = JSON.parse(localStorage.getItem("cancionero_multi_repertorios"));
+        if (prevMulti && prevMulti.listas) {
+          for (const k in prevMulti.listas) {
+            if (prevMulti.listas[k] && prevMulti.listas[k].length > 0 && !bibliotecaRepertorios[k]) {
+              bibliotecaRepertorios[k] = prevMulti.listas[k];
+            }
+          }
+          localStorage.setItem("cancionero_biblioteca_repertorios", JSON.stringify(bibliotecaRepertorios));
+        }
+      } catch (e) {
+        bibliotecaRepertorios = {};
+      }
+    })();
+
+    function guardarPrograma() {
+      localStorage.setItem("programaMisa", JSON.stringify(programa));
+      const input = document.getElementById("nombre-repertorio-input");
+      if (input) {
+        localStorage.setItem("programaMisaNombre", input.value.trim());
+      }
+    }
+
+    function actualizarContadorBiblioteca() {
+      const cant = Object.keys(bibliotecaRepertorios).length;
+      const el = document.getElementById("contador-repertorios-guardados");
+      if (el) el.textContent = cant;
+    }
+
+    window.guardarEnBibliotecaRepertorios = function() {
+      const input = document.getElementById("nombre-repertorio-input");
+      const nombre = (input ? input.value : "").trim();
+      if (!nombre) {
+        alert("Por favor escribí un nombre para identificar este repertorio (ej: Misa Domingo 20hs, Retiro de Jóvenes...).");
+        if (input) input.focus();
+        return;
+      }
+      if (!programa || programa.length === 0) {
+        alert("Tu listado actual no tiene canciones. Agregá al menos una canción antes de guardarlo.");
+        return;
+      }
+      if (bibliotecaRepertorios[nombre]) {
+        const sobreescribir = confirm(`Ya tenés un repertorio guardado llamado "${nombre}". ¿Querés reemplazarlo con este nuevo listado?`);
+        if (!sobreescribir) return;
+      }
+
+      bibliotecaRepertorios[nombre] = JSON.parse(JSON.stringify(programa));
+      localStorage.setItem("cancionero_biblioteca_repertorios", JSON.stringify(bibliotecaRepertorios));
+      localStorage.setItem("programaMisaNombre", nombre);
+      actualizarContadorBiblioteca();
+
+      const msg = document.getElementById("mensaje-guardado-repertorio");
+      if (msg) {
+        msg.textContent = `✓ ¡Repertorio "${nombre}" guardado con éxito en tu biblioteca!`;
+        msg.style.display = "block";
+        setTimeout(() => { msg.style.display = "none"; }, 3500);
+      }
+    };
+
+    window.abrirModalBiblioteca = function() {
+      actualizarBibliotecaUI();
+      const modal = document.getElementById("modal-biblioteca-repertorios");
+      if (modal) modal.style.display = "flex";
+    };
+
+    window.cerrarModalBiblioteca = function() {
+      const modal = document.getElementById("modal-biblioteca-repertorios");
+      if (modal) modal.style.display = "none";
+    };
+
+    window.actualizarBibliotecaUI = function() {
+      const listaDiv = document.getElementById("lista-biblioteca-items");
+      if (!listaDiv) return;
+      listaDiv.innerHTML = "";
+      actualizarContadorBiblioteca();
+
+      const nombres = Object.keys(bibliotecaRepertorios);
+      if (nombres.length === 0) {
+        listaDiv.innerHTML = `
+          <div class="p-4 text-center text-muted small border rounded-3" style="border-style: dashed !important;">
+            No tenés repertorios guardados todavía.<br>
+            Armá tu lista en la pantalla principal, escribile un nombre en el campo <i>Nombre del repertorio</i> y tocá <b>Guardar</b>.
+          </div>
+        `;
+        return;
+      }
+
+      nombres.forEach(nombre => {
+        const canciones = bibliotecaRepertorios[nombre] || [];
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "item-repertorio-guardado p-3 mb-2 rounded-3 border d-flex justify-content-between align-items-center gap-2";
+        itemDiv.style.background = "rgba(42, 157, 143, 0.04)";
+
+        itemDiv.innerHTML = `
+          <div style="overflow: hidden;">
+            <div class="fw-bold text-truncate" style="color: #2A9D8F; font-size: 15px;">📁 ${nombre}</div>
+            <div class="small text-muted">${canciones.length} canción${canciones.length === 1 ? '' : 'es'}</div>
+          </div>
+          <div class="d-flex gap-1 flex-shrink-0">
+            <button type="button" class="btn btn-sm text-white fw-bold px-2 py-1" style="background:#2A9D8F; font-size:12px;" onclick="cargarRepertorioDeBiblioteca('${nombre.replace(/'/g, "\\'")}')">
+              ⬇️ Cargar
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm px-2 py-1" style="font-size:12px;" onclick="eliminarDeBiblioteca('${nombre.replace(/'/g, "\\'")}')" title="Eliminar este repertorio">
+              🗑️
+            </button>
+          </div>
+        `;
+        listaDiv.appendChild(itemDiv);
+      });
+    };
+
+    window.cargarRepertorioDeBiblioteca = function(nombre) {
+      if (!bibliotecaRepertorios[nombre]) return;
+      if (programa.length > 0) {
+        const confirmar = confirm(`¿Cargar el repertorio "${nombre}"? Reemplazará las canciones que tenés actualmente en pantalla.`);
+        if (!confirmar) return;
+      }
+
+      programa = JSON.parse(JSON.stringify(bibliotecaRepertorios[nombre]));
+      const input = document.getElementById("nombre-repertorio-input");
+      if (input) input.value = nombre;
+      localStorage.setItem("programaMisaNombre", nombre);
+      guardarPrograma();
+      mostrarPrograma();
+      cerrarModalBiblioteca();
+    };
+
+    window.eliminarDeBiblioteca = function(nombre) {
+      const seguro = confirm(`¿Seguro que querés eliminar el repertorio guardado "${nombre}"?`);
+      if (seguro) {
+        delete bibliotecaRepertorios[nombre];
+        localStorage.setItem("cancionero_biblioteca_repertorios", JSON.stringify(bibliotecaRepertorios));
+        actualizarBibliotecaUI();
+      }
+    };
 
     const seccionSelect = document.getElementById("seccion-select");
     for (const seccion in window.canciones) {
@@ -84,9 +298,12 @@
     }
 
     function transponerTono(tono, semitonos) {
-      const tonos = ["DO","DO#","RE","MIb","MI","FA","FA#","SOL","LAb","LA","SIb","SI"];
-      const esMenor = tono.endsWith("m");
-      const base = esMenor ? tono.slice(0, -1) : tono;
+      const tonos = ["DO","DO#","RE","MIb","MI","FA","FA#","SOL","SOL#","LA","SIb","SI"];
+      const equivalencias = { "REb": "DO#", "RE#": "MIb", "SOLb": "FA#", "LAb": "SOL#", "LA#": "SIb" };
+      const limpio = (tono || "").trim();
+      const esMenor = limpio.endsWith("m");
+      let base = (esMenor ? limpio.slice(0, -1) : limpio).trim();
+      if (equivalencias[base]) base = equivalencias[base];
       const idx = tonos.indexOf(base);
       if (idx === -1) return tono;
       const nuevo = tonos[(idx + semitonos + 12) % 12];
@@ -115,8 +332,111 @@
       guardarPrograma();
     }
 
+    // Armamos un índice único de todas las canciones para el buscador por título del repertorio
+    const catalogoUnicoRepertorio = [];
+    (function armarCatalogoRepertorio() {
+      const rutasVistas = new Set();
+      for (const seccion in window.canciones) {
+        for (const nombre in window.canciones[seccion]) {
+          const datos = window.canciones[seccion][nombre];
+          if (datos && datos.ruta && !rutasVistas.has(datos.ruta)) {
+            rutasVistas.add(datos.ruta);
+            catalogoUnicoRepertorio.push({
+              seccion: seccion,
+              nombre: nombre,
+              ruta: datos.ruta,
+              tono: datos.tono,
+              capo: datos.capo !== undefined ? parseInt(datos.capo) : 0
+            });
+          }
+        }
+      }
+      catalogoUnicoRepertorio.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
+    })();
+
+    function normalizarTextoRep(txt) {
+      return (txt || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!.,;:()"]/g, "");
+    }
+
+    function filtrarCancionesRepertorio() {
+      const input = document.getElementById("buscador-repertorio");
+      const caja = document.getElementById("resultados-repertorio");
+      if (!input || !caja) return;
+
+      const filtro = normalizarTextoRep(input.value.trim());
+      if (filtro.length === 0) {
+        caja.style.display = "none";
+        caja.innerHTML = "";
+        return;
+      }
+
+      const empiezan = [];
+      const contienen = [];
+
+      catalogoUnicoRepertorio.forEach((item, idx) => {
+        const limpio = normalizarTextoRep(item.nombre);
+        const pos = limpio.indexOf(filtro);
+        if (pos === 0) {
+          empiezan.push({ ...item, idx });
+        } else if (pos > 0) {
+          contienen.push({ ...item, idx });
+        }
+      });
+
+      const resultados = [...empiezan, ...contienen];
+      const esOscuro = document.body.classList.contains("modo-oscuro");
+      caja.style.background = esOscuro ? "#121212" : "#FDFBF7";
+      caja.style.display = "block";
+
+      if (resultados.length === 0) {
+        caja.innerHTML = `<div style="padding: 8px 12px; color: ${esOscuro ? '#aaa' : '#666'}; font-size: 0.9rem;">No se encontraron canciones con ese título.</div>`;
+        return;
+      }
+
+      caja.innerHTML = resultados.map(r => `
+        <button type="button" class="btn btn-outline-primary btn-sm text-start d-flex justify-content-between align-items-center mb-1" style="width: 100%; border-radius: 10px !important; padding: 7px 12px;" onclick="agregarDesdeBuscadorRepertorio(${r.idx})">
+          <span>${r.nombre} <small style="opacity: 0.7; font-weight: normal;">(${r.seccion})</small></span>
+          <span style="font-weight: 800; color: #2A9D8F; margin-left: 8px;">＋ Agregar</span>
+        </button>
+      `).join("");
+    }
+
+    window.agregarDesdeBuscadorRepertorio = function(idx) {
+      const item = catalogoUnicoRepertorio[idx];
+      if (!item) return;
+      programa.push({
+        seccion: item.seccion,
+        nombre: item.nombre,
+        cancion: item.ruta,
+        tono: item.tono,
+        capo: item.capo
+      });
+      mostrarPrograma();
+      guardarPrograma();
+
+      const input = document.getElementById("buscador-repertorio");
+      const caja = document.getElementById("resultados-repertorio");
+      if (input) input.value = "";
+      if (caja) {
+        caja.style.display = "none";
+        caja.innerHTML = "";
+      }
+    };
+
+    document.addEventListener("click", function(e) {
+      const cont = document.getElementById("contenedor-buscador-repertorio");
+      const caja = document.getElementById("resultados-repertorio");
+      if (cont && caja && !cont.contains(e.target)) {
+        caja.style.display = "none";
+      }
+    });
+
     function guardarPrograma() {
       localStorage.setItem("programaMisa", JSON.stringify(programa));
+      const input = document.getElementById("nombre-repertorio-input");
+      if (input) {
+        localStorage.setItem("programaMisaNombre", input.value.trim());
+      }
     }
 
     function mostrarPrograma() {
@@ -135,6 +455,31 @@
               @media (min-width: 768px) {
                   .fila-programa { flex-direction: row; align-items: center; }
                   .controles-programa { width: auto; margin-top: 0; justify-content: flex-end; gap: 20px; }
+              }
+
+              /* Adaptación a modo oscuro */
+              body.modo-oscuro #card-nombre-repertorio {
+                  background: #18181b !important;
+                  border-color: #2A9D8F !important;
+              }
+              body.modo-oscuro #nombre-repertorio-input {
+                  background-color: #000000 !important;
+                  color: #ffffff !important;
+                  border-color: #444 !important;
+              }
+              body.modo-oscuro #modal-biblioteca-repertorios .card {
+                  background-color: #121212 !important;
+                  color: #ffffff !important;
+                  border-color: #2A9D8F !important;
+              }
+              body.modo-oscuro #modal-biblioteca-repertorios .item-repertorio-guardado {
+                  background-color: #1a1a1e !important;
+                  border-color: #333 !important;
+                  color: #ffffff !important;
+              }
+              body.modo-oscuro #modal-biblioteca-repertorios p,
+              body.modo-oscuro #modal-biblioteca-repertorios .text-muted {
+                  color: #aaaaaa !important;
               }
             </style>
           `);
@@ -216,40 +561,122 @@
     };
 
     document.getElementById("limpiar-programa").addEventListener("click", () => {
-        let seguro = confirm("¿Estás seguro de que querés borrar todo el repertorio?");
+        let seguro = confirm("¿Estás seguro de que querés borrar todas las canciones del listado actual?");
         if (seguro) {
             programa = [];
+            const input = document.getElementById("nombre-repertorio-input");
+            if (input) input.value = "";
+            localStorage.removeItem("programaMisaNombre");
             guardarPrograma(); 
             mostrarPrograma();
         }
     });
 
-    document.getElementById("compartir-programa").addEventListener("click", () => {
+    document.getElementById("compartir-programa").addEventListener("click", async () => {
+      if (!programa || programa.length === 0) {
+        alert("El repertorio está vacío. Agregá canciones antes de compartir.");
+        return;
+      }
+
+      const input = document.getElementById("nombre-repertorio-input");
+      const nombre = (input ? input.value : "").trim();
+
       const params = programa.map(item => `${encodeURIComponent(item.seccion)}=${encodeURIComponent(item.nombre)}~${encodeURIComponent(item.tono)}~${item.capo || 0}`).join("&");
-      const url = `${window.location.origin}${window.location.pathname}?${params}`;
-      navigator.clipboard.writeText(url);
-      alert("Enlace copiado al portapapeles:\n\n" + url);
+      let url = `${window.location.origin}${window.location.pathname}?${params}`;
+      if (nombre) {
+        url += `&nombre=${encodeURIComponent(nombre)}`;
+      }
+
+      // Solo el título del repertorio (si es que tiene) y el link directo
+      const mensajeCompartir = nombre ? `${nombre}\n${url}` : url;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(mensajeCompartir);
+        }
+      } catch (e) {}
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: nombre || "Repertorio",
+            text: mensajeCompartir,
+            url: url
+          });
+          return;
+        } catch (e) {}
+      }
+
+      alert("¡Enlace copiado al portapapeles!\n\n" + mensajeCompartir);
     });
 
     function cargarProgramaDesdeURL() {
       const params = new URLSearchParams(window.location.search);
       if ([...params].length === 0) return;
+
+      const nombreUrl = params.get("nombre");
+      if (nombreUrl) {
+        const input = document.getElementById("nombre-repertorio-input");
+        if (input) input.value = nombreUrl;
+        localStorage.setItem("programaMisaNombre", nombreUrl);
+      }
+
       programa = [];
       for (const [seccion, valor] of params.entries()) {
+        if (seccion === "nombre") continue;
         const partes = valor.split("~");
         const nombre = partes[0], tono = partes[1], capo = partes[2] ? parseInt(partes[2]) : 0;
         if (window.canciones && window.canciones[seccion] && window.canciones[seccion][nombre]) {
           programa.push({ seccion: seccion, nombre: nombre, cancion: window.canciones[seccion][nombre].ruta, tono: tono || window.canciones[seccion][nombre].tono, capo: capo });
         }
       }
-      guardarPrograma(); mostrarPrograma();
+      guardarPrograma(); 
+      mostrarPrograma();
     }
 
     document.getElementById("programa-full").onclick = () => { guardarPrograma(); window.location.href = "programa-full.html"; };
     document.getElementById("programa-acordes").onclick = () => { guardarPrograma(); window.location.href = "programa-acordes.html"; };
     document.getElementById("programa-texto").onclick = () => { guardarPrograma(); window.location.href = "programa-texto.html"; };
 
-    window.addEventListener("DOMContentLoaded", () => { cargarProgramaDesdeURL(); mostrarPrograma(); });
+    document.getElementById("btn-imprimir-repertorio").onclick = () => {
+      if (!programa || programa.length === 0) {
+        alert("El repertorio está vacío. Agregá alguna canción antes de imprimir.");
+        return;
+      }
+      guardarPrograma();
+      const modal = document.getElementById("modal-imprimir-opciones");
+      if (modal) modal.style.display = "flex";
+    };
+
+    function cerrarModalImprimir() {
+      const modal = document.getElementById("modal-imprimir-opciones");
+      if (modal) modal.style.display = "none";
+    }
+
+    function imprimirVersion(tipo) {
+      cerrarModalImprimir();
+      if (tipo === 'acordes') {
+        window.open('programa-acordes.html?print=1', '_blank');
+      } else {
+        window.open('programa-texto.html?print=1', '_blank');
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => { 
+      const input = document.getElementById("nombre-repertorio-input");
+      const guardado = localStorage.getItem("programaMisaNombre");
+      if (input && guardado) {
+        input.value = guardado;
+      }
+      if (input) {
+        input.addEventListener("input", function() {
+          localStorage.setItem("programaMisaNombre", this.value.trim());
+        });
+      }
+      cargarProgramaDesdeURL(); 
+      actualizarContadorBiblioteca();
+      mostrarPrograma(); 
+    });
   </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -32,14 +32,17 @@
 <nav class="navbar sticky-top navbar-dark bg-primary">
   <div class="container-fluid">
     
-    <a class="navbar-brand" href="index.html">
-      <img src="images/logo-schoenstatt-png.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-      ÍNDICE
-    </a>
+    <div style="display: inline-flex; align-items: center;">
+      <a class="navbar-brand" href="index.html" style="margin-right: 16px;">
+        <img src="images/logo-schoenstatt-png.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+        ÍNDICE
+      </a>
+      <a class="btn-toggle-theme" href="#" id="toggle-theme" title="Cambiar Modo Noche / Día" style="display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.7); border-radius: 50px; padding: 3px 11px; color: #fff; text-decoration: none; font-size: 15px; line-height: 1.2;">🌙</a>
+    </div>
     
 <div class="d-flex position-relative ms-lg-3" style="min-width: 250px;">
         
-        <input id="inputGlobal" class="form-control me-2" type="search" placeholder="🔍 Buscar canción..." aria-label="Search" onkeyup="filtrarGlobal()">
+        <input id="inputGlobal" class="form-control me-2" type="search" placeholder="🔍 Buscar canción..." aria-label="Search" onkeyup="filtrarGlobal()" onfocus="mostrarRecientesBuscador()" onclick="mostrarRecientesBuscador()">
         
         <div id="listaGlobal" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; max-height: 400px; overflow-y: auto; display: none;">
             
@@ -107,6 +110,7 @@
    <a class="btn btn-outline-primary btn-sm" href="entrada/cristo-joven.html">Cristo Joven</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/cristo-reina.html">Cristo reina</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/cristo-rey.html">Cristo Rey</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/cristo-rey-con-subida.html">Cristo Rey (con subida)</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/dame-tu-si.html">Dame Tu Sí</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/dame-tus-ojos.html">Dame tus ojos</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/de-cirene.html">De Cirene</a>
@@ -368,7 +372,7 @@
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/ofrenda.html">Ofrenda (Trilla y Vendimia)</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/venid-a-mi.html">Venid a mi</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/siervo-de-dios.html">Siervo de Dios</a>
-  <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/ven-y-veras.html">Ven y verás (QCuCS)</a>
+  <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/ven-y-veras-qcucs.html">Ven y verás (QCuCS)</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/pasas-madre.html">Pasas Madre</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/encuentro.html">Encuentro</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/con-la-vuelta-del-sol.html">Con la vuelta del Sol</a>
@@ -503,23 +507,33 @@
     <div class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto"><a class="d-block btn btn-primary" href="20-albumes.html">ALBUMES</a></div>
 </div>
 
-<div style="text-align: center; margin: 40px 0;">
-    <a href="donaciones.html" style="display: inline-block; padding: 10px 20px; background-color: transparent; border: 2px solid #00979f; color: #00979f; text-decoration: none; border-radius: 20px; font-weight: bold;">
+<div style="text-align: center; margin: 40px 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0 15px;">
+    <a href="guia.html" style="display: inline-block; padding: 10px 20px; background-color: rgba(42, 157, 143, 0.08); border: 2px solid #2A9D8F; color: #2C3E50; text-decoration: none; border-radius: 50px; font-weight: bold;">
+        📖 Manual de uso
+    </a>
+
+    <a href="javascript:void(0)" id="btn-descargar-todo" style="display: inline-block; padding: 10px 20px; background-color: rgba(42, 157, 143, 0.08); border: 2px solid #2A9D8F; color: #2C3E50; text-decoration: none; border-radius: 50px; font-weight: bold;">
+        ⬇️ Descargar para usar sin internet
+    </a>
+
+    <a href="donaciones.html" style="display: inline-block; padding: 10px 20px; background-color: rgba(42, 157, 143, 0.08); border: 2px solid #2A9D8F; color: #2C3E50; text-decoration: none; border-radius: 50px; font-weight: bold;">
         🤍 Donaciones
     </a>
 
-    <a href="sugerencias.html" style="display: inline-block; padding: 10px 20px; background-color: transparent; border: 2px solid #00979f; color: #00979f; text-decoration: none; border-radius: 20px; font-weight: bold;">
+    <a href="sugerencias.html" style="display: inline-block; padding: 10px 20px; background-color: rgba(42, 157, 143, 0.08); border: 2px solid #2A9D8F; color: #2C3E50; text-decoration: none; border-radius: 50px; font-weight: bold;">
         💡 Dejar una sugerencia
     </a>
 </div>
 
-<div class="text-bg-primary my-5">
-    <div class="fs-4 lh-sm text-center mx-auto">
-        <p>Juventud de Schoenstatt Córdoba</p>
-        <p>Contacto: alvarezroquebenjamin@gmail.com</p>
-        <a href="https://docs.google.com/document/d/1ml6DZPy-DJhAMs7ukrhDv7rkUwXOA3xpQZGKWa44zQg/edit?usp=sharing" target="_blank" class="text-white">Cancionero para imprimir</a>
-     </div>
-</div>
+<footer class="mt-4 mb-0 py-3 px-3" style="background-color: #2A9D8F; color: #ffffff;">
+    <div class="text-center mx-auto" style="max-width: 520px; font-size: 0.92rem; line-height: 1.4;">
+        <div style="font-weight: 800; letter-spacing: 0.3px; margin-bottom: 2px;">Juventud de Schoenstatt Córdoba</div>
+        <div style="opacity: 0.92; font-size: 0.85rem; margin-bottom: 8px;">Contacto: alvarezroquebenjamin@gmail.com</div>
+        <a href="https://docs.google.com/document/d/1ml6DZPy-DJhAMs7ukrhDv7rkUwXOA3xpQZGKWa44zQg/edit?usp=sharing" target="_blank" style="display: inline-block; padding: 4px 14px; border-radius: 99px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.5); color: #ffffff !important; text-decoration: none; font-weight: 700; font-size: 0.84rem;">
+            🖨️ Cancionero para imprimir
+        </a>
+    </div>
+</footer>
 
 
 <script src="scripts/cancionero.js"></script>
@@ -528,7 +542,10 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/cancionerobenja/sw.js')
-        .then(registro => console.log('Service Worker registrado con éxito:', registro.scope))
+        .then(registro => {
+          registro.update();
+          console.log('Service Worker registrado con éxito:', registro.scope);
+        })
         .catch(error => console.log('Falló el Service Worker:', error));
     });
   }

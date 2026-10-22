@@ -859,3 +859,350 @@ body.modo-oscuro .portada h1 {
     height: auto; /* Esto es vital para que no se deforme */
     display: block;
 }
+
+/* ============================================================
+   MEJORAS VISUALES PARA CELULAR
+   Pegar al FINAL de css/cancionero.css (después de todo lo que hay).
+   Para deshacerlo, borrá este bloque completo.
+   ============================================================ */
+@media (max-width: 768px) {
+
+  /* 1. Buscador: que se lea "Buscar canción..." completo */
+  nav #inputGlobal { width: 175px !important; }
+
+  /* 2. Encabezado de la canción más compacto: la letra empieza más arriba */
+  .titulo { margin-top: 10px !important; margin-bottom: 4px !important; }
+  #toggleChordsButton { margin-bottom: 4px !important; }
+  .transpose-keys { margin-top: 2px !important; margin-bottom: 2px !important; }
+  .capo-selector-div { margin-top: 2px !important; margin-bottom: 6px !important; }
+  #letra { padding-top: 0 !important; }
+
+  /* 3. Botón redondo ☰ más chico y un poco transparente para tapar menos letra */
+  #super-menu-container #menu-trigger { width: 44px !important; height: 44px !important; font-size: 20px !important; opacity: 0.85; }
+  #super-menu-container #menu-trigger:active { opacity: 1; }
+}
+
+/* ============================================================
+   MEJORAS ESTÉTICAS: BUSCADOR, BARRA DE TONOS Y BOTÓN ACORDES
+   ============================================================ */
+
+/* 1. Buscador desplegable con los colores cálidos y verde pino del cancionero */
+#listaGlobal {
+    background-color: #FDFBF7 !important;
+    border: 2px solid #2A9D8F !important;
+    padding: 8px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22) !important;
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+    margin-top: 4px !important;
+}
+
+#listaGlobal a.btn {
+    display: block;
+    width: 100% !important;
+    text-align: left !important;
+    border-radius: 10px !important;
+    margin-bottom: 5px !important;
+    padding: 6px 12px !important;
+    background-color: rgba(42, 157, 143, 0.08) !important;
+    border: 1px solid rgba(42, 157, 143, 0.3) !important;
+    color: #2C3E50 !important;
+    font-weight: 700 !important;
+}
+
+#listaGlobal a.btn:hover,
+#listaGlobal a.btn:focus {
+    background-color: #2A9D8F !important;
+    color: #ffffff !important;
+    border-color: #2A9D8F !important;
+}
+
+/* 2. Barra de Tonos centrada, redondeada y en verde pino */
+.transpose-keys {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    margin: 8px auto 10px !important;
+    overflow: visible !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.transpose-keys a {
+    float: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 2.35rem !important;
+    width: auto !important;
+    padding: 5px 8px !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    background-color: rgba(42, 157, 143, 0.10) !important;
+    color: #2C3E50 !important;
+    border: 1.5px solid rgba(42, 157, 143, 0.35) !important;
+    text-decoration: none !important;
+    transition: all 0.15s ease !important;
+}
+
+.transpose-keys a:hover {
+    background-color: rgba(42, 157, 143, 0.22) !important;
+    border-color: #2A9D8F !important;
+}
+
+.transpose-keys a.selected {
+    background-color: #2A9D8F !important;
+    color: #ffffff !important;
+    border-color: #2A9D8F !important;
+    box-shadow: 0 2px 6px rgba(42, 157, 143, 0.35) !important;
+    transform: translateY(-1px);
+}
+
+/* 3. Botón "Mostrar/ocultar acordes" integrado con el diseño */
+.btn-acordes,
+#toggleChordsButton {
+    border-radius: 50px !important;
+    padding: 6px 18px !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    background-color: rgba(42, 157, 143, 0.10) !important;
+    color: #2C3E50 !important;
+    border: 1.5px solid #2A9D8F !important;
+    transition: all 0.2s ease !important;
+}
+
+.btn-acordes:hover,
+#toggleChordsButton:hover,
+.btn-acordes.active,
+#toggleChordsButton.active {
+    background-color: #2A9D8F !important;
+    color: #ffffff !important;
+    border-color: #2A9D8F !important;
+}
+
+body.modo-oscuro .btn-acordes,
+body.modo-oscuro #toggleChordsButton {
+    background-color: rgba(42, 157, 143, 0.15) !important;
+    color: #ffffff !important;
+    border: 1.5px solid #2A9D8F !important;
+}
+
+body.modo-oscuro .btn-acordes.active,
+body.modo-oscuro #toggleChordsButton.active {
+    background-color: #2A9D8F !important;
+    color: #ffffff !important;
+}
+
+/* 4. Botón "Original" y texto del buscador legible en modo oscuro */
+body.modo-oscuro .btn-reset-tono {
+    background-color: rgba(42, 157, 143, 0.2) !important;
+    color: #ffffff !important;
+    border-color: #2A9D8F !important;
+}
+
+body.modo-oscuro #inputGlobal::placeholder,
+body.modo-oscuro .form-control::placeholder {
+    color: #cbd5e1 !important;
+    opacity: 1 !important;
+}
+
+body.modo-oscuro #toggle-theme,
+body.modo-oscuro .btn-toggle-theme {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+}
+
+/* 5. Barra rápida de abecedario (A - Z) en el Índice Alfabético */
+#barra-abecedario {
+    position: sticky;
+    top: 54px;
+    z-index: 950;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 10px;
+    margin: 0 auto 14px;
+    max-width: 780px;
+    background-color: rgba(253, 251, 247, 0.96);
+    backdrop-filter: blur(6px);
+    border: 1.5px solid rgba(42, 157, 143, 0.35);
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(44, 62, 80, 0.08);
+}
+
+.btn-letra-abc {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(42, 157, 143, 0.35);
+    background-color: rgba(42, 157, 143, 0.10);
+    color: #2C3E50;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-letra-abc:hover,
+.btn-letra-abc.activo {
+    background-color: #2A9D8F;
+    color: #ffffff;
+    border-color: #2A9D8F;
+    transform: translateY(-1px);
+}
+
+body.modo-oscuro #barra-abecedario {
+    background-color: rgba(24, 24, 24, 0.95);
+    border-color: rgba(42, 157, 143, 0.5);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+}
+
+body.modo-oscuro .btn-letra-abc {
+    background-color: rgba(42, 157, 143, 0.16);
+    color: #e0e0e0;
+    border-color: rgba(42, 157, 143, 0.45);
+}
+
+body.modo-oscuro .btn-letra-abc:hover,
+body.modo-oscuro .btn-letra-abc.activo {
+    background-color: #2A9D8F;
+    color: #ffffff;
+    border-color: #2A9D8F;
+}
+
+/* =============================================================================
+   PANEL RESUMEN DE ACORDES DE LA CANCIÓN (OPCIÓN 5)
+   ============================================================================= */
+.panel-resumen-acordes {
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+body.modo-oscuro .panel-resumen-acordes {
+    background: #1e1e1e !important;
+    border-color: #444444 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.modo-oscuro .panel-acordes-titulo {
+    color: #90caf9 !important;
+}
+
+body.modo-oscuro .tarjeta-acorde-resumen {
+    background: #2b2b2b !important;
+    border-color: #4a4a4a !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.modo-oscuro .tarjeta-acorde-resumen > div:first-child {
+    color: #90caf9 !important;
+}
+
+body.modo-oscuro .btn-toggle-diagramas {
+    background: rgba(144, 202, 249, 0.14) !important;
+    color: #90caf9 !important;
+    border-color: #90caf9 !important;
+}
+
+body.modo-oscuro .btn-toggle-diagramas.activo {
+    background: #90caf9 !important;
+    color: #121212 !important;
+}
+
+/* =============================================================================
+   ESTILOS DE IMPRESIÓN Y PDF (@media print) (OPCIÓN 3)
+   ============================================================================= */
+@media print {
+    @page {
+        margin: 1.4cm 1.2cm;
+        size: auto;
+    }
+    
+    html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Ocultar elementos de navegación, menús flotantes, botones y controles */
+    #nav-placeholder, nav, .navbar, .nav-canciones,
+    #super-menu-container, #menu-trigger, #menu-content,
+    .navigation-buttons, .no-print, #toggleChordsButton,
+    .transpose-keys, .capo-selector-div, .video, iframe,
+    #acorde-overlay, #acorde-modal, #fav-overlay, #fav-modal,
+    #modal-biblioteca-repertorios, #modal-imprimir-opciones, .modal-backdrop,
+    .btn, button, footer, #btn-descargar-todo, #btn-modo-atril,
+    .panel-resumen-acordes, .btn-toggle-diagramas {
+        display: none !important;
+    }
+
+    /* Título / Distintivo del repertorio */
+    #nombre-repertorio-badge {
+        display: block !important;
+        font-size: 18pt !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+        background: transparent !important;
+        border: none !important;
+        border-bottom: 2px solid #000000 !important;
+        border-radius: 0 !important;
+        padding: 0 0 6px 0 !important;
+        margin: 0 auto 20px auto !important;
+        text-align: center !important;
+    }
+
+    /* Cada canción del repertorio en bloque sin cortes a mitad de estrofa */
+    .cancion-content, .cancion-en-lista {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 24px !important;
+        padding-bottom: 16px !important;
+        border-bottom: 1px dashed #777777 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: left !important;
+    }
+
+    h1, h2, h3 {
+        color: #000000 !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        margin-top: 14px !important;
+        margin-bottom: 10px !important;
+        font-size: 14pt !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+    }
+
+    pre, pre#letra, pre[id^="letra-lista"], .lh-base {
+        color: #000000 !important;
+        font-size: 10.5pt !important;
+        line-height: 1.42 !important;
+        white-space: pre-wrap !important;
+        font-family: 'Courier New', Courier, monospace, sans-serif !important;
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    span.c {
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+}
+

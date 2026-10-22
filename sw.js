@@ -1,5 +1,5 @@
 // Número de versión de la copia guardada en el celular.
-const CACHE_NAME = 'cancionero-v19';
+const CACHE_NAME = 'cancionero-v25';
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -9,9 +9,13 @@ const urlsToCache = [
   '/cancionerobenja/navbar.html',
   '/cancionerobenja/css/cancionero.css',
   '/cancionerobenja/scripts/cancionero.js',
+  '/cancionerobenja/scripts/letras-buscador.js',
   '/cancionerobenja/images/logo-schoenstatt-png.png',
   '/cancionerobenja/images/foto-cpk.jpg', 
   '/cancionerobenja/crear-programa.html',
+  '/cancionerobenja/programa-full.html',
+  '/cancionerobenja/programa-acordes.html',
+  '/cancionerobenja/programa-texto.html',
 
   // 1.1. Secciones
   '/cancionerobenja/01-entrada.html',
@@ -35,6 +39,7 @@ const urlsToCache = [
     '/cancionerobenja/19-indice-alfabetico.html',
     '/cancionerobenja/20-albumes.html',
     '/cancionerobenja/donaciones.html',
+    '/cancionerobenja/guia.html',
     '/cancionerobenja/sugerencias.html',
   
   // 2. Las páginas de los álbumes

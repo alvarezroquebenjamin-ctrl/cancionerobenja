@@ -888,16 +888,181 @@ window.canciones = {
 // 1. MÓDULO DE TRANSPOSICIÓN (JQUERY) Y CREADOR DE CAPO
 // =============================================================================
 (function($) {
+  // =========================================================================
+  // MÓDULO DE CIFRADO LATINO (DO-RE-MI) <-> AMERICANO (C-D-E)
+  // =========================================================================
+  var MAPA_LATINO_AMERICANO = {
+    "DO#": "C#", "RE#": "D#", "FA#": "F#", "SOL#": "G#", "LA#": "A#",
+    "REB": "Db", "MIB": "Eb", "SOLB": "Gb", "LAB": "Ab", "SIB": "Bb",
+    "REb": "Db", "MIb": "Eb", "SOLb": "Gb", "LAb": "Ab", "SIb": "Bb",
+    "DO": "C", "RE": "D", "MI": "E", "FA": "F", "SOL": "G", "LA": "A", "SI": "B"
+  };
+
+  var MAPA_AMERICANO_LATINO = {
+    "C#": "DO#", "D#": "RE#", "F#": "FA#", "G#": "SOL#", "A#": "LA#",
+    "DB": "REb", "EB": "MIb", "GB": "SOLb", "AB": "LAb", "BB": "SIb",
+    "Db": "REb", "Eb": "MIb", "Gb": "SOLb", "Ab": "LAb", "Bb": "SIb",
+    "C": "DO", "D": "RE", "E": "MI", "F": "FA", "G": "SOL", "A": "LA", "B": "SI"
+  };
+
+  window.convertirAcordeLatinoAAmericano = function(acorde) {
+    if (!acorde) return acorde;
+    if (acorde.indexOf("/") !== -1) {
+      var partes = acorde.split("/");
+      return window.convertirAcordeLatinoAAmericano(partes[0]) + "/" + window.convertirAcordeLatinoAAmericano(partes[1]);
+    }
+    // Si NO empieza con una nota latina, ya está en americano o formato no latino; NO TOCAR
+    if (!/^(DO|RE|MI|FA|SOL|LA|SI)/i.test(acorde)) {
+      return acorde;
+    }
+    var raiz = "";
+    if (/^SOL[#bB]/i.test(acorde)) raiz = acorde.substr(0, 4);
+    else if (/^SOL/i.test(acorde)) raiz = acorde.substr(0, 3);
+    else if (/^(DO|RE|MI|FA|LA|SI)[#bB]/i.test(acorde)) raiz = acorde.substr(0, 3);
+    else if (/^(DO|RE|MI|FA|LA|SI)/i.test(acorde)) raiz = acorde.substr(0, 2);
+
+    var raizUpper = raiz.toUpperCase();
+    if (raiz.endsWith("b") || raiz.endsWith("B")) {
+      raizUpper = raiz.substr(0, raiz.length - 1).toUpperCase() + "b";
+    }
+    if (raizUpper && MAPA_LATINO_AMERICANO[raizUpper]) {
+      return MAPA_LATINO_AMERICANO[raizUpper] + acorde.substr(raiz.length);
+    }
+    return acorde;
+  };
+
+  window.convertirAcordeAmericanoALatino = function(acorde) {
+    if (!acorde) return acorde;
+    if (acorde.indexOf("/") !== -1) {
+      var partes = acorde.split("/");
+      return window.convertirAcordeAmericanoALatino(partes[0]) + "/" + window.convertirAcordeAmericanoALatino(partes[1]);
+    }
+    // Si ya empieza con una nota latina, NO TOCAR JAMÁS (evita mutar DO en REO o FA en FAAA)
+    if (/^(DO|RE|MI|FA|SOL|LA|SI)/i.test(acorde)) {
+      return acorde;
+    }
+    var raiz = "";
+    if (/^[A-G][#bB]/.test(acorde)) raiz = acorde.substr(0, 2);
+    else if (/^[A-G]/.test(acorde)) raiz = acorde.substr(0, 1);
+
+    var raizNorm = raiz.charAt(0).toUpperCase();
+    if (raiz.length > 1) {
+      raizNorm += (raiz.charAt(1) === "#" ? "#" : "b");
+    }
+
+    if (raizNorm && MAPA_AMERICANO_LATINO[raizNorm]) {
+      return MAPA_AMERICANO_LATINO[raizNorm] + acorde.substr(raiz.length);
+    }
+    return acorde;
+  };
+
+  window.sistemaCifradoActual = localStorage.getItem("cancionero_sistema_cifrado") || "latino";
+
+  window.actualizarBotonesCifrado = function(sistema) {
+    var esAm = (sistema === "americano");
+    $(".btn-toggle-cifrado .lbl-cifrado-modo").text(esAm ? "C" : "DO");
+    $(".btn-toggle-cifrado").attr("title", esAm ? "Cifrado actual: Americano (C). Clic para cambiar a Latino (DO)" : "Cifrado actual: Latino (DO). Clic para cambiar a Americano (C)");
+  };
+
+  window.aplicarSistemaCifrado = function(sistema, $context) {
+    var $targets = $context ? $context.find("span.c, .c") : $("span.c, .c");
+    $targets.each(function() {
+      var el = $(this);
+      var chord = el.text().trim();
+      if (!chord) return;
+      if (!el.data("orig-block-len")) {
+        var next = el[0].nextSibling;
+        var spaces = 0;
+        if (next && next.nodeType === 3) {
+          var m = next.nodeValue.match(/^(\s+)/);
+          if (m) spaces = m[1].length;
+        }
+        el.data("orig-block-len", el.text().length + spaces);
+      }
+      var origLen = el.data("orig-block-len");
+      var nuevo = chord;
+      if (sistema === "americano") {
+        nuevo = window.convertirAcordeLatinoAAmericano(chord);
+      } else {
+        nuevo = window.convertirAcordeAmericanoALatino(chord);
+      }
+      if (nuevo !== chord) {
+        var spacesNeeded = origLen - nuevo.length;
+        if (spacesNeeded < 0) spacesNeeded = 0;
+        el.text(nuevo);
+        var next = el[0].nextSibling;
+        if (next && next.nodeType === 3) {
+          next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^\s+/, "");
+        } else if (spacesNeeded > 0) {
+          el.after(document.createTextNode(" ".repeat(spacesNeeded)));
+        }
+      }
+    });
+
+    $(".transpose-keys").each(function() {
+      $(this).find("a").each(function() {
+        var $a = $(this);
+        var txt = $a.text().trim();
+        if (sistema === "americano") {
+          $a.text(window.convertirAcordeLatinoAAmericano(txt));
+        } else {
+          $a.text(window.convertirAcordeAmericanoALatino(txt));
+        }
+      });
+    });
+
+    window.actualizarBotonesCifrado(sistema);
+    if (typeof window.actualizarResumenAcordesActivo === 'function') {
+      try { window.actualizarResumenAcordesActivo(); } catch(e) {}
+    }
+  };
+
+  window.toggleSistemaCifrado = function() {
+    var actual = localStorage.getItem("cancionero_sistema_cifrado") || "latino";
+    var nuevo = (actual === "americano") ? "latino" : "americano";
+    localStorage.setItem("cancionero_sistema_cifrado", nuevo);
+    window.sistemaCifradoActual = nuevo;
+    window.aplicarSistemaCifrado(nuevo);
+  };
+
   var isChordLine = function(line) { return /(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b#]?/.test(line); };
   $.fn.transpose = function(options) {
     var opts = $.extend({}, $.fn.transpose.defaults, options);
     var currentKey = null;
     var keys = [{name:'LAb',value:0,type:'F'},{name:'LA',value:1,type:'N'},{name:'LA#',value:2,type:'S'},{name:'SIb',value:2,type:'F'},{name:'SI',value:3,type:'N'},{name:'DO',value:4,type:'N'},{name:'DO#',value:5,type:'S'},{name:'REb',value:5,type:'F'},{name:'RE',value:6,type:'N'},{name:'RE#',value:7,type:'S'},{name:'MIb',value:7,type:'F'},{name:'MI',value:8,type:'N'},{name:'FA',value:9,type:'N'},{name:'FA#',value:10,type:'S'},{name:'SOLb',value:10,type:'F'},{name:'SOL',value:11,type:'N'},{name:'SOL#',value:0,type:'S'}];
-    var getKeyByName = function (name) { if (name.charAt(name.length-1) == "m") name = name.substring(0, name.length-1); for (var i = 0; i < keys.length; i++) { if (name == keys[i].name) return keys[i]; } };
+    var getKeyByName = function (name) { 
+      if (!name) return null;
+      name = name.trim();
+      if (name.charAt(name.length-1) == "m" || name.charAt(name.length-1) == "M") name = name.substring(0, name.length-1); 
+      var mapeado = MAPA_AMERICANO_LATINO[name] || MAPA_AMERICANO_LATINO[name.toUpperCase()];
+      if (mapeado) name = mapeado;
+      for (var i = 0; i < keys.length; i++) { 
+        if (name.toUpperCase() == keys[i].name.toUpperCase()) return keys[i]; 
+      } 
+      return null;
+    };
     var getChordRoot = function (input) { var ind = 2; if(input.substring(0,2)=="SO") ind=3; if (input.length > ind && (input.charAt(ind) == "b" || input.charAt(ind) == "#")) return input.substr(0, ind+1); else return input.substr(0, ind); };
-    var getNewKey = function (oldKey, delta, targetKey) { var keyValue = getKeyByName(oldKey).value + delta; if (keyValue > 11) keyValue -= 12; else if (keyValue < 0) keyValue += 12; var i=0; if (keyValue == 0 || keyValue == 2 || keyValue == 5 || keyValue == 7 || keyValue == 10) { switch(targetKey.name) { case "LA": case "LA#": case "SI": case "DO": case "DO#": case "RE": case "RE#": case "MI": case "FA#": case "SOL": case "SOL#": for (;i<keys.length;i++) { if (keys[i].value == keyValue && keys[i].type == "S") return keys[i]; } default: for (;i<keys.length;i++) { if (keys[i].value == keyValue && keys[i].type == "F") return keys[i]; } } } else { for (;i<keys.length;i++) { if (keys[i].value == keyValue) return keys[i]; } } };
+    var getNewKey = function (oldKey, delta, targetKey) { 
+      var k = getKeyByName(oldKey);
+      var val = k ? k.value : 0;
+      var keyValue = val + delta; 
+      if (keyValue > 11) keyValue -= 12; 
+      else if (keyValue < 0) keyValue += 12; 
+      var i=0; 
+      if (keyValue == 0 || keyValue == 2 || keyValue == 5 || keyValue == 7 || keyValue == 10) { 
+        switch(targetKey.name) { 
+          case "LA": case "LA#": case "SI": case "DO": case "DO#": case "RE": case "RE#": case "MI": case "FA#": case "SOL": case "SOL#": 
+            for (;i<keys.length;i++) { if (keys[i].value == keyValue && keys[i].type == "S") return keys[i]; } 
+          default: 
+            for (;i<keys.length;i++) { if (keys[i].value == keyValue && keys[i].type == "F") return keys[i]; } 
+        } 
+      } else { 
+        for (;i<keys.length;i++) { if (keys[i].value == keyValue) return keys[i]; } 
+      } 
+      return keys[0];
+    };
     var getDelta = function (oldIndex, newIndex) { if (oldIndex > newIndex) return 0 - (oldIndex - newIndex); else if (oldIndex < newIndex) return 0 + (newIndex - oldIndex); else return 0; };
-    var transposeSong = function (target, key) { var newKey = getKeyByName(key); if (currentKey.name == newKey.name) return; var delta = getDelta(currentKey.value, newKey.value); $("span.c", target).each(function (i, el) { transposeChord(el, delta, newKey); }); currentKey = newKey; };
+    var transposeSong = function (target, key) { var newKey = getKeyByName(key); if (!newKey || currentKey.name == newKey.name) return; var delta = getDelta(currentKey.value, newKey.value); $("span.c", target).each(function (i, el) { transposeChord(el, delta, newKey); }); currentKey = newKey; };
     
     var transposeChord = function (selector, delta, targetKey) { 
         var el = $(selector); 
@@ -912,11 +1077,12 @@ window.canciones = {
         
         var originalBlockLen = el.data("orig-block-len"); 
         var oldChord = el.text(); 
+        var oldChordLatino = (window.sistemaCifradoActual === "americano") ? window.convertirAcordeAmericanoALatino(oldChord) : oldChord;
         var newChord = "";
 
         // TRANSPOSICIÓN DOBLE PARA BAJOS INVERTIDOS
-        if (oldChord.indexOf("/") !== -1) {
-            var parts = oldChord.split("/");
+        if (oldChordLatino.indexOf("/") !== -1) {
+            var parts = oldChordLatino.split("/");
             var mainChord = parts[0];
             var bassChord = parts[1];
 
@@ -930,9 +1096,13 @@ window.canciones = {
 
             newChord = newMain + "/" + newBass;
         } else {
-            var oldChordRoot = getChordRoot(oldChord); 
+            var oldChordRoot = getChordRoot(oldChordLatino); 
             var newChordRoot = getNewKey(oldChordRoot, delta, targetKey); 
-            newChord = newChordRoot.name + oldChord.substr(oldChordRoot.length); 
+            newChord = newChordRoot.name + oldChordLatino.substr(oldChordRoot.length); 
+        }
+
+        if (window.sistemaCifradoActual === "americano") {
+            newChord = window.convertirAcordeLatinoAAmericano(newChord);
         }
 
         var spacesNeeded = originalBlockLen - newChord.length; 
@@ -952,11 +1122,13 @@ window.canciones = {
         var startKey = $(this).attr("data-key"); 
         if (!startKey || $.trim(startKey) == "") startKey = opts.key; 
         if (!startKey || $.trim(startKey) == "") return this; 
-        currentKey = getKeyByName(startKey); 
+        currentKey = getKeyByName(startKey) || keys[5]; 
         var keyLinks = []; 
+        var isAm = (window.sistemaCifradoActual === "americano");
         $(keys).each(function(i, key) { 
-            if (currentKey.name == key.name) keyLinks.push("<a href='#' class='selected'>" + key.name + "</a>"); 
-            else keyLinks.push("<a href='#'>" + key.name + "</a>"); 
+            var label = isAm ? window.convertirAcordeLatinoAAmericano(key.name) : key.name;
+            if (currentKey && currentKey.name == key.name) keyLinks.push("<a href='#' class='selected'>" + label + "</a>"); 
+            else keyLinks.push("<a href='#'>" + label + "</a>"); 
         }); 
         var $this = $(this); 
         var keysHtml = $("<div class='transpose-keys justify-content-md-center' style='margin-bottom:10px;'></div>"); 
@@ -991,13 +1163,36 @@ window.canciones = {
       if(targets.length > 0) { 
           targets.transpose(); 
 
-          // --- NUEVO: CREAR SELECTOR DE CAPO DEBAJO DE LOS TONOS ---
+          var esPaginaPrograma = /programa-(full|acordes|texto)/i.test(window.location.pathname);
+          var claveCancionActual = decodeURI(window.location.pathname).replace(/^\/?cancionerobenja\//, "");
+          var prefsGuardadas = {};
+          try {
+              prefsGuardadas = JSON.parse(localStorage.getItem("cancionero_tonos_usuario") || "{}");
+          } catch (e) { prefsGuardadas = {}; }
+
+          function guardarPrefCancion(tono, capo, origKey, origCapo) {
+              if (esPaginaPrograma || !claveCancionActual) return;
+              try {
+                  var tonoLatino = (window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(tono) : tono).toUpperCase();
+                  var origKeyUpper = (origKey || "").toUpperCase();
+                  var todas = JSON.parse(localStorage.getItem("cancionero_tonos_usuario") || "{}");
+                  if (tonoLatino === origKeyUpper && String(capo) === String(origCapo)) {
+                      delete todas[claveCancionActual];
+                  } else {
+                      todas[claveCancionActual] = { tono: tonoLatino, capo: String(capo) };
+                  }
+                  localStorage.setItem("cancionero_tonos_usuario", JSON.stringify(todas));
+              } catch (e) {}
+          }
+
+          // --- CREAR SELECTOR DE CAPO Y MEMORIA DE TONO/CAPO DEBAJO DE LOS TONOS ---
           targets.each(function() {
-              var defaultCapo = $(this).attr("data-capo") || "0";
-              var keysDiv = $(this).prev('.transpose-keys');
+              var $letra = $(this);
+              var origKey = ($letra.attr("data-key") || "").replace(/m$/i, "").trim();
+              var defaultCapo = $letra.attr("data-capo") || "0";
+              var keysDiv = $letra.prev('.transpose-keys');
               
               if (keysDiv.length > 0) {
-                  // Opciones del 0 al 12
                   var opciones = "";
                   for(var i = 0; i <= 12; i++) {
                       var texto = i === 0 ? "Sin Capo" : "Traste " + i;
@@ -1005,18 +1200,296 @@ window.canciones = {
                       opciones += `<option value="${i}" ${seleccionado}>${texto}</option>`;
                   }
 
+                  var botonCompartirHTML = esPaginaPrograma ? "" : `
+                          <button type="button" class="btn-compartir-tono" style="margin-left:8px; padding:4px 11px; border-radius:99px; border:1px solid #2A9D8F; background:#2A9D8F; color:#ffffff; font-size:12px; font-weight:700; cursor:pointer;" title="Compartir link de esta canción con el tono y capo seleccionados">
+                              📲 Compartir
+                          </button>
+                  `;
+
+                  var botonCifradoHTML = `
+                          <button type="button" class="btn-toggle-cifrado" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Cambiar sistema de acordes entre Latino (DO) y Americano (C)">
+                              🔤 Cifrado: <b class="lbl-cifrado-modo">${(window.sistemaCifradoActual === "americano" ? "C" : "DO")}</b>
+                          </button>
+                  `;
+
+                  var botonAcordesHTML = esPaginaPrograma ? "" : `
+                          <button type="button" class="btn-toggle-diagramas" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #0A2846; background:rgba(10,40,70,0.08); color:#0A2846; font-size:12px; font-weight:700; cursor:pointer;" title="Ver todos los acordes utilizados en esta canción">
+                              🎸 Acordes usados
+                          </button>
+                  `;
+
                   var capoHTML = `
-                      <div class="capo-selector-div">
+                      <div class="capo-selector-div" style="flex-wrap:wrap; gap:6px;">
                           <label>🎸 Capo: </label>
                           <select class="form-select d-inline-block capo-dropdown">
                               ${opciones}
                           </select>
+                          <button type="button" class="btn-reset-tono" style="display:none; margin-left:6px; padding:4px 10px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Volver al tono y capo original de fábrica">
+                              ↺ Original
+                          </button>
+                          ${botonCompartirHTML}
+                          ${botonCifradoHTML}
+                          ${botonAcordesHTML}
                       </div>
                   `;
-                  keysDiv.after(capoHTML);
+                  if (keysDiv.length > 0) {
+                      keysDiv.after(capoHTML);
+                      var $capoDiv = keysDiv.next('.capo-selector-div');
+                  } else {
+                      $letra.before(capoHTML);
+                      var $capoDiv = $letra.prev('.capo-selector-div');
+                  }
+
+                  // Inyectar contenedor del resumen de acordes debajo del capo en páginas de canciones
+                  if (!esPaginaPrograma) {
+                      var panelAcordesHTML = `
+                          <div class="panel-resumen-acordes" style="display:none; width:100%; max-width:850px; margin: 10px auto 25px auto; padding: 14px 12px; background: #fbfbfb; border: 1.5px solid #d0d7de; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); text-align: center;">
+                              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #eaeaea;">
+                                  <span class="panel-acordes-titulo" style="font-weight:700; color:#0A2846; font-size:15px;">🎸 Acordes de la canción</span>
+                                  <button type="button" class="btn-cerrar-panel-acordes" style="background:transparent; border:none; font-size:18px; color:#888; cursor:pointer; line-height:1;" title="Cerrar panel">✕</button>
+                              </div>
+                              <div class="panel-acordes-grilla" style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px;"></div>
+                          </div>
+                      `;
+                      $capoDiv.after(panelAcordesHTML);
+                  }
+
+                  var $panelAcordes = $capoDiv.next('.panel-resumen-acordes');
+                  var $btnToggleDiagramas = $capoDiv.find('.btn-toggle-diagramas');
+
+                  function actualizarPanelAcordes() {
+                      if (esPaginaPrograma || !$panelAcordes.length) return;
+                      var $grilla = $panelAcordes.find('.panel-acordes-grilla');
+                      $grilla.empty();
+
+                      if (!window.dbAcordes || !window.generarDibujoAcorde) {
+                          $grilla.html('<p style="color:#888; font-size:13px; margin:10px 0;">Cargando diccionario de acordes...</p>');
+                          setTimeout(actualizarPanelAcordes, 200);
+                          return;
+                      }
+
+                      var acordesVistos = new Set();
+                      var listaAcordes = [];
+                      $letra.find('span.c').each(function() {
+                          var acordeTexto = $(this).text().trim();
+                          if (!acordeTexto) return;
+                          if (!acordesVistos.has(acordeTexto)) {
+                              acordesVistos.add(acordeTexto);
+                              listaAcordes.push(acordeTexto);
+                          }
+                      });
+
+                      if (listaAcordes.length === 0) {
+                          $grilla.html('<p style="color:#888; font-size:13px; margin:10px 0;">No se encontraron acordes en esta canción.</p>');
+                          return;
+                      }
+
+                      var encontrados = 0;
+                      listaAcordes.forEach(function(acorde) {
+                          var nombreLatino = window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(acorde) : acorde;
+                          var posiciones = null;
+                          var notaBajo = "";
+
+                          if (window.dbAcordes[nombreLatino]) {
+                              posiciones = window.dbAcordes[nombreLatino];
+                          } else {
+                              var partes = nombreLatino.split("/");
+                              if (window.dbAcordes[partes[0]]) {
+                                  posiciones = window.dbAcordes[partes[0]];
+                                  var acordeBaseOrig = acorde.split("/")[0];
+                                  notaBajo = `<span style="font-size:11px; color:#666; display:block; margin-bottom:2px;">(Base: ${acordeBaseOrig})</span>`;
+                              }
+                          }
+
+                          if (posiciones) {
+                              encontrados++;
+                              var svgDibujo = window.generarDibujoAcorde(posiciones);
+                              var tarjeta = $(`
+                                  <div class="tarjeta-acorde-resumen" style="display:flex; flex-direction:column; align-items:center; background:white; border-radius:10px; padding:10px 6px; box-shadow:0 2px 6px rgba(0,0,0,0.06); border:1px solid #e2e8f0; min-width:130px;">
+                                      <div style="font-weight:700; font-size:16px; color:#0A2846; margin-bottom:4px;">${acorde}</div>
+                                      ${notaBajo}
+                                      <div style="transform: scale(0.92); transform-origin: top center; margin-top:2px;">
+                                          ${svgDibujo}
+                                      </div>
+                                  </div>
+                              `);
+                              $grilla.append(tarjeta);
+                          }
+                      });
+
+                      $panelAcordes.find('.panel-acordes-titulo').text(`🎸 Acordes utilizados (${encontrados}):`);
+                  }
+
+                  window.actualizarResumenAcordesActivo = function() {
+                      if ($panelAcordes && $panelAcordes.is(':visible')) {
+                          actualizarPanelAcordes();
+                      }
+                  };
+
+                  $btnToggleDiagramas.on('click', function(e) {
+                      e.preventDefault();
+                      if ($panelAcordes.is(':visible')) {
+                          $panelAcordes.slideUp(200);
+                          $(this).removeClass('activo');
+                      } else {
+                          actualizarPanelAcordes();
+                          $panelAcordes.slideDown(250);
+                          $(this).addClass('activo');
+                      }
+                  });
+
+                  $panelAcordes.find('.btn-cerrar-panel-acordes').on('click', function() {
+                      $panelAcordes.slideUp(200);
+                      $btnToggleDiagramas.removeClass('activo');
+                  });
+
+                  var $selectCapo = $capoDiv.find('select.capo-dropdown');
+                  var $btnReset = $capoDiv.find('.btn-reset-tono');
+                  var $btnCompartir = $capoDiv.find('.btn-compartir-tono');
+
+                  function actualizarBotonReset() {
+                      if (esPaginaPrograma) return;
+                      var tonoElegido = keysDiv.find('a.selected').text().trim();
+                      var tonoElegidoLatino = (window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(tonoElegido) : tonoElegido).toUpperCase();
+                      var capoElegido = $selectCapo.val();
+                      var cambio = (origKey && tonoElegidoLatino !== origKey.toUpperCase()) || (String(capoElegido) !== String(defaultCapo));
+                      $btnReset.css("display", cambio ? "inline-block" : "none");
+                  }
+
+                  // 1) Si el link viene compartido con ?tono=... o ?capo=..., aplicamos eso primero
+                  var urlParamsTono = new URLSearchParams(window.location.search);
+                  var tonoDesdeUrl = urlParamsTono.get("tono");
+                  var capoDesdeUrl = urlParamsTono.get("capo");
+
+                  if (!esPaginaPrograma && (tonoDesdeUrl || capoDesdeUrl !== null)) {
+                      if (tonoDesdeUrl) {
+                          var tonoParamLatino = (window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(tonoDesdeUrl) : tonoDesdeUrl).toUpperCase();
+                          var tonoParamAm = (window.convertirAcordeLatinoAAmericano ? window.convertirAcordeLatinoAAmericano(tonoDesdeUrl) : tonoDesdeUrl).toUpperCase();
+                          var $linkUrl = keysDiv.find('a').filter(function() {
+                              var t = $(this).text().trim().toUpperCase();
+                              return t === tonoParamLatino || t === tonoParamAm;
+                          }).first();
+                          if ($linkUrl.length) {
+                              $linkUrl.trigger('click');
+                          }
+                      }
+                      if (capoDesdeUrl !== null && capoDesdeUrl !== "") {
+                          $selectCapo.val(String(capoDesdeUrl));
+                      }
+                      var tonoAplicado = keysDiv.find('a.selected').text().trim() || origKey;
+                      guardarPrefCancion(tonoAplicado, $selectCapo.val(), origKey, defaultCapo);
+                      actualizarBotonReset();
+                  }
+                  // 2) Si no vino por link compartido, restauramos el tono y capo que el usuario usó la última vez
+                  else if (!esPaginaPrograma && prefsGuardadas[claveCancionActual]) {
+                      var pref = prefsGuardadas[claveCancionActual];
+                      if (pref.tono) {
+                          var tonoGuardadoLatino = (window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(pref.tono) : pref.tono).toUpperCase();
+                          var tonoGuardadoAm = (window.convertirAcordeLatinoAAmericano ? window.convertirAcordeLatinoAAmericano(pref.tono) : pref.tono).toUpperCase();
+                          var $linkGuardado = keysDiv.find('a').filter(function() {
+                              var t = $(this).text().trim().toUpperCase();
+                              return t === tonoGuardadoLatino || t === tonoGuardadoAm;
+                          }).first();
+                          if ($linkGuardado.length) {
+                              $linkGuardado.trigger('click');
+                          }
+                      }
+                      if (pref.capo !== undefined) {
+                          $selectCapo.val(String(pref.capo));
+                      }
+                      actualizarBotonReset();
+                  }
+
+                  // Guardar automáticamente cuando el usuario toca un tono
+                  keysDiv.find('a').on('click', function() {
+                      var nuevoTono = $(this).text().trim();
+                      var capoActual = $selectCapo.val();
+                      guardarPrefCancion(nuevoTono, capoActual, origKey, defaultCapo);
+                      actualizarBotonReset();
+                      if ($panelAcordes && $panelAcordes.is(':visible')) {
+                          setTimeout(actualizarPanelAcordes, 50);
+                      }
+                  });
+
+                  // Guardar automáticamente cuando el usuario cambia el capo
+                  $selectCapo.on('change', function() {
+                      var tonoActual = keysDiv.find('a.selected').text().trim() || origKey;
+                      var nuevoCapo = $(this).val();
+                      guardarPrefCancion(tonoActual, nuevoCapo, origKey, defaultCapo);
+                      actualizarBotonReset();
+                  });
+
+                  // Botón para restaurar el tono y capo original de la canción
+                  $btnReset.on('click', function() {
+                      if (origKey) {
+                          var isAm = (window.sistemaCifradoActual === "americano");
+                          var targetLabel = isAm ? window.convertirAcordeLatinoAAmericano(origKey) : origKey;
+                          var $linkOrig = keysDiv.find('a').filter(function() {
+                              var txt = $(this).text().trim().toUpperCase();
+                              return txt === targetLabel.toUpperCase() || txt === origKey.toUpperCase();
+                          }).first();
+                          if ($linkOrig.length) $linkOrig.trigger('click');
+                      }
+                      $selectCapo.val(String(defaultCapo));
+                      guardarPrefCancion(origKey, defaultCapo, origKey, defaultCapo);
+                      actualizarBotonReset();
+                      if ($panelAcordes && $panelAcordes.is(':visible')) {
+                          setTimeout(actualizarPanelAcordes, 50);
+                      }
+                  });
+
+                  // Botón para compartir la canción con el Tono y Capo elegidos
+                  $btnCompartir.on('click', async function() {
+                      var tonoActual = keysDiv.find('a.selected').text().trim() || origKey;
+                      var capoActual = $selectCapo.val() || "0";
+                      var esMenorOrig = ($letra.attr("data-key") || "").trim().endsWith("m");
+                      var etiquetaTono = tonoActual + (esMenorOrig && !tonoActual.endsWith("m") ? "m" : "");
+                      var textoCapo = String(capoActual) === "0" ? "Sin Capo" : ("Capo " + capoActual);
+
+                      var urlCompartir = new URL(window.location.href);
+                      urlCompartir.searchParams.set("tono", tonoActual);
+                      urlCompartir.searchParams.set("capo", String(capoActual));
+                      var linkFinal = urlCompartir.toString();
+
+                      var tituloCancion = (document.querySelector("h1") ? document.querySelector("h1").textContent : document.title.split("-")[0]).trim();
+                      var mensajeCompartir = `🎵 ${tituloCancion} (Tono: ${etiquetaTono} · ${textoCapo})`;
+
+                      try {
+                          if (navigator.clipboard && navigator.clipboard.writeText) {
+                              await navigator.clipboard.writeText(`${mensajeCompartir}\n${linkFinal}`);
+                          }
+                      } catch (e) {}
+
+                      var textoOriginalBtn = $btnCompartir.html();
+                      $btnCompartir.html("✓ ¡Link copiado!");
+                      setTimeout(function() {
+                          $btnCompartir.html(textoOriginalBtn);
+                      }, 2500);
+
+                      if (navigator.share) {
+                          try {
+                              await navigator.share({
+                                  title: tituloCancion,
+                                  text: mensajeCompartir,
+                                  url: linkFinal
+                              });
+                          } catch (e) {}
+                      }
+                  });
               }
           });
+
+          // Si el usuario tenía guardado el modo americano, lo aplicamos a las canciones cargadas
+          if (window.sistemaCifradoActual === "americano") {
+              window.aplicarSistemaCifrado("americano", targets);
+          }
       } 
+
+      // Listener global para alternar cifrado Latino <-> Americano
+      $(document).on("click", ".btn-toggle-cifrado", function(e) {
+          e.preventDefault();
+          window.toggleSistemaCifrado();
+      });
   });
 })(jQuery);
 
@@ -1088,16 +1561,17 @@ document.addEventListener("DOMContentLoaded", function() {
         /* Asegurar que el selector de Capo también se ponga oscuro */
         body.modo-oscuro select.capo-dropdown { background-color: #000000 !important; color: #90caf9 !important; border-color: #444 !important; }
         
-        body.modo-oscuro #listaGlobal, body.modo-oscuro .dropdown-menu, body.modo-oscuro #fav-modal { background-color: #000000 !important; border: 1px solid #444 !important; color: #fff !important; }
-        body.modo-oscuro #listaGlobal a, body.modo-oscuro .dropdown-item, body.modo-oscuro .fav-item a { border-bottom: 1px solid #333 !important; color: #e0e0e0 !important; }
-        body.modo-oscuro #listaGlobal a:hover, body.modo-oscuro .dropdown-item:hover { background-color: #333 !important; color: #fff !important; } /* Mantenemos este en gris para que se note al tocar */
+        body.modo-oscuro #listaGlobal, body.modo-oscuro .dropdown-menu, body.modo-oscuro #fav-modal { background-color: #121212 !important; border: 2px solid #2A9D8F !important; color: #fff !important; }
+        body.modo-oscuro #listaGlobal a, body.modo-oscuro .dropdown-item, body.modo-oscuro .fav-item a { border-bottom: 1px solid #2c2c2e !important; color: #e0e0e0 !important; }
+        body.modo-oscuro #listaGlobal a:hover, body.modo-oscuro .dropdown-item:hover { background-color: #2A9D8F !important; color: #fff !important; }
         body.modo-oscuro span.c, body.modo-oscuro .c { color: red !important; font-weight: bold; }
         body.modo-oscuro #menu-content { background: #000000; border-color: #444; }
         body.modo-oscuro .menu-label { color: #ccc; }
         body.modo-oscuro .mini-btn { background: #000000; border-color: #555; color: #fff; }
         body.modo-oscuro #menu-trigger { background: #fff; color: #000; }
-        body.modo-oscuro .transpose-keys a { background-color: #000000 !important; color: #fff !important; border: 1px solid #444 !important; }
-        body.modo-oscuro .transpose-keys a.selected { background-color: #444 !important; border-color: #fff !important; } /* Mantenemos este en gris para saber qué tono elegiste */
+        body.modo-oscuro .transpose-keys a { background-color: #18181b !important; color: #e4e4e7 !important; border: 1px solid #3f3f46 !important; }
+        body.modo-oscuro .transpose-keys a.selected { background-color: #2A9D8F !important; color: #ffffff !important; border-color: #2A9D8F !important; }
+        body.modo-oscuro .btn-toggle-cifrado { background: rgba(42,157,143,0.2) !important; color: #2A9D8F !important; border-color: #2A9D8F !important; }
 
         /* --- ARREGLO PARA QUE EL REPERTORIO SEA UNA SOLA PÁGINA --- */
         #letra, .zona-letra {
@@ -1117,8 +1591,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const modalHTML = `
         <div id="fav-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2147483647;"></div>
-        <div id="fav-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; background:white; z-index:2147483648; border-radius:10px; padding:20px; border:1px solid #ccc;">
-            <h3 style="margin-top:0;">Mis Favoritos ❤️</h3>
+        <div id="fav-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; background:white; z-index:2147483648; border-radius:12px; padding:20px; border:1px solid #ccc; max-height:80vh; overflow-y:auto;">
+            <h3 id="fav-modal-title" style="margin-top:0;">Mis Favoritos ❤️</h3>
             <div id="fav-list-container"></div>
             <button class="mini-btn" id="fav-close" style="margin-top:15px; width:100%;">Cerrar</button>
         </div>
@@ -1268,24 +1742,105 @@ document.addEventListener("DOMContentLoaded", function() {
             body.modo-oscuro .btn-suelto { background: #1C1C1E; color: #FFFFFF; }
             .btn-suelto:active { transform: scale(0.95); }
 
-            /* Afinador: Teclas circulares */
-            .btn-circulo {
-                width: 38px; 
-                height: 38px; 
-                border-radius: 50%; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                background: #F2F2F7; 
-                border: none; 
-                font-weight: 700; 
-                font-size: 14px; 
-                color: #1C1C1E;
-                padding: 0;
+            /* Ventana Modal del Afinador Visual por Micrófono */
+            #tuner-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.65);
+                z-index: 2147483647;
             }
-            body.modo-oscuro .btn-circulo { background: #1C1C1E; color: #FFFFFF; }
-            .btn-circulo.active { background: #0A2846; color: #fff; }
-            body.modo-oscuro .btn-circulo.active { background: #0A84FF; color: #fff; }
+            #tuner-modal {
+                display: none;
+                position: fixed;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                width: 92%;
+                max-width: 360px;
+                background: #FDFBF7;
+                color: #2C3E50;
+                z-index: 2147483648;
+                border-radius: 18px;
+                padding: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+                border: 2px solid rgba(42, 157, 143, 0.35);
+                font-family: sans-serif;
+                text-align: center;
+            }
+            body.modo-oscuro #tuner-modal {
+                background: #121212 !important;
+                color: #e0e0e0 !important;
+                border-color: #333 !important;
+            }
+            .tuner-display-box {
+                background: #ffffff;
+                border: 1px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 16px 12px;
+                margin: 12px 0;
+            }
+            body.modo-oscuro .tuner-display-box {
+                background: #1e1e1e !important;
+                border-color: #333 !important;
+            }
+            .tuner-gauge-bar {
+                position: relative;
+                height: 18px;
+                background: #e2e8f0;
+                border-radius: 999px;
+                overflow: hidden;
+                margin-top: 8px;
+                border: 1px solid #cbd5e1;
+            }
+            body.modo-oscuro .tuner-gauge-bar {
+                background: #2c2c2e !important;
+                border-color: #444 !important;
+            }
+            .tuner-gauge-center {
+                position: absolute;
+                top: 0; bottom: 0;
+                left: 43%; right: 43%;
+                background: rgba(16, 185, 129, 0.25);
+                border-left: 1px dashed #10b981;
+                border-right: 1px dashed #10b981;
+            }
+            #tuner-needle {
+                position: absolute;
+                top: 2px; bottom: 2px;
+                width: 12px;
+                border-radius: 999px;
+                background: #10b981;
+                left: calc(50% - 6px);
+                transition: left 0.08s ease-out, background-color 0.15s;
+            }
+            .tuner-string-pills {
+                display: flex;
+                justify-content: space-between;
+                gap: 4px;
+                margin-top: 12px;
+            }
+            .tuner-string-tag {
+                flex: 1;
+                padding: 5px 2px;
+                border-radius: 8px;
+                font-size: 11px;
+                font-weight: 800;
+                background: #f1f5f9;
+                color: #64748b;
+                border: 1px solid #e2e8f0;
+                transition: all 0.15s;
+            }
+            body.modo-oscuro .tuner-string-tag {
+                background: #2c2c2e;
+                color: #94a3b8;
+                border-color: #3f3f46;
+            }
+            .tuner-string-tag.detected {
+                background: #2A9D8F;
+                color: #ffffff;
+                border-color: #2A9D8F;
+                transform: scale(1.06);
+            }
 
             /* Input Numérico Transparente */
             .input-invisible { 
@@ -1312,6 +1867,51 @@ document.addEventListener("DOMContentLoaded", function() {
             body.modo-oscuro .divisor-tema { background: #1C1C1E !important; }
         </style>
 
+        <!-- VENTANA MODAL DEL AFINADOR CON MICRÓFONO -->
+        <div id="tuner-overlay"></div>
+        <div id="tuner-modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-weight:800; font-size:16px;">🎸 Afinador de Guitarra</span>
+                <span id="tuner-badge" style="font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px; background:#e0f2fe; color:#0369a1;">🎙️ Activo</span>
+            </div>
+
+            <div class="tuner-display-box">
+                <div id="tuner-sub-info" style="font-size:12px; color:#64748b; font-weight:600; margin-bottom:2px;">Tocá una cuerda de tu guitarra...</div>
+                <div id="tuner-main-note" style="font-size:38px; font-weight:900; line-height:1.1; margin:6px 0;">—</div>
+                <div id="tuner-status-msg" style="font-size:13px; font-weight:700; color:#2A9D8F; min-height:20px;">Escuchando micrófono...</div>
+
+                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b; margin-top:12px; padding:0 2px;">
+                    <span>⏪ Baja (Ajustar)</span>
+                    <span style="color:#10b981;">CENTRO</span>
+                    <span>Alta (Aflojar) ⏩</span>
+                </div>
+                <div class="tuner-gauge-bar">
+                    <div class="tuner-gauge-center"></div>
+                    <div id="tuner-needle"></div>
+                </div>
+
+                <!-- Indicador de cuál de las 6 cuerdas se detectó (no son botones de sonido, solo indicador visual) -->
+                <div class="tuner-string-pills">
+                    <div class="tuner-string-tag" id="tag-cuerda-0">6ª MI</div>
+                    <div class="tuner-string-tag" id="tag-cuerda-1">5ª LA</div>
+                    <div class="tuner-string-tag" id="tag-cuerda-2">4ª RE</div>
+                    <div class="tuner-string-tag" id="tag-cuerda-3">3ª SOL</div>
+                    <div class="tuner-string-tag" id="tag-cuerda-4">2ª SI</div>
+                    <div class="tuner-string-tag" id="tag-cuerda-5">1ª mi</div>
+                </div>
+
+                <!-- Medidor de volumen para comprobar que el micrófono toma sonido -->
+                <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; white-space:nowrap;">🎙️ Señal:</span>
+                    <div style="flex:1; height:6px; background:#e2e8f0; border-radius:99px; overflow:hidden;">
+                        <div id="tuner-vol-bar" style="width:0%; height:100%; background:#2A9D8F; transition:width 0.06s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="tuner-close-btn" style="width:100%; background:#0A2846; color:#fff; border:none; padding:11px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer;">Cerrar afinador</button>
+        </div>
+
         <!-- CONTENEDOR DE LAS 4 BOLITAS -->
         <div id="contenedor-bolitas" style="display:none; position:fixed; top:30px; right:30px; gap:8px; z-index:2147483647; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 20px; align-items: center;">
             <div id="bolita-1" style="width:20px; height:20px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
@@ -1319,20 +1919,81 @@ document.addEventListener("DOMContentLoaded", function() {
             <div id="bolita-3" style="width:15px; height:15px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
             <div id="bolita-4" style="width:15px; height:15px; border-radius:50%; background:#ccc; opacity:1; transition:0.1s;"></div>
         </div>
+
+        <!-- CONTROL FLOTANTE DE AUTO SCROLL (AFUERA DEL MENÚ) -->
+        <style>
+            #autoscroll-flotante {
+                display: none;
+                position: fixed;
+                bottom: 30px;
+                right: 80px;
+                z-index: 2147483646;
+                background: rgba(255, 255, 255, 0.96);
+                border: 2px solid #2A9D8F;
+                border-radius: 999px;
+                padding: 4px 8px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.22);
+                align-items: center;
+                gap: 4px;
+                font-family: sans-serif;
+            }
+            @media (max-width: 768px) {
+                #autoscroll-flotante {
+                    bottom: 20px;
+                    right: 70px;
+                }
+            }
+            body.modo-oscuro #autoscroll-flotante {
+                background: rgba(24, 24, 27, 0.96);
+                border-color: #2A9D8F;
+                color: #ffffff;
+            }
+            .btn-float-scroll {
+                background: transparent;
+                border: none;
+                border-radius: 999px;
+                width: 32px;
+                height: 32px;
+                font-weight: 800;
+                font-size: 15px;
+                color: #1C1C1E;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                padding: 0;
+            }
+            body.modo-oscuro .btn-float-scroll { color: #ffffff; }
+            .btn-float-scroll:active { background: rgba(42, 157, 143, 0.2); }
+            #float-scroll-play.active {
+                background: #2A9D8F;
+                color: #ffffff;
+            }
+            #float-scroll-speed {
+                font-weight: 800;
+                font-size: 14px;
+                min-width: 20px;
+                text-align: center;
+                color: #2A9D8F;
+            }
+        </style>
+        <div id="autoscroll-flotante">
+            <button class="btn-float-scroll" id="float-scroll-minus" title="Más lento">－</button>
+            <span id="float-scroll-speed">3</span>
+            <button class="btn-float-scroll" id="float-scroll-plus" title="Más rápido">＋</button>
+            <div style="width:1px; height:18px; background:rgba(128,128,128,0.3); margin:0 2px;"></div>
+            <button class="btn-float-scroll" id="float-scroll-play" title="Pausar / Reanudar">▶</button>
+            <button class="btn-float-scroll" id="float-scroll-close" title="Cerrar control" style="color:#ef4444; font-size:13px;">✖</button>
+        </div>
         <div id="super-menu-container">
             <div id="menu-content">
                 
                 <div class="menu-row">
                     <span class="menu-label">Favoritos</span>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn-suelto" id="fav-toggle">🤍</button>
-                        <button class="btn-suelto" id="fav-view">📂</button>
+                        <button class="btn-suelto" id="fav-toggle" title="Guardar o quitar de Favoritos">🤍</button>
+                        <button class="btn-suelto" id="fav-view" title="Ver mis Favoritos">📂</button>
                     </div>
-                </div>
-
-                <div class="menu-row">
-                    <span class="menu-label">Modo Offline</span>
-                        <button class="btn-suelto" id="btn-descargar-todo">⬇️ Bajar Todo</button>
                 </div>
 
                 <div class="menu-row">
@@ -1344,22 +2005,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
                 </div>
 
-                <div class="menu-row" style="flex-direction: column; align-items: flex-start; border-bottom: 1px solid transparent;">
-                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 12px;">
-                        <span class="menu-label">Afinador</span>
-                        <button class="btn-suelto" id="btn-stop-tuner" style="padding: 2px 10px; font-size: 12px; display: none; color: #FF453A; background: transparent;">Silenciar</button>
-                    </div>
-                    <div style="display:flex; width: 100%; justify-content: space-between; gap: 4px;">
-                        <button class="btn-circulo btn-cuerda" data-freq="82.41">E</button>
-                        <button class="btn-circulo btn-cuerda" data-freq="110.00">A</button>
-                        <button class="btn-circulo btn-cuerda" data-freq="146.83">D</button>
-                        <button class="btn-circulo btn-cuerda" data-freq="196.00">G</button>
-                        <button class="btn-circulo btn-cuerda" data-freq="246.94">B</button>
-                        <button class="btn-circulo btn-cuerda" data-freq="329.63">e</button>
-                    </div>
+                <div class="menu-row">
+                    <span class="menu-label">Afinador</span>
+                    <button class="btn-suelto" id="btn-open-mic-tuner" style="background:#2A9D8F; color:#fff;">🎙️ Afina tu guitarra</button>
                 </div>
-                
-                <div style="width: 100%; height: 1px; background: #f0f0f0; margin-bottom: 0;" class="divisor-tema"></div>
 
                 <div class="menu-row">
                     <span class="menu-label">Auto Scroll</span>
@@ -1381,11 +2030,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     </div>
                 </div>
 
-                <div class="menu-row">
-                    <span class="menu-label">Tema</span>
-                    <button class="btn-suelto" id="toggle-theme">🌙</button>
-                </div>
-
             </div>
             <button id="menu-trigger">☰</button>
         </div>
@@ -1396,11 +2040,24 @@ document.addEventListener("DOMContentLoaded", function() {
     const menuContent = document.getElementById("menu-content");
     menuTrigger.onclick = () => { menuContent.classList.toggle("activo"); menuTrigger.innerHTML = menuContent.classList.contains("activo") ? "✖" : "☰"; };
 
-    // --- 3. FAVORITOS ---
+    // --- 3. FAVORITOS Y RECIENTES (ÚLTIMAS CANCIONES VISTAS) ---
     let favorites = JSON.parse(localStorage.getItem('cancionero_favoritos')) || [];
+    let recientes = JSON.parse(localStorage.getItem('cancionero_recientes')) || [];
     const currentUrl = window.location.pathname;
-    const currentTitle = document.title.split("-")[0].trim(); 
+    const h1El = document.querySelector("h1");
+    const currentTitle = (h1El ? h1El.textContent : document.title.split("-")[0]).trim(); 
     const favToggle = document.getElementById("fav-toggle");
+    const modalTitleEl = document.getElementById("fav-modal-title");
+
+    // Si estamos dentro de una canción, la guardamos automáticamente en "Recientes" (máximo 8 canciones)
+    if (document.getElementById("letra") && currentTitle) {
+        recientes = recientes.filter(r => r.u !== currentUrl);
+        recientes.unshift({ t: currentTitle, u: currentUrl });
+        if (recientes.length > 8) recientes = recientes.slice(0, 8);
+        try {
+            localStorage.setItem('cancionero_recientes', JSON.stringify(recientes));
+        } catch (e) {}
+    }
     
     const checkFav = () => { 
         if(!document.getElementById("letra")){ favToggle.disabled=true; return; }
@@ -1417,28 +2074,128 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.getElementById("fav-view").onclick = () => {
         const listContainer = document.getElementById("fav-list-container");
+        if (modalTitleEl) modalTitleEl.innerText = "Mis Favoritos ❤️";
         favorites = JSON.parse(localStorage.getItem('cancionero_favoritos')) || [];
-        listContainer.innerHTML = favorites.length ? favorites.map((f,i) => `<div class="fav-item"><a href="${f.u}">${f.t}</a><span class="fav-delete" onclick="eliminarFav(${i})">🗑️</span></div>`).join('') : "<p>Vacío</p>";
+        listContainer.innerHTML = favorites.length ? favorites.map((f,i) => `<div class="fav-item"><a href="${f.u}">${f.t}</a><span class="fav-delete" onclick="eliminarFav(${i})">🗑️</span></div>`).join('') : "<p>Todavía no guardaste canciones favoritas.</p>";
         document.getElementById("fav-modal").style.display = "block";
         document.getElementById("fav-overlay").style.display = "block";
         menuContent.classList.remove("activo"); menuTrigger.innerHTML = "☰";
     };
     window.eliminarFav = (i) => { favorites.splice(i,1); localStorage.setItem('cancionero_favoritos', JSON.stringify(favorites)); document.getElementById("fav-view").click(); checkFav(); };
+
+    const recentViewBtn = document.getElementById("recent-view");
+    if (recentViewBtn) {
+        recentViewBtn.onclick = () => {
+            const listContainer = document.getElementById("fav-list-container");
+            if (modalTitleEl) modalTitleEl.innerText = "Últimas canciones vistas 🕒";
+            recientes = JSON.parse(localStorage.getItem('cancionero_recientes')) || [];
+            if (recientes.length) {
+                listContainer.innerHTML = recientes.map((r, i) => `
+                    <div class="fav-item" style="display:flex; justify-content:space-between; align-items:center; padding:8px 4px; border-bottom:1px solid rgba(128,128,128,0.2);">
+                        <a href="${r.u}" style="text-decoration:none; font-weight:600;">${i + 1}. ${r.t}</a>
+                    </div>
+                `).join('') + `<button class="mini-btn" onclick="limpiarRecientes()" style="margin-top:10px; width:100%; font-size:13px; opacity:0.8;">🗑️ Limpiar historial</button>`;
+            } else {
+                listContainer.innerHTML = "<p>Todavía no abriste ninguna canción hoy.</p>";
+            }
+            document.getElementById("fav-modal").style.display = "block";
+            document.getElementById("fav-overlay").style.display = "block";
+            menuContent.classList.remove("activo"); menuTrigger.innerHTML = "☰";
+        };
+    }
+    window.limpiarRecientes = () => {
+        recientes = [];
+        localStorage.removeItem('cancionero_recientes');
+        if (recentViewBtn) recentViewBtn.click();
+    };
+
     const closeFav = () => { document.getElementById("fav-modal").style.display="none"; document.getElementById("fav-overlay").style.display="none"; };
     document.getElementById("fav-close").onclick = closeFav; 
     document.getElementById("fav-overlay").onclick = closeFav;
 
-    // --- 4. AUTOSCROLL, FUENTE Y TEMA ---
-    let scrollSpeed=3, isScrolling=false, scrollInterval;
-    const stopScroll = () => { clearInterval(scrollInterval); isScrolling=false; document.getElementById("scroll-play").innerHTML="▶"; document.getElementById("scroll-play").classList.remove("active"); document.documentElement.style.scrollBehavior="smooth"; };
-    const startScroll = () => { clearInterval(scrollInterval); document.documentElement.style.scrollBehavior="auto"; const delay = 275-(scrollSpeed*20); scrollInterval=setInterval(()=>{ if((window.innerHeight+window.pageYOffset)>=document.documentElement.scrollHeight) stopScroll(); else window.scrollTo(0,window.pageYOffset+1); }, delay); document.getElementById("scroll-play").innerHTML="⏸"; document.getElementById("scroll-play").classList.add("active"); isScrolling=true; };
-    
-    document.getElementById("scroll-play").onclick = () => isScrolling?stopScroll():startScroll();
-    document.getElementById("scroll-plus").onclick = () => { if(scrollSpeed<10) { scrollSpeed++; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
-    document.getElementById("scroll-minus").onclick = () => { if(scrollSpeed>1) { scrollSpeed--; document.getElementById("scroll-speed-display").innerText=scrollSpeed; if(isScrolling) startScroll(); } };
+    // --- 4. AUTOSCROLL (CON CONTROL FLOTANTE EXTERNO), FUENTE Y TEMA ---
+    let scrollSpeed = 3, isScrolling = false, scrollInterval;
+    const floatScrollBar = document.getElementById("autoscroll-flotante");
+    const floatScrollPlay = document.getElementById("float-scroll-play");
+    const floatScrollSpeed = document.getElementById("float-scroll-speed");
+    const floatScrollPlus = document.getElementById("float-scroll-plus");
+    const floatScrollMinus = document.getElementById("float-scroll-minus");
+    const floatScrollClose = document.getElementById("float-scroll-close");
+
+    const syncScrollUI = () => {
+        const playBtn = document.getElementById("scroll-play");
+        const speedDisp = document.getElementById("scroll-speed-display");
+        if (speedDisp) speedDisp.innerText = scrollSpeed;
+        if (floatScrollSpeed) floatScrollSpeed.innerText = scrollSpeed;
+        if (playBtn) {
+            playBtn.innerHTML = isScrolling ? "⏸" : "▶";
+            playBtn.classList.toggle("active", isScrolling);
+        }
+        if (floatScrollPlay) {
+            floatScrollPlay.innerHTML = isScrolling ? "⏸" : "▶";
+            floatScrollPlay.classList.toggle("active", isScrolling);
+        }
+    };
+
+    const stopScroll = () => {
+        clearInterval(scrollInterval);
+        isScrolling = false;
+        document.documentElement.style.scrollBehavior = "smooth";
+        syncScrollUI();
+    };
+
+    const startScroll = () => {
+        clearInterval(scrollInterval);
+        document.documentElement.style.scrollBehavior = "auto";
+        const delay = 275 - (scrollSpeed * 20);
+        scrollInterval = setInterval(() => {
+            if ((window.innerHeight + window.pageYOffset) >= document.documentElement.scrollHeight - 2) {
+                stopScroll();
+            } else {
+                window.scrollTo(0, window.pageYOffset + 1);
+            }
+        }, delay);
+        isScrolling = true;
+        if (floatScrollBar) floatScrollBar.style.display = "flex";
+        syncScrollUI();
+    };
+
+    // Desde el menú ☰: al activar Auto Scroll, cerramos el menú grande y dejamos la barrita flotante afuera
+    document.getElementById("scroll-play").onclick = () => {
+        if (isScrolling) {
+            stopScroll();
+        } else {
+            startScroll();
+            menuContent.classList.remove("activo");
+            menuTrigger.innerHTML = "☰";
+        }
+    };
+
+    const cambiarVelocidadScroll = (delta) => {
+        const nueva = scrollSpeed + delta;
+        if (nueva >= 1 && nueva <= 10) {
+            scrollSpeed = nueva;
+            syncScrollUI();
+            if (isScrolling) startScroll();
+        }
+    };
+
+    document.getElementById("scroll-plus").onclick = () => cambiarVelocidadScroll(1);
+    document.getElementById("scroll-minus").onclick = () => cambiarVelocidadScroll(-1);
+
+    // Botones de la barrita flotante externa
+    if (floatScrollPlay) floatScrollPlay.onclick = () => isScrolling ? stopScroll() : startScroll();
+    if (floatScrollPlus) floatScrollPlus.onclick = () => cambiarVelocidadScroll(1);
+    if (floatScrollMinus) floatScrollMinus.onclick = () => cambiarVelocidadScroll(-1);
+    if (floatScrollClose) {
+        floatScrollClose.onclick = () => {
+            stopScroll();
+            if (floatScrollBar) floatScrollBar.style.display = "none";
+        };
+    }
 
     let fontSize = 100;
-    const obtenerLetras = () => document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra");
+    const obtenerLetras = () => document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra, #programa-completo-container pre, .cancion-content pre");
     setTimeout(() => { obtenerLetras().forEach(el => { el.style.fontSize = fontSize + "%"; el.style.lineHeight = "1.5"; }); }, 500); 
 
     const updFont = (v) => { 
@@ -1453,16 +2210,46 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("font-minus").onclick = () => updFont(-10);
 
     const isDark = localStorage.getItem("cancionero_darkmode") === "true";
+    const syncThemeButtonIcon = () => {
+        const oscuroActivo = document.body.classList.contains("modo-oscuro");
+        document.querySelectorAll("#toggle-theme, .btn-toggle-theme").forEach((btn) => {
+            const nuevoTexto = btn.getAttribute("data-full-label") === "true"
+                ? (oscuroActivo ? "☀️ Modo Día" : "🌙 Modo Noche")
+                : (oscuroActivo ? "☀️" : "🌙");
+            if (btn.innerText !== nuevoTexto) {
+                btn.innerText = nuevoTexto;
+            }
+        });
+    };
     const applyTheme = (d) => { 
         d ? document.body.classList.add("modo-oscuro") : document.body.classList.remove("modo-oscuro"); 
-        document.getElementById("toggle-theme").innerText = d ? "☀️" : "🌙"; 
+        syncThemeButtonIcon();
         localStorage.setItem("cancionero_darkmode", d); 
     };
     applyTheme(isDark);
-    document.getElementById("toggle-theme").onclick = () => applyTheme(!document.body.classList.contains("modo-oscuro"));
+    setTimeout(syncThemeButtonIcon, 200);
+    setTimeout(syncThemeButtonIcon, 700);
 
-    const oldBtn = document.getElementById("toggleChordsButton");
-    if(oldBtn) oldBtn.onclick = function() { const c = document.querySelectorAll(".c"); if(c.length) { const v = c[0].style.display!=="none"; c.forEach(el=>el.style.display=v?"none":"inline"); }};
+    // Como navbar.html se carga dinámicamente en las subpáginas, escuchamos el clic en todo el documento
+    document.addEventListener("click", (e) => {
+        const btn = e.target && e.target.closest("#toggle-theme, .btn-toggle-theme");
+        if (btn) {
+            e.preventDefault();
+            applyTheme(!document.body.classList.contains("modo-oscuro"));
+        }
+    });
+
+    // Funciona tanto en canciones individuales como dentro de "Programa full (con acordes)"
+    document.addEventListener("click", (e) => {
+        const btnAcordes = e.target && e.target.closest("#toggleChordsButton");
+        if (btnAcordes) {
+            const c = document.querySelectorAll(".c");
+            if (c.length) {
+                const v = c[0].style.display !== "none";
+                c.forEach(el => el.style.display = v ? "none" : "inline");
+            }
+        }
+    });
 
     // --- 5. MOTOR DE AUDIO SEGURO (METRÓNOMO Y AFINADOR) ---
     let audioCtx = null;
@@ -1599,65 +2386,294 @@ if (contenedorBolitas) {
     });
 }
 
-    // Lógica del Afinador
-    let afinadorOscilador = null;
-    let afinadorGanancia = null;
-    const btnStopTuner = document.getElementById('btn-stop-tuner');
-    const botonesCuerdas = document.querySelectorAll('.btn-cuerda');
+    // =========================================================================
+    // LÓGICA DEL AFINADOR POR MICRÓFONO (ALTA SENSIBILIDAD + MEDIDOR DE SEÑAL)
+    // =========================================================================
+    const cuerdasGuitarra = [
+        { idx: 0, nombre: 'MI', detalle: '6ª cuerda (E)', freq: 82.41 },
+        { idx: 1, nombre: 'LA', detalle: '5ª cuerda (A)', freq: 110.00 },
+        { idx: 2, nombre: 'RE', detalle: '4ª cuerda (D)', freq: 146.83 },
+        { idx: 3, nombre: 'SOL', detalle: '3ª cuerda (G)', freq: 196.00 },
+        { idx: 4, nombre: 'SI', detalle: '2ª cuerda (B)', freq: 246.94 },
+        { idx: 5, nombre: 'mi', detalle: '1ª cuerda (e)', freq: 329.63 }
+    ];
 
-    function detenerAfinador() {
-        if (afinadorOscilador && audioCtx) {
-            afinadorGanancia.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-            afinadorOscilador.stop(audioCtx.currentTime + 0.1);
-            afinadorOscilador = null;
+    let micStream = null;
+    let micAudioCtx = null;
+    let micAnimId = null;
+    let historialFreq = [];
+
+    const tunerModal = document.getElementById('tuner-modal');
+    const tunerOverlay = document.getElementById('tuner-overlay');
+    const btnOpenMicTuner = document.getElementById('btn-open-mic-tuner');
+    const btnCloseTuner = document.getElementById('tuner-close-btn');
+
+    function actualizarAgujaVisual(cents, cuerda, freqReal) {
+        const needle = document.getElementById('tuner-needle');
+        const mainNote = document.getElementById('tuner-main-note');
+        const subInfo = document.getElementById('tuner-sub-info');
+        const statusMsg = document.getElementById('tuner-status-msg');
+        const badge = document.getElementById('tuner-badge');
+
+        const limitado = Math.max(-50, Math.min(50, cents));
+        const porcentaje = 50 + (limitado * 0.88);
+        if (needle) needle.style.left = `calc(${porcentaje}% - 6px)`;
+
+        if (mainNote) {
+            mainNote.innerHTML = `${cuerda.nombre} <span style="font-size:16px; font-weight:700; opacity:0.65;">(${cuerda.detalle.split(' ')[0]})</span>`;
         }
-        botonesCuerdas.forEach(b => b.classList.remove('active'));
-        if (btnStopTuner) btnStopTuner.style.display = 'none';
-    }
+        if (subInfo) {
+            subInfo.innerText = `${cuerda.detalle} · ${freqReal.toFixed(1)} Hz`;
+        }
 
-    botonesCuerdas.forEach(boton => {
-        boton.addEventListener('click', function() {
-            initAudio(); 
-            
-            if (this.classList.contains('active')) {
-                detenerAfinador();
-                return;
+        // Resaltar la pastillita de la cuerda detectada
+        for (let i = 0; i < 6; i++) {
+            const tag = document.getElementById('tag-cuerda-' + i);
+            if (tag) {
+                if (i === cuerda.idx) tag.classList.add('detected');
+                else tag.classList.remove('detected');
             }
-            
-            detenerAfinador();
-            this.classList.add('active');
+        }
 
-            const frecuencia = parseFloat(this.getAttribute('data-freq'));
-            afinadorOscilador = audioCtx.createOscillator();
-            afinadorGanancia = audioCtx.createGain();
-            
-            afinadorOscilador.connect(afinadorGanancia);
-            afinadorGanancia.connect(audioCtx.destination);
-            afinadorOscilador.type = "triangle"; 
-            afinadorOscilador.frequency.value = frecuencia;
-            
-            afinadorGanancia.gain.setValueAtTime(0, audioCtx.currentTime);
-            afinadorGanancia.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.1);
-            
-            // 1. Arranca a sonar
-            afinadorOscilador.start();
-            
-            // 2. Le decimos que baje el volumen suavemente a los 2.5 segundos
-            afinadorGanancia.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
-            
-            // 3. Corta el oscilador totalmente a los 3 segundos
-            afinadorOscilador.stop(audioCtx.currentTime + 3);
-
-            // 4. Se destilda el botón solo cuando termina
-            setTimeout(() => {
-                detenerAfinador();
-            }, 3000);
-        });
-    });
-
-    if (btnStopTuner) {
-        btnStopTuner.addEventListener('click', detenerAfinador);
+        if (Math.abs(cents) <= 6) {
+            if (needle) needle.style.background = '#10b981';
+            if (statusMsg) {
+                statusMsg.innerText = '✓ ¡Perfecto! Cuerda afinada';
+                statusMsg.style.color = '#10b981';
+            }
+            if (badge) {
+                badge.innerText = '✓ Afinada';
+                badge.style.background = '#d1fae5';
+                badge.style.color = '#065f46';
+            }
+        } else if (cents < 0) {
+            if (needle) needle.style.background = '#f59e0b';
+            if (statusMsg) {
+                statusMsg.innerText = '⬆️ Está baja: ajustá (subí) la clavija';
+                statusMsg.style.color = '#d97706';
+            }
+            if (badge) {
+                badge.innerText = 'Baja';
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+            }
+        } else {
+            if (needle) needle.style.background = '#ef4444';
+            if (statusMsg) {
+                statusMsg.innerText = '⬇️ Está alta: aflojá (bajá) la clavija';
+                statusMsg.style.color = '#ef4444';
+            }
+            if (badge) {
+                badge.innerText = 'Alta';
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#991b1b';
+            }
+        }
     }
+
+    // Detector de tono NSDF normalizado con interpolación parabólica (alta sensibilidad)
+    function detectarFrecuenciaNSDF(buf, sampleRate) {
+        const size = buf.length;
+        let rms = 0;
+        let maxAbs = 0;
+        for (let i = 0; i < size; i++) {
+            const v = buf[i];
+            rms += v * v;
+            if (Math.abs(v) > maxAbs) maxAbs = Math.abs(v);
+        }
+        rms = Math.sqrt(rms / size);
+
+        // Actualizamos la barrita verde de nivel de micrófono para que el usuario vea que entra sonido
+        const volBar = document.getElementById('tuner-vol-bar');
+        if (volBar) {
+            const nivelVisual = Math.min(100, Math.round(rms * 1400));
+            volBar.style.width = nivelVisual + '%';
+        }
+
+        // Umbral muy sensible para que tome el micrófono aunque esté bajito
+        if (rms < 0.0015 || maxAbs === 0) return -1;
+
+        // Normalizamos la onda a [-1, 1] para que funcione igual con micrófonos bajos o altos
+        const norm = new Float32Array(size);
+        for (let i = 0; i < size; i++) {
+            norm[i] = buf[i] / maxAbs;
+        }
+
+        // Rango de búsqueda: entre 55 Hz y 900 Hz
+        const minLag = Math.floor(sampleRate / 900);
+        const maxLag = Math.min(Math.floor(sampleRate / 55), Math.floor(size / 2));
+
+        const nsdf = new Float32Array(maxLag + 1);
+        for (let tau = minLag; tau <= maxLag; tau++) {
+            let acf = 0;
+            let div = 0;
+            // Muestreamos cada 2 puntos para máxima velocidad sin perder precisión
+            for (let i = 0; i < size - maxLag; i += 2) {
+                const a = norm[i];
+                const b = norm[i + tau];
+                acf += a * b;
+                div += a * a + b * b;
+            }
+            nsdf[tau] = div > 0 ? (2 * acf) / div : 0;
+        }
+
+        // Buscamos el primer cruce positivo y el pico principal
+        let tau = minLag;
+        while (tau <= maxLag && nsdf[tau] > 0) tau++;
+        while (tau <= maxLag && nsdf[tau] <= 0) tau++;
+        if (tau > maxLag) tau = minLag;
+
+        let mejorTau = -1;
+        let maxVal = 0;
+        for (let t = tau; t <= maxLag; t++) {
+            if (nsdf[t] > maxVal) {
+                maxVal = nsdf[t];
+                mejorTau = t;
+            }
+        }
+
+        // Claridad mínima de nota musical
+        if (mejorTau <= 0 || maxVal < 0.35) return -1;
+
+        // Buscamos el primer pico fuerte (al menos 85% del máximo) para evitar saltar a la octava
+        const umbralPico = maxVal * 0.85;
+        for (let t = tau + 1; t < maxLag; t++) {
+            if (nsdf[t] >= umbralPico && nsdf[t] > nsdf[t - 1] && nsdf[t] >= nsdf[t + 1]) {
+                mejorTau = t;
+                break;
+            }
+        }
+
+        // Interpolación parabólica para precisión fina
+        let tauPreciso = mejorTau;
+        if (mejorTau > minLag && mejorTau < maxLag) {
+            const s0 = nsdf[mejorTau - 1];
+            const s1 = nsdf[mejorTau];
+            const s2 = nsdf[mejorTau + 1];
+            const denom = 2 * s1 - s2 - s0;
+            if (denom !== 0) {
+                tauPreciso = mejorTau + (s2 - s0) / (2 * denom);
+            }
+        }
+
+        return sampleRate / tauPreciso;
+    }
+
+    async function iniciarMicrofonoAfinador() {
+        detenerMicrofonoAfinador();
+        historialFreq = [];
+
+        const subInfo = document.getElementById('tuner-sub-info');
+        const mainNote = document.getElementById('tuner-main-note');
+        const statusMsg = document.getElementById('tuner-status-msg');
+        const badge = document.getElementById('tuner-badge');
+
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
+
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            micAudioCtx = new AudioContextClass();
+            if (micAudioCtx.state === 'suspended') {
+                await micAudioCtx.resume();
+            }
+
+            const source = micAudioCtx.createMediaStreamSource(micStream);
+            const analyser = micAudioCtx.createAnalyser();
+            analyser.fftSize = 4096;
+            source.connect(analyser);
+            const buffer = new Float32Array(analyser.fftSize);
+
+            if (badge) {
+                badge.innerText = '🎙️ Escuchando';
+                badge.style.background = '#e0f2fe';
+                badge.style.color = '#0369a1';
+            }
+            if (subInfo) subInfo.innerText = 'Tocá una cuerda de tu guitarra...';
+            if (mainNote) mainNote.innerText = '—';
+            if (statusMsg) {
+                statusMsg.innerText = 'Esperando sonido...';
+                statusMsg.style.color = '#2A9D8F';
+            }
+
+            function leerTono() {
+                if (!micStream || !micAudioCtx) return;
+                analyser.getFloatTimeDomainData(buffer);
+                const freq = detectarFrecuenciaNSDF(buffer, micAudioCtx.sampleRate);
+
+                if (freq !== -1 && freq >= 55 && freq <= 900) {
+                    historialFreq.push(freq);
+                    if (historialFreq.length > 4) historialFreq.shift();
+
+                    // Mediana de las últimas lecturas para que la aguja no salte
+                    const ordenadas = [...historialFreq].sort((a, b) => a - b);
+                    const freqSuave = ordenadas[Math.floor(ordenadas.length / 2)];
+
+                    let masCercana = cuerdasGuitarra[0];
+                    let menorDif = Infinity;
+                    cuerdasGuitarra.forEach(c => {
+                        const dif = Math.abs(1200 * Math.log2(freqSuave / c.freq));
+                        if (dif < menorDif) {
+                            menorDif = dif;
+                            masCercana = c;
+                        }
+                    });
+                    const cents = Math.round(1200 * Math.log2(freqSuave / masCercana.freq));
+                    actualizarAgujaVisual(cents, masCercana, freqSuave);
+                }
+                micAnimId = requestAnimationFrame(leerTono);
+            }
+            leerTono();
+        } catch (err) {
+            if (badge) {
+                badge.innerText = 'Sin permiso';
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#991b1b';
+            }
+            if (subInfo) subInfo.innerText = 'No se pudo acceder al micrófono';
+            if (statusMsg) {
+                statusMsg.innerText = 'Permití el uso del micrófono arriba en el navegador';
+                statusMsg.style.color = '#ef4444';
+            }
+        }
+    }
+
+    function detenerMicrofonoAfinador() {
+        if (micAnimId) {
+            cancelAnimationFrame(micAnimId);
+            micAnimId = null;
+        }
+        if (micStream) {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+        }
+        if (micAudioCtx) {
+            try { micAudioCtx.close(); } catch (e) {}
+            micAudioCtx = null;
+        }
+        const volBar = document.getElementById('tuner-vol-bar');
+        if (volBar) volBar.style.width = '0%';
+    }
+
+    if (btnOpenMicTuner) {
+        btnOpenMicTuner.addEventListener('click', function() {
+            menuContent.classList.remove('activo');
+            menuTrigger.innerHTML = '☰';
+            tunerOverlay.style.display = 'block';
+            tunerModal.style.display = 'block';
+            iniciarMicrofonoAfinador();
+        });
+    }
+
+    function cerrarModalAfinador() {
+        detenerMicrofonoAfinador();
+        if (tunerOverlay) tunerOverlay.style.display = 'none';
+        if (tunerModal) tunerModal.style.display = 'none';
+    }
+
+    if (btnCloseTuner) btnCloseTuner.addEventListener('click', cerrarModalAfinador);
+    if (tunerOverlay) tunerOverlay.addEventListener('click', cerrarModalAfinador);
 });
 
 // =============================================================================
@@ -1813,37 +2829,179 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// Cargamos automáticamente la base de datos de letras para el buscador
+(function cargarBaseLetras() {
+    if (window.letrasCanciones) return;
+    var s = document.createElement("script");
+    var hasBase = document.getElementsByTagName("base").length > 0;
+    var path = window.location.pathname;
+    var esRaiz = path.endsWith("index.html") || path.endsWith("/") || !path.includes(".html") || /^\/cancionerobenja\/[^\/]+\.html$/.test(path);
+    s.src = hasBase ? "scripts/letras-buscador.js" : (esRaiz ? "scripts/letras-buscador.js" : "../scripts/letras-buscador.js");
+    s.async = true;
+    document.head.appendChild(s);
+})();
+
+function obtenerClaveCancion(href) {
+    if (!href) return "";
+    // Limpiamos ?seccion=... y rutas iniciales para comparar con window.letrasCanciones
+    return decodeURI(href.split("?")[0]).replace(/^(\.\.\/)+/, "").replace(/^\/?cancionerobenja\//, "");
+}
+
+function armarExtractoLetra(letraOriginal, filtroLimpio) {
+    if (!letraOriginal) return "";
+    var letraLimpia = limpiarTexto(letraOriginal);
+    var pos = letraLimpia.indexOf(filtroLimpio);
+    if (pos === -1) return "";
+    // Aproximamos la posición en el texto original para mostrar un fragmento legible
+    var inicio = Math.max(0, pos - 18);
+    var fin = Math.min(letraOriginal.length, pos + filtroLimpio.length + 32);
+    var recorte = letraOriginal.substring(inicio, fin).trim();
+    return (inicio > 0 ? "«…" : "«") + recorte + (fin < letraOriginal.length ? "…»" : "»");
+}
+
+function mostrarRecientesBuscador() {
+    var input = document.getElementById("inputGlobal");
+    var contenedor = document.getElementById("listaGlobal");
+    if (!input || !contenedor) return;
+
+    var filtro = limpiarTexto(input.value);
+    if (filtro.length > 0) return;
+
+    var recientes = [];
+    try {
+        recientes = JSON.parse(localStorage.getItem("cancionero_recientes") || "[]");
+    } catch (e) { recientes = []; }
+
+    var boxRec = document.getElementById("recientes-buscador-box");
+    if (!recientes || recientes.length === 0) {
+        if (boxRec) boxRec.style.display = "none";
+        contenedor.style.display = "none";
+        return;
+    }
+
+    // Ocultamos todas las canciones normales de la lista mientras el buscador está vacío
+    var enlacesCatalogo = contenedor.querySelectorAll("a.btn");
+    for (var i = 0; i < enlacesCatalogo.length; i++) {
+        enlacesCatalogo[i].style.display = "none";
+    }
+
+    if (!boxRec) {
+        boxRec = document.createElement("div");
+        boxRec.id = "recientes-buscador-box";
+        contenedor.insertBefore(boxRec, contenedor.firstChild);
+    }
+
+    var esOscuro = document.body.classList.contains("modo-oscuro");
+    var colorTexto = esOscuro ? "#e0e0e0" : "#2C3E50";
+    var bgItem = esOscuro ? "rgba(42,157,143,0.14)" : "rgba(42,157,143,0.08)";
+
+    boxRec.style.display = "block";
+    boxRec.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 8px 6px; font-size:0.78rem; font-weight:800; color:#2A9D8F; border-bottom:1px solid rgba(42,157,143,0.25); margin-bottom:6px;">
+            <span>🕒 Últimas que abriste</span>
+            <button type="button" onclick="limpiarRecientesBuscador(event)" style="background:none; border:none; color:#ef4444; font-size:0.75rem; font-weight:700; cursor:pointer; padding:0;">🗑️ Limpiar</button>
+        </div>
+    ` + recientes.map(function(r) {
+        var rutaRel = obtenerClaveCancion(r.u) || r.u;
+        return `<a href="${rutaRel}" class="item-reciente-buscador" style="display:block; padding:7px 12px; margin-bottom:4px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.88rem; color:${colorTexto}; background:${bgItem}; border:1px solid rgba(42,157,143,0.22);">🕒 ${r.t}</a>`;
+    }).join("");
+
+    contenedor.style.display = "block";
+}
+
+function limpiarRecientesBuscador(ev) {
+    if (ev) ev.stopPropagation();
+    localStorage.removeItem("cancionero_recientes");
+    var boxRec = document.getElementById("recientes-buscador-box");
+    var contenedor = document.getElementById("listaGlobal");
+    if (boxRec) boxRec.style.display = "none";
+    if (contenedor) contenedor.style.display = "none";
+}
+
 function filtrarGlobal() {
     var input = document.getElementById("inputGlobal");
     var contenedor = document.getElementById("listaGlobal");
     if(!input || !contenedor) return;
 
-    var enlaces = contenedor.getElementsByTagName("a");
-    
-    // ACÁ APLICAMOS LA MAGIA AL TEXTO QUE ESCRIBE EL USUARIO
+    var enlaces = contenedor.querySelectorAll("a.btn");
     var filtro = limpiarTexto(input.value);
+    var boxRec = document.getElementById("recientes-buscador-box");
 
-    if (filtro.length === 0) { contenedor.style.display = "none"; return; } 
-    else { contenedor.style.display = "block"; }
+    if (filtro.length === 0) {
+        if (document.activeElement === input) {
+            mostrarRecientesBuscador();
+        } else {
+            if (boxRec) boxRec.style.display = "none";
+            contenedor.style.display = "none";
+        }
+        return;
+    } else {
+        if (boxRec) boxRec.style.display = "none";
+        contenedor.style.display = "block";
+    }
+
+    var dbLetras = window.letrasCanciones || {};
+    var empiezaTitulo = [];
+    var contieneTitulo = [];
+    var contieneLetra = [];
 
     for (var i = 0; i < enlaces.length; i++) {
-        var texto = enlaces[i].textContent || enlaces[i].innerText;
-        var letra = enlaces[i].getAttribute("data-letra") || ""; 
-        var textoCompleto = texto + " " + letra;
-        
-        // ACÁ APLICAMOS LA MAGIA AL NOMBRE DE LA CANCIÓN Y COMPARAMOS
-        if (limpiarTexto(textoCompleto).indexOf(filtro) > -1) {
-            enlaces[i].style.display = ""; 
+        var el = enlaces[i];
+        // Guardamos el título y orden alfabético original la primera vez
+        var tituloOriginal = el.getAttribute("data-titulo-orig");
+        if (!tituloOriginal) {
+            tituloOriginal = (el.textContent || el.innerText).trim();
+            el.setAttribute("data-titulo-orig", tituloOriginal);
+            el.setAttribute("data-orden-orig", String(i));
+        }
+
+        var href = el.getAttribute("href") || "";
+        var clave = obtenerClaveCancion(href);
+        var letra = el.getAttribute("data-letra") || dbLetras[clave] || "";
+
+        var tituloLimpio = limpiarTexto(tituloOriginal);
+        var posTitulo = tituloLimpio.indexOf(filtro);
+        var coincideTitulo = posTitulo > -1;
+        var coincideLetra = !coincideTitulo && filtro.length >= 2 && limpiarTexto(letra).indexOf(filtro) > -1;
+
+        var ordenOrig = parseInt(el.getAttribute("data-orden-orig") || i, 10);
+
+        if (coincideTitulo) {
+            el.innerHTML = tituloOriginal;
+            el.style.display = "";
+            if (posTitulo === 0) {
+                empiezaTitulo.push({ el: el, idx: ordenOrig });
+            } else {
+                contieneTitulo.push({ el: el, idx: ordenOrig });
+            }
+        } else if (coincideLetra) {
+            var extracto = armarExtractoLetra(letra, filtro);
+            el.innerHTML = `<div>${tituloOriginal}</div>` +
+                (extracto ? `<small style="display:block; font-size:0.78em; opacity:0.75; font-weight:normal; font-style:italic; white-space:normal;">${extracto}</small>` : "");
+            el.style.display = "";
+            contieneLetra.push({ el: el, idx: ordenOrig });
         } else {
-            enlaces[i].style.display = "none"; 
+            el.innerHTML = tituloOriginal;
+            el.style.display = "none";
         }
     }
+
+    // Ordenamos cada grupo alfabéticamente y ponemos primero los títulos y después las letras
+    empiezaTitulo.sort(function(a, b) { return a.idx - b.idx; });
+    contieneTitulo.sort(function(a, b) { return a.idx - b.idx; });
+    contieneLetra.sort(function(a, b) { return a.idx - b.idx; });
+
+    var frag = document.createDocumentFragment();
+    empiezaTitulo.forEach(function(item) { frag.appendChild(item.el); });
+    contieneTitulo.forEach(function(item) { frag.appendChild(item.el); });
+    contieneLetra.forEach(function(item) { frag.appendChild(item.el); });
+    contenedor.appendChild(frag);
 }
 
 document.addEventListener('click', function(event) {
     var contenedor = document.getElementById('listaGlobal');
     var input = document.getElementById('inputGlobal');
-    if (contenedor && input && event.target !== input && event.target !== contenedor) {
+    if (contenedor && input && event.target !== input && !contenedor.contains(event.target)) {
         contenedor.style.display = 'none';
     }
 });
@@ -2130,6 +3288,13 @@ const dbAcordes = {
         return html;
     }
 
+    // Exponer globalmente la base de datos de acordes y el generador de dibujos para el resumen de acordes
+    window.dbAcordes = dbAcordes;
+    window.generarDibujoAcorde = generarDibujoAcorde;
+    if (typeof window.actualizarResumenAcordesActivo === 'function') {
+        try { window.actualizarResumenAcordesActivo(); } catch(e) {}
+    }
+
     // 5. El "Escuchador" de clicks (CON VISIÓN PERIFÉRICA PARA BAJOS)
     $(document).on("click", ".c", function() {
         let nombreAcorde = $(this).text().trim(); 
@@ -2147,19 +3312,27 @@ const dbAcordes = {
             nombreAcorde = $(prev.previousSibling).text().trim() + "/" + nombreAcorde;
         }
         
-        // 1. Buscamos si el acorde completo (ej: LAm/SOL) existe en la base de datos
-        if(dbAcordes[nombreAcorde]) {
-            document.getElementById("acorde-titulo").innerText = nombreAcorde;
-            document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[nombreAcorde]);
+        // Obtenemos el nombre en formato Latino para buscar en la base de datos
+        let nombreLatino = window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(nombreAcorde) : nombreAcorde;
+
+        // 1. Buscamos si el acorde completo (ej: LAm/SOL o Am/G) existe en la base de datos
+        if(dbAcordes[nombreLatino]) {
+            let tituloModal = (nombreAcorde !== nombreLatino) ? `${nombreAcorde} (${nombreLatino})` : nombreAcorde;
+            document.getElementById("acorde-titulo").innerText = tituloModal;
+            document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[nombreLatino]);
             document.getElementById("acorde-overlay").style.display = "block";
             document.getElementById("acorde-modal").style.display = "block";
         } 
         // 2. Si no tenés cargado el bajo, mostramos el acorde base como Plan B
         else {
-            let acordeBase = nombreAcorde.split("/")[0];
-            if (dbAcordes[acordeBase]) {
-                document.getElementById("acorde-titulo").innerText = nombreAcorde + " (Acorde base)"; 
-                document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[acordeBase]);
+            let acordeBaseLatino = nombreLatino.split("/")[0];
+            if (dbAcordes[acordeBaseLatino]) {
+                let acordeBaseOriginal = nombreAcorde.split("/")[0];
+                let tituloModal = (acordeBaseOriginal !== acordeBaseLatino) 
+                    ? `${acordeBaseOriginal} (${acordeBaseLatino})` 
+                    : `${nombreAcorde} (Acorde base)`;
+                document.getElementById("acorde-titulo").innerText = tituloModal; 
+                document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[acordeBaseLatino]);
                 document.getElementById("acorde-overlay").style.display = "block";
                 document.getElementById("acorde-modal").style.display = "block";
             }
@@ -2181,8 +3354,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     btnDescargar.addEventListener("click", async function() {
         const btn = this;
+        const textoOriginal = btn.innerText;
         
-        btn.innerText = "⏳ Bajando...";
+        btn.innerText = "⏳ Descargando canciones...";
         btn.disabled = true;
 
         try {
@@ -2211,7 +3385,8 @@ document.addEventListener("DOMContentLoaded", function() {
             rutasParaBajar.push(baseRepo + 'donaciones.html');
             // Por las dudas aseguramos el CSS y el JS
             rutasParaBajar.push(baseRepo + 'css/cancionero.css');
-            rutasParaBajar.push(baseRepo + 'scripts/cancionero.js'); 
+            rutasParaBajar.push(baseRepo + 'scripts/cancionero.js');
+            rutasParaBajar.push(baseRepo + 'scripts/letras-buscador.js');
 
             let descargadas = 0;
             let fallidas = 0;
@@ -2243,7 +3418,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             
             setTimeout(() => {
-                btn.innerText = "⬇️ Bajar Todo";
+                btn.innerText = textoOriginal;
                 btn.disabled = false;
             }, 4000);
 
@@ -2361,3 +3536,47 @@ document.addEventListener('click', function(event) {
     }
   });
 })();
+
+// =============================================================================
+// 8. BARRA RÁPIDA DE LETRAS (A - Z) EN EL ÍNDICE ALFABÉTICO
+// =============================================================================
+document.addEventListener("DOMContentLoaded", function () {
+  var listaCanciones = document.getElementById("lista-canciones");
+  if (!listaCanciones) return;
+
+  var titulos = listaCanciones.querySelectorAll(".titulo h1");
+  if (!titulos || titulos.length === 0) return;
+
+  var barra = document.createElement("div");
+  barra.id = "barra-abecedario";
+  barra.setAttribute("aria-label", "Saltar a la letra");
+
+  titulos.forEach(function (h1) {
+    var letra = (h1.textContent || "").trim().toUpperCase();
+    if (!letra) return;
+
+    var contenedorTitulo = h1.parentElement || h1;
+    var idDestino = "letra-indice-" + letra;
+    contenedorTitulo.id = idDestino;
+    contenedorTitulo.style.scrollMarginTop = "140px";
+
+    var btnLetra = document.createElement("button");
+    btnLetra.type = "button";
+    btnLetra.className = "btn-letra-abc";
+    btnLetra.textContent = letra;
+    btnLetra.addEventListener("click", function () {
+      var destino = document.getElementById(idDestino);
+      if (destino) {
+        destino.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      barra.querySelectorAll(".btn-letra-abc").forEach(function (b) {
+        b.classList.remove("activo");
+      });
+      btnLetra.classList.add("activo");
+    });
+
+    barra.appendChild(btnLetra);
+  });
+
+  listaCanciones.parentNode.insertBefore(barra, listaCanciones);
+});

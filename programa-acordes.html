@@ -16,6 +16,7 @@
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" type="text/css" href="css/cancionero.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="scripts/cancionero.js"></script>
   <style>
   /* La caja que envuelve todo (acordes, capo y botones) */
   .cancion-en-lista {
@@ -65,9 +66,25 @@
     });
   </script> 
 
-  <div id="programa-container" class="container" style="max-width: 800px; margin: 0 auto; padding-top: 20px;"></div>
+  <div class="text-center my-3 no-print d-flex justify-content-center align-items-center gap-2 flex-wrap">
+    <span id="nombre-repertorio-badge" class="badge rounded-pill border px-3 py-2" style="font-size: 14px; font-weight: 700; color: #2A9D8F !important; background: rgba(42, 157, 143, 0.08);">📁 Repertorio</span>
+    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold" onclick="window.print()" title="Imprimir o exportar como PDF">
+      🖨️ Imprimir / Guardar PDF
+    </button>
+  </div>
+
+  <div id="programa-container" class="container" style="max-width: 800px; margin: 0 auto; padding-top: 10px;"></div>
 
 <script>
+  const nombreRepertorioActivo = (function() {
+    try {
+      return localStorage.getItem('programaMisaNombre') || '';
+    } catch(e) { return ''; }
+  })();
+  if (nombreRepertorioActivo && document.getElementById('nombre-repertorio-badge')) {
+    document.getElementById('nombre-repertorio-badge').textContent = '📁 ' + nombreRepertorioActivo;
+  }
+
   const programa = JSON.parse(localStorage.getItem('programaMisa'));
   if (!programa || programa.length === 0) {
     alert('No hay un programa de misa guardado.');
@@ -90,10 +107,13 @@
         // Título de la canción, forzado al centro
         const tituloHTML = `<h3 class="mt-4 mb-3 text-center" style="color:#0A2846; font-weight:bold;">${item.nombre}</h3>`;
         
-        const letraPre = doc.querySelector('#letra');
+        const letraPre = doc.querySelector('#letra') || doc.querySelector('.zona-letra') || doc.querySelector('pre');
         
         if (letraPre) {
           letraPre.id = `letra-lista-${i}`;
+          if (!letraPre.getAttribute('data-key') && item.tono) {
+            letraPre.setAttribute('data-key', item.tono);
+          }
           
           const divCancion = document.createElement('div');
           divCancion.className = 'cancion-en-lista mb-5 pb-5 border-bottom'; 
@@ -103,7 +123,7 @@
           
           container.appendChild(divCancion);
 
-          setTimeout(() => { aplicarTonoYCapo(item, i); }, 50);
+          aplicarTonoYCapo(item, i);
         }
       } catch (error) {
         console.error(`Error al cargar ${item.cancion}:`, error);
@@ -122,9 +142,13 @@
 
     // Aplicar tono
     if (item.tono) {
-      const claveObjetivo = item.tono.replace(/m$/i, '');
+      const equivalencias = { "REb": "DO#", "RE#": "MIb", "SOLb": "FA#", "LAb": "SOL#", "LA#": "SIb" };
+      let claveObjetivo = item.tono.replace(/m$/i, '').trim();
+      if (equivalencias[claveObjetivo]) claveObjetivo = equivalencias[claveObjetivo];
+      let claveObjetivoAm = (typeof window.convertirAcordeLatinoAAmericano === 'function') ? window.convertirAcordeLatinoAAmericano(claveObjetivo) : claveObjetivo;
       const $link = $pre.prev('.transpose-keys').find('a').filter(function () {
-        return $(this).text().toUpperCase() === claveObjetivo.toUpperCase();
+        const t = $(this).text().toUpperCase();
+        return t === claveObjetivo.toUpperCase() || t === claveObjetivoAm.toUpperCase();
       }).first();
       if ($link.length) $link.trigger('click');
     }
@@ -140,12 +164,19 @@
             opciones += `<option value="${i}">${texto}</option>`;
         }
         
+        const botonCifrado = `
+            <button type="button" class="btn-toggle-cifrado" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Cambiar sistema de acordes entre Latino (DO) y Americano (C)">
+                🔤 Cifrado: <b class="lbl-cifrado-modo">${(localStorage.getItem("cancionero_sistema_cifrado") === "americano" ? "C" : "DO")}</b>
+            </button>
+        `;
+        
         const capoHTML = `
-            <div class="capo-selector-div" style="text-align:center; margin-top: 10px; margin-bottom: 25px;">
+            <div class="capo-selector-div" style="text-align:center; margin-top: 10px; margin-bottom: 25px; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:6px;">
                 <label style="font-size:15px; margin-right: 5px; font-weight:bold;">🎸 Capo: </label>
                 <select class="form-select form-select-sm d-inline-block capo-dropdown-repertorio" style="width: auto; cursor:pointer;" data-index="${index}">
                     ${opciones}
                 </select>
+                ${botonCifrado}
             </div>
         `;
         
@@ -155,6 +186,10 @@
             $pre.before(capoHTML);
         }
         capoDiv = $pre.prev('.capo-selector-div');
+    }
+
+    if (localStorage.getItem("cancionero_sistema_cifrado") === "americano" && typeof window.aplicarSistemaCifrado === 'function') {
+      window.aplicarSistemaCifrado("americano", $pre);
     }
 
     const select = capoDiv.find('select');
@@ -167,10 +202,14 @@
     });
   }
 
-  cargarTodo();
+  cargarTodo().then(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('print') === '1' || urlParams.get('print') === 'true') {
+      setTimeout(() => { window.print(); }, 700);
+    }
+  });
 </script>
 
-<script src="scripts/cancionero.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
