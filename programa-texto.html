@@ -24,6 +24,40 @@
       button, .btn {
         display: none !important;
       }
+
+      .cancion-content {
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+        display: block !important;
+        margin-bottom: 24px !important;
+        padding-bottom: 16px !important;
+      }
+
+      .cancion-content h2 {
+        break-after: avoid-page !important;
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+        margin-top: 14px !important;
+        margin-bottom: 8px !important;
+      }
+
+      .cancion-content pre,
+      pre.lh-base {
+        display: block !important;
+        break-before: avoid-page !important;
+        break-before: avoid !important;
+        page-break-before: avoid !important;
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        white-space: pre-wrap !important;
+      }
     }
   </style>
 </head>

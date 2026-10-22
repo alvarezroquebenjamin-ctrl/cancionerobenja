@@ -36,31 +36,63 @@
       flex-wrap: wrap !important; /* Para que los botones bajen de línea si no entran en el celu */
       clear: both !important; 
     }
+
+    /* En pantalla: Centra la caja y permite que el texto adentro esté alineado a la izquierda */
+    pre[id^="letra-lista"] {
+      display: inline-block !important; /* Permite que el div padre lo centre como un bloque */
+      width: auto !important; /* Se ajusta al ancho del texto más largo */
+      max-width: 100% !important;
+      text-align: left !important; /* El texto por dentro se alinea a la izquierda de la caja */
+      white-space: pre-wrap !important; 
+      padding: 0 10px !important;
+      margin: 0 auto !important;
+      overflow: visible !important;
+      height: auto !important;
+      max-height: none !important;
+    }
   }
 
-  /* AL IMPRIMIR / PDF: Ocultar botones de tonalidad, capo, menús flotantes y botones */
+  /* AL IMPRIMIR / PDF: Ocultar botones de tonalidad, capo, menús flotantes; garantizar que título y letra queden juntos */
   @media print {
     .transpose-keys, .capo-selector-div,
     #super-menu-container, #menu-trigger, #menu-content,
     #nav-placeholder, nav, .no-print, button, .btn {
       display: none !important;
     }
-  }
 
-  /* LA MAGIA: Obliga a la letra a ir abajo, elimina el scroll y centra el bloque */
-  pre[id^="letra-lista"] {
-    display: inline-block !important; /* Permite que el div padre lo centre como un bloque */
-    width: auto !important; /* Se ajusta al ancho del texto más largo */
-    max-width: 100% !important;
-    text-align: left !important; /* El texto por dentro se alinea a la izquierda de la caja */
-    white-space: pre-wrap !important; 
-    padding: 0 10px !important;
-    margin: 0 auto !important;
-    
-    /* ESTO ELIMINA EL SCROLL INTERNO Y HACE QUE BAJE DE CORRIDO */
-    overflow: visible !important;
-    height: auto !important;
-    max-height: none !important;
+    .cancion-en-lista {
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+      display: block !important;
+      margin-bottom: 24px !important;
+      padding-bottom: 16px !important;
+    }
+
+    .cancion-en-lista h3 {
+      break-after: avoid-page !important;
+      break-after: avoid !important;
+      page-break-after: avoid !important;
+      margin-top: 14px !important;
+      margin-bottom: 8px !important;
+    }
+
+    .cancion-en-lista > div,
+    pre[id^="letra-lista"] {
+      display: block !important;
+      break-before: avoid-page !important;
+      break-before: avoid !important;
+      page-break-before: avoid !important;
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      height: auto !important;
+      max-height: none !important;
+      white-space: pre-wrap !important;
+    }
   }
   /* --- COLOR DE LOS TÍTULOS EN MODO OSCURO --- */
   body.modo-oscuro .cancion-en-lista h3 {
