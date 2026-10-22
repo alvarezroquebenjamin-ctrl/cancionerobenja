@@ -1215,11 +1215,11 @@ window.canciones = {
                           <select class="form-select d-inline-block capo-dropdown">
                               ${opciones}
                           </select>
+                          ${botonCompartirHTML}
+                          ${botonCifradoHTML}
                           <button type="button" class="btn-reset-tono" style="display:none; margin-left:6px; padding:4px 10px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Volver al tono y capo original de fábrica">
                               ↺ Original
                           </button>
-                          ${botonCompartirHTML}
-                          ${botonCifradoHTML}
                       </div>
                   `;
                   if (keysDiv.length > 0) {
@@ -2095,18 +2095,70 @@ document.addEventListener("DOMContentLoaded", function() {
 
     let fontSize = 100;
     const obtenerLetras = () => document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra, #programa-completo-container pre, .cancion-content pre");
-    setTimeout(() => { obtenerLetras().forEach(el => { el.style.fontSize = fontSize + "%"; el.style.lineHeight = "1.5"; }); }, 500); 
+
+    // --- COLUMNAS AUTOMÁTICAS AL REDUCIR EL TAMAÑO DE LA LETRA (50% ANCHO PANTALLA) ---
+    const verificarColumnasAutomaticas = () => {
+        const letras = obtenerLetras();
+        if (letras.length === 0) return;
+        const anchoPantalla = window.innerWidth || document.documentElement.clientWidth;
+
+        letras.forEach(el => {
+            const testSpan = document.createElement("span");
+            testSpan.style.visibility = "hidden";
+            testSpan.style.position = "absolute";
+            testSpan.style.whiteSpace = "pre";
+            testSpan.style.fontFamily = window.getComputedStyle(el).fontFamily || "'Courier New', Courier, monospace";
+            testSpan.style.fontSize = el.style.fontSize || (fontSize + "%");
+            testSpan.textContent = "MMMMMMMMMM";
+            document.body.appendChild(testSpan);
+            const charWidth = testSpan.getBoundingClientRect().width / 10;
+            document.body.removeChild(testSpan);
+
+            if (!charWidth || charWidth <= 0) return;
+
+            const lines = (el.textContent || "").split("\n");
+            let maxChars = 0;
+            for (let i = 0; i < lines.length; i++) {
+                const len = lines[i].length;
+                if (len > maxChars) maxChars = len;
+            }
+
+            const maxAnchoTexto = maxChars * charWidth;
+            const contenedorPadre = el.closest(".col-12, .col-md-8, .col-lg-4, .cancion-en-lista, .cancion-content, .d-flex");
+
+            if (maxAnchoTexto > 0 && maxAnchoTexto <= (anchoPantalla * 0.50)) {
+                el.classList.add("letra-dos-columnas");
+                if (contenedorPadre) contenedorPadre.classList.add("letra-dos-columnas-padre");
+            } else {
+                el.classList.remove("letra-dos-columnas");
+                if (contenedorPadre) contenedorPadre.classList.remove("letra-dos-columnas-padre");
+            }
+        });
+    };
+
+    setTimeout(() => { 
+        obtenerLetras().forEach(el => { 
+            el.style.fontSize = fontSize + "%"; 
+            el.style.lineHeight = "1.5"; 
+        }); 
+        verificarColumnasAutomaticas();
+    }, 500); 
 
     const updFont = (v) => { 
         const letras = obtenerLetras();
         if(letras.length === 0) return; 
         fontSize += v; 
-        if(fontSize < 60) fontSize = 60; 
+        if(fontSize < 40) fontSize = 40; 
         if(fontSize > 250) fontSize = 250; 
         letras.forEach(el => { el.style.fontSize = fontSize + "%"; });
+        verificarColumnasAutomaticas();
     };
     document.getElementById("font-plus").onclick = () => updFont(10);
     document.getElementById("font-minus").onclick = () => updFont(-10);
+
+    window.addEventListener("resize", () => {
+        verificarColumnasAutomaticas();
+    });
 
     const isDark = localStorage.getItem("cancionero_darkmode") === "true";
     const syncThemeButtonIcon = () => {

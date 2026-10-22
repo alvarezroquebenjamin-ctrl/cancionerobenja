@@ -123,16 +123,7 @@
           <!-- Items generados dinámicamente -->
         </div>
         
-        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top flex-wrap gap-2">
-          <div class="d-flex gap-2 flex-wrap">
-            <button type="button" class="btn btn-outline-primary btn-sm fw-bold px-2 py-1" onclick="exportarBackupRepertorios()" title="Descargar copia de seguridad en un archivo .json">
-              💾 Exportar copia
-            </button>
-            <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-2 py-1" onclick="document.getElementById('input-importar-backup').click()" title="Restaurar repertorios desde un archivo de respaldo">
-              📥 Importar copia
-            </button>
-            <input type="file" id="input-importar-backup" accept=".json,application/json" style="display:none;" onchange="importarBackupRepertorios(event)">
-          </div>
+        <div class="d-flex justify-content-end mt-3 pt-3 border-top">
           <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="cerrarModalBiblioteca()">Cerrar</button>
         </div>
       </div>
@@ -281,82 +272,6 @@
       bibliotecaRepertorios[nuevoNombre] = JSON.parse(JSON.stringify(bibliotecaRepertorios[nombre]));
       localStorage.setItem("cancionero_biblioteca_repertorios", JSON.stringify(bibliotecaRepertorios));
       actualizarBibliotecaUI();
-    };
-
-    window.exportarBackupRepertorios = function() {
-      const cant = Object.keys(bibliotecaRepertorios).length;
-      if (cant === 0 && (!programa || programa.length === 0)) {
-        alert("No tenés repertorios guardados para exportar.");
-        return;
-      }
-      const dataBackup = {
-        app: "Cancionero Catolico",
-        version: "1.0",
-        fechaExportacion: new Date().toISOString(),
-        bibliotecaRepertorios: bibliotecaRepertorios,
-        repertorioActual: {
-          nombre: localStorage.getItem("programaMisaNombre") || "",
-          canciones: programa || []
-        }
-      };
-
-      const jsonStr = JSON.stringify(dataBackup, null, 2);
-      const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const fechaHoy = new Date().toISOString().slice(0, 10);
-      a.href = url;
-      a.download = `repertorios-cancionero-${fechaHoy}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
-
-    window.importarBackupRepertorios = function(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          let nuevosRepertorios = {};
-
-          if (parsed && parsed.bibliotecaRepertorios && typeof parsed.bibliotecaRepertorios === 'object') {
-            nuevosRepertorios = parsed.bibliotecaRepertorios;
-          } else if (parsed && typeof parsed === 'object') {
-            nuevosRepertorios = parsed;
-          }
-
-          const nombresImportados = Object.keys(nuevosRepertorios).filter(k => Array.isArray(nuevosRepertorios[k]));
-          if (nombresImportados.length === 0) {
-            alert("El archivo seleccionado no contiene repertorios válidos.");
-            return;
-          }
-
-          const listaNombres = nombresImportados.slice(0, 5).map(n => `• ${n}`).join('\n');
-          const extra = nombresImportados.length > 5 ? `\n... y ${nombresImportados.length - 5} más` : '';
-          const confirmar = confirm(`Se encontraron ${nombresImportados.length} repertorios en la copia de seguridad:\n\n${listaNombres}${extra}\n\n¿Querés agregarlos a tus repertorios guardados?`);
-          if (!confirmar) return;
-
-          let agregados = 0;
-          nombresImportados.forEach(nom => {
-            bibliotecaRepertorios[nom] = nuevosRepertorios[nom];
-            agregados++;
-          });
-
-          localStorage.setItem("cancionero_biblioteca_repertorios", JSON.stringify(bibliotecaRepertorios));
-          actualizarBibliotecaUI();
-          alert(`✓ ¡Éxito! Se restauraron ${agregados} repertorios en tu biblioteca.`);
-        } catch (err) {
-          console.error("Error al importar backup:", err);
-          alert("Hubo un error al leer el archivo. Asegurate de que sea un archivo .json válido.");
-        } finally {
-          event.target.value = "";
-        }
-      };
-      reader.readAsText(file);
     };
 
     window.cargarRepertorioDeBiblioteca = function(nombre) {

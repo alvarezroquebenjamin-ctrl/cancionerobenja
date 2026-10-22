@@ -1,5 +1,5 @@
 // Número de versión de la copia guardada en el celular.
-const CACHE_NAME = 'cancionero-v28';
+const CACHE_NAME = 'cancionero-v29';
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
