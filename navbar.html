@@ -1,12 +1,52 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
-  <div class="container-fluid">
+﻿<nav class="navbar navbar-dark bg-primary sticky-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
     
-    <a class="navbar-brand" href="index.html">
-      <img src="images/logo-schoenstatt-png.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
-      ÍNDICE
-    </a>
-
-    <div class="d-flex align-items-center ms-auto order-lg-last">
+    <!-- LADO IZQUIERDO -->
+    <div class="d-flex align-items-center gap-2">
+      <a class="navbar-brand" href="index.html" style="margin-right: 2px;">
+        <img src="images/logo-schoenstatt-png.png" alt="Logo" width="28" height="28" class="d-inline-block align-text-top">
+        ÍNDICE
+      </a>
+      
+      <div class="dropdown d-inline-block">
+        <a class="nav-link dropdown-toggle active text-white" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600; font-size: 14.5px; padding: 4px 6px; text-decoration: none;">
+          MENÚ
+        </a>
+        <ul class="dropdown-menu shadow" aria-labelledby="navbarDropdownMenuLink">
+            <li><a class="dropdown-item" href="01-entrada.html">Entrada</a></li>
+            <li><a class="dropdown-item" href="02-perdon.html">Perdón</a></li>
+            <li><a class="dropdown-item" href="03-gloria.html">Gloria</a></li>
+            <li><a class="dropdown-item" href="04-salmos.html">Salmos</a></li>
+            <li><a class="dropdown-item" href="05-aleluya.html">Aleluya</a></li>
+            <li><a class="dropdown-item" href="06-ofertorio.html">Ofertorio</a></li>
+            <li><a class="dropdown-item" href="07-santo.html">Santo</a></li>
+            <li><a class="dropdown-item" href="08-padrenuestro.html">Padrenuestro</a></li>
+            <li><a class="dropdown-item" href="09-cordero.html">Cordero</a></li>
+            <li><a class="dropdown-item" href="10-comunion.html">Comunión</a></li>
+            <li><a class="dropdown-item" href="11-meditacion.html">Meditación</a></li>
+            <li><a class="dropdown-item" href="12-salida.html">Salida</a></li>
+            <li><a class="dropdown-item" href="13-marianos.html">Marianos</a></li>
+            <li><a class="dropdown-item" href="14-envio.html">Envío</a></li>
+            <li><a class="dropdown-item" href="15-espiritu-santo.html">Espíritu Santo</a></li>
+            <li><a class="dropdown-item" href="16-adoracion.html">Adoración</a></li>
+            <li><a class="dropdown-item" href="17-jm.html">JM</a></li>
+            <li><a class="dropdown-item" href="18-jf.html">JF</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="19-indice-alfabetico.html">Índice Alfabético</a></li>
+            <li><a class="dropdown-item" href="20-albumes.html">Albumes</a></li>
+            <li><a class="dropdown-item" href="crear-programa.html">Repertorio</a></li>
+            <li><a class="dropdown-item" href="manual-de-uso.html">Manual de uso</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="donaciones.html">Donaciones</a></li>
+            <li><a class="dropdown-item" href="sugerencias.html">Sugerencias</a></li>
+        </ul>
+      </div>
+      
+      <a class="btn-toggle-theme" href="#" id="toggle-theme" title="Cambiar Modo Noche / Día" style="display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.7); border-radius: 50px; padding: 3px 11px; color: #fff; text-decoration: none; font-size: 15px; line-height: 1.2;">🌙</a>
+    </div>
+    
+    <!-- LADO DERECHO -->
+    <div class="d-flex align-items-center ms-auto">
       <button type="button" class="btn-lupa-buscar" id="btn-abrir-buscador" title="Buscar canción" aria-label="Buscar canción">🔍</button>
       
       <div class="buscador-desplegable ms-lg-2" id="box-buscador-desplegable">
@@ -440,59 +480,9 @@
   <a class="btn btn-outline-primary btn-sm" href="vive-dios/and-we-go.html">And we go</a>
   <a class="btn btn-outline-primary btn-sm" href="vive-dios/ahi-vino-jesus.html">Ahí vino Jesús</a>
   <a class="btn btn-outline-primary btn-sm" href="vive-dios/maria-te-quiero-cantar.html">María, te quiero cantar</a>
-                    </div>
+        </div>
       </div>
-
-      <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
     </div>
-
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            MENÚ
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="01-entrada.html">Entrada</a></li>
-            <li><a class="dropdown-item" href="02-perdon.html">Perdón</a></li>
-            <li><a class="dropdown-item" href="03-gloria.html">Gloria</a></li>
-            <li><a class="dropdown-item" href="04-salmos.html">Salmos</a></li>
-            <li><a class="dropdown-item" href="05-aleluya.html">Aleluya</a></li>
-            <li><a class="dropdown-item" href="06-ofertorio.html">Ofertorio</a></li>
-            <li><a class="dropdown-item" href="07-santo.html">Santo</a></li>
-            <li><a class="dropdown-item" href="08-padrenuestro.html">Padrenuestro</a></li>
-            <li><a class="dropdown-item" href="09-cordero.html">Cordero</a></li>
-            <li><a class="dropdown-item" href="10-comunion.html">Comunión</a></li>
-            <li><a class="dropdown-item" href="11-meditacion.html">Meditación</a></li>
-            <li><a class="dropdown-item" href="12-salida.html">Salida</a></li>
-            <li><a class="dropdown-item" href="13-marianos.html">Marianos</a></li>
-            <li><a class="dropdown-item" href="14-envio.html">Envío</a></li>
-            <li><a class="dropdown-item" href="15-espiritu-santo.html">Espíritu Santo</a></li>
-            <li><a class="dropdown-item" href="16-adoracion.html">Adoración</a></li>
-            <li><a class="dropdown-item" href="17-jm.html">JM</a></li>
-            <li><a class="dropdown-item" href="18-jf.html">JF</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="19-indice-alfabetico.html">Índice Alfabético</a></li>
-            <li><a class="dropdown-item" href="20-albumes.html">Albumes</a></li>
-            <li><a class="dropdown-item" href="crear-programa.html">Repertorio</a></li>
-            <li><a class="dropdown-item" href="manual-de-uso.html">Manual de uso</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="donaciones.html">Donaciones</a></li>
-            <li><a class="dropdown-item" href="sugerencias.html">Sugerencias</a></li>
-      </ul>
-        </li>
-        <li class="nav-item d-flex align-items-center" style="margin-left: 12px;">
-          <a class="btn-toggle-theme" href="#" id="toggle-theme" title="Cambiar Modo Noche / Día" style="display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.7); border-radius: 50px; padding: 3px 11px; color: #fff; text-decoration: none; font-size: 15px; line-height: 1.2;">🌙</a>
-        </li>
-      </ul>
-
-
-
-    </div>
+    
   </div>
 </nav>
-
-
-</div>

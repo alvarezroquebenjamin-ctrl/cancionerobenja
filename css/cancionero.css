@@ -865,9 +865,30 @@ body.modo-oscuro .portada h1 {
    Pegar al FINAL de css/cancionero.css (después de todo lo que hay).
    Para deshacerlo, borrá este bloque completo.
    ============================================================ */
-html, body {
+html {
   max-width: 100% !important;
   overflow-x: hidden !important;
+}
+
+body {
+  max-width: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  overflow-x: hidden !important;
+}
+
+/* El menú desplegable tiene scroll interno fluido y ocupa la altura disponible */
+.dropdown-menu {
+  max-height: calc(100vh - 70px) !important;
+  max-height: calc(100dvh - 70px) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin;
+  z-index: 2050 !important;
+}
+
+.navbar, .navbar .container-fluid, .navbar .dropdown {
+  overflow: visible !important;
 }
 
 /* Botón de la Lupa */
