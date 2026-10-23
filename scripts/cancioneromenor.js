@@ -154,38 +154,39 @@ console.log(keyValue);
     // ---- ESPACIADO INTELIGENTE SOLO EN LA FUNCIÓN DE TRANSPOSICIÓN ----
     var transposeChord = function (selector, delta, targetKey) {
         var el = $(selector);
+        var next = el[0] ? el[0].nextSibling : null;
+        var isAtEndOfLine = !next || (next.nodeType === 3 && /^[^\S\r\n]*[\r\n]/.test(next.nodeValue));
 
         // Guardar longitud original del acorde + espacios a la derecha
-        if (!el.data("orig-block-len")) {
-            // Calcula cuántos espacios siguen al acorde en la línea original
-            var next = el[0].nextSibling;
+        if (!el.data("orig-block-len") && !el.attr("data-orig-block-len")) {
             var spaces = 0;
-            if (next && next.nodeType === 3) { // nodo de texto
-                var m = next.nodeValue.match(/^(\s+)/);
+            if (next && next.nodeType === 3 && !isAtEndOfLine) {
+                var m = next.nodeValue.match(/^([^\S\r\n]+)/);
                 if (m) spaces = m[1].length;
             }
-            el.data("orig-block-len", el.text().length + spaces);
+            var calcLen = el.text().length + spaces;
+            el.data("orig-block-len", calcLen);
+            el.attr("data-orig-block-len", calcLen);
         }
 
-        var originalBlockLen = el.data("orig-block-len");
+        var originalBlockLen = parseInt(el.data("orig-block-len") || el.attr("data-orig-block-len"), 10);
         var oldChord = el.text();
         var oldChordRoot = getChordRoot(oldChord);
         var newChordRoot = getNewKey(oldChordRoot, delta, targetKey);
         var newChord = newChordRoot.name + oldChord.substr(oldChordRoot.length);
 
-        // Calcular cuántos espacios se necesitan a la derecha
+        el.text(newChord);
+
+        if (isAtEndOfLine) {
+            return;
+        }
+
         var spacesNeeded = originalBlockLen - newChord.length;
         if (spacesNeeded < 0) spacesNeeded = 0;
 
-        // Modificar el texto del acorde y los espacios a la derecha (en el nodo de texto siguiente)
-        el.text(newChord);
-
-        var next = el[0].nextSibling;
         if (next && next.nodeType === 3) {
-            // Reemplaza los espacios por los nuevos
-            next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^\s+/, "");
+            next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^[^\S\r\n]+/, "");
         } else if (spacesNeeded > 0) {
-            // Si no hay nodo de texto, agrégalo
             el.after(document.createTextNode(" ".repeat(spacesNeeded)));
         }
     };

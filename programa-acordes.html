@@ -102,6 +102,25 @@
       font-size: 9.5pt !important;
       line-height: 1.35 !important;
     }
+
+    .nota-inline-wrapper {
+      background-color: #fef3c7 !important;
+      border: 1px solid #f59e0b !important;
+      border-left: 4px solid #d97706 !important;
+      border-radius: 4pt !important;
+      padding: 4pt 8pt !important;
+      margin: 5pt 0 !important;
+      font-size: 9.5pt !important;
+      color: #78350f !important;
+      white-space: normal !important;
+      display: block !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .nota-inline-tag { font-weight: 800 !important; font-size: 8.5pt !important; text-transform: uppercase !important; color: #b45309 !important; }
+    .nota-inline-cuerpo { font-weight: 500 !important; display: inline !important; }
   }
   /* --- COLOR DE LOS TÍTULOS EN MODO OSCURO --- */
   body.modo-oscuro .cancion-en-lista h3 {
@@ -168,6 +187,11 @@
 
   const container = document.getElementById('programa-container');
 
+  function escaparHTML(str) {
+    if (!str) return "";
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
   async function cargarTodo() {
     for (let i = 0; i < programa.length; i++) {
       const item = programa[i];
@@ -181,29 +205,62 @@
         
         let notasGlobales = {};
         try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
-        const notaCancion = (item.nota !== undefined) ? item.nota : (notasGlobales[item.cancion] || "");
-        const notaHTML = notaCancion ? `<div class="nota-cancion-impresion text-center mb-2 fst-italic" style="color:#b45309; font-size:13.5px;">📝 <b>Nota:</b> ${notaCancion}</div>` : '';
+        const claveNormal = (item.cancion || "").replace(/^\/?cancionerobenja\//, "").replace(/^\/+/, "");
+        const notaRaw = (item.nota !== undefined && item.nota !== "") ? item.nota : (notasGlobales[claveNormal] || notasGlobales[item.cancion] || notasGlobales["/" + claveNormal] || "");
+        
+        let arrayNotas = [];
+        if (Array.isArray(notaRaw)) {
+          arrayNotas = notaRaw;
+        } else if (typeof notaRaw === "string" && notaRaw.trim()) {
+          arrayNotas = [{ lineIndex: -1, texto: notaRaw.trim() }];
+        }
 
         // Título de la canción, forzado al centro
-        const tituloHTML = `<h3 class="mt-4 mb-3 text-center" style="color:#0A2846; font-weight:bold;">${item.nombre}</h3>` + notaHTML;
+        const tituloHTML = `<h3 class="mt-4 mb-3 text-center" style="color:#0A2846; font-weight:bold;">${item.nombre}</h3>`;
         
         const letraPre = doc.querySelector('#letra') || doc.querySelector('.zona-letra') || doc.querySelector('pre');
         
         if (letraPre) {
           letraPre.id = `letra-lista-${i}`;
+          letraPre.setAttribute('data-song-path', item.cancion);
+          letraPre.setAttribute('data-index', i);
           if (!letraPre.getAttribute('data-key') && item.tono) {
             letraPre.setAttribute('data-key', item.tono);
           }
-          
+
           const divCancion = document.createElement('div');
           divCancion.className = 'cancion-en-lista mb-5 pb-5 border-bottom'; 
+          divCancion.setAttribute('data-song-path', item.cancion);
           
           // Envolvemos la letra en un div centrado
           divCancion.innerHTML = tituloHTML + `<div style="text-align: center; width: 100%;">${letraPre.outerHTML}</div>`;
-          
           container.appendChild(divCancion);
 
+          const $preEl = $(`#letra-lista-${i}`);
+          $preEl.data('song-path', item.cancion);
+          $preEl.attr('data-song-path', item.cancion);
+
+          // 1. Aplicar transposición y tono PRIMERO sobre la letra limpia
           aplicarTonoYCapo(item, i);
+
+          // 2. Insertar las notas DESPUÉS de aplicar el tono usando renderizarNotasCancion
+          if (typeof window.renderizarNotasCancion === 'function') {
+            window.renderizarNotasCancion(item.cancion, $preEl);
+          } else if (arrayNotas.length > 0) {
+            const rawLines = $preEl.html().split('\n');
+            const newLines = [];
+            for (let l = 0; l < rawLines.length; l++) {
+              const notasDeLinea = arrayNotas.filter(n => {
+                const idx = (n.lineIndex !== undefined && n.lineIndex !== null) ? n.lineIndex : -1;
+                return (idx === l) || (l === 0 && idx < 0);
+              });
+              notasDeLinea.forEach(n => {
+                newLines.push(`<span class="nota-inline-wrapper"><b class="nota-inline-tag">📌 NOTA:</b> <span class="nota-inline-cuerpo">${escaparHTML(n.texto)}</span></span>`);
+              });
+              newLines.push(rawLines[l]);
+            }
+            $preEl.html(newLines.join('\n'));
+          }
         }
       } catch (error) {
         console.error(`Error al cargar ${item.cancion}:`, error);
@@ -245,15 +302,15 @@
         }
         
         const botonCifrado = `
-            <button type="button" class="btn-toggle-cifrado" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Cambiar sistema de acordes entre Latino (DO) y Americano (C)">
+            <button type="button" class="btn-toggle-cifrado" style="height:28px; padding:3px 10px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px;" title="Cambiar sistema de acordes entre Latino (DO) y Americano (C)">
                 🔤 Cifrado: <b class="lbl-cifrado-modo">${(localStorage.getItem("cancionero_sistema_cifrado") === "americano" ? "C" : "DO")}</b>
             </button>
         `;
         
         const capoHTML = `
-            <div class="capo-selector-div" style="text-align:center; margin-top: 10px; margin-bottom: 25px; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:6px;">
-                <label style="font-size:15px; margin-right: 5px; font-weight:bold;">🎸 Capo: </label>
-                <select class="form-select form-select-sm d-inline-block capo-dropdown-repertorio" style="width: auto; cursor:pointer;" data-index="${index}">
+            <div class="capo-selector-div" style="margin-top: 4px; margin-bottom: 16px;">
+                <label style="font-size:12px; font-weight:700; margin-right:4px;">🎸 Capo: </label>
+                <select class="form-select form-select-sm d-inline-block capo-dropdown-repertorio" style="width: auto; height:28px; padding:2px 24px 2px 8px; font-size:11.5px; font-weight:600; border-radius:99px; border:1px solid #2A9D8F; background-color:rgba(42,157,143,0.08); color:inherit; cursor:pointer;" data-index="${index}">
                     ${opciones}
                 </select>
                 ${botonCifrado}

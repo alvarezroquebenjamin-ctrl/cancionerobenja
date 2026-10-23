@@ -918,15 +918,17 @@ body.modo-oscuro .portada h1 {
     border-color: #2A9D8F !important;
 }
 
-/* 2. Barra de Tonos centrada, redondeada y en verde pino */
+/* 2. Barra de Tonos centrada, redondeada, compacta y en verde pino */
 .transpose-keys {
     display: flex !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
-    gap: 5px !important;
-    margin: 8px auto 10px !important;
+    gap: 3px !important;
+    margin: 3px auto 6px !important;
     overflow: visible !important;
     font-family: 'Outfit', sans-serif !important;
+    max-width: 580px !important;
+    width: 100% !important;
 }
 
 .transpose-keys a {
@@ -934,17 +936,18 @@ body.modo-oscuro .portada h1 {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-width: 2.35rem !important;
+    min-width: 1.65rem !important;
     width: auto !important;
-    padding: 5px 8px !important;
+    padding: 2px 5px !important;
     margin: 0 !important;
-    border-radius: 8px !important;
-    font-size: 0.78rem !important;
+    border-radius: 5px !important;
+    font-size: 0.68rem !important;
     font-weight: 700 !important;
     background-color: rgba(42, 157, 143, 0.10) !important;
     color: #2C3E50 !important;
-    border: 1.5px solid rgba(42, 157, 143, 0.35) !important;
+    border: 1px solid rgba(42, 157, 143, 0.35) !important;
     text-decoration: none !important;
+    line-height: 1.2 !important;
     transition: all 0.15s ease !important;
 }
 
@@ -957,7 +960,7 @@ body.modo-oscuro .portada h1 {
     background-color: #2A9D8F !important;
     color: #ffffff !important;
     border-color: #2A9D8F !important;
-    box-shadow: 0 2px 6px rgba(42, 157, 143, 0.35) !important;
+    box-shadow: 0 2px 5px rgba(42, 157, 143, 0.35) !important;
     transform: translateY(-1px);
 }
 
@@ -965,14 +968,15 @@ body.modo-oscuro .portada h1 {
 .btn-acordes,
 #toggleChordsButton {
     border-radius: 50px !important;
-    padding: 6px 18px !important;
+    padding: 4px 14px !important;
     font-family: 'Outfit', sans-serif !important;
     font-weight: 700 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.78rem !important;
     background-color: rgba(42, 157, 143, 0.10) !important;
     color: #2C3E50 !important;
     border: 1.5px solid #2A9D8F !important;
     transition: all 0.2s ease !important;
+    margin-bottom: 4px !important;
 }
 
 .btn-acordes:hover,
@@ -995,6 +999,140 @@ body.modo-oscuro .btn-acordes.active,
 body.modo-oscuro #toggleChordsButton.active {
     background-color: #2A9D8F !important;
     color: #ffffff !important;
+}
+
+/* 4. Barra de funciones organizada (Capo, Cifrado, Nota, Imprimir, Compartir, Original) */
+.capo-selector-div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin: 3px auto 10px !important;
+    padding: 0 4px !important;
+    max-width: 580px !important;
+    width: 100% !important;
+    clear: both !important;
+}
+
+.capo-selector-div label {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: #2C3E50 !important;
+    margin: 0 !important;
+}
+
+.capo-selector-div select.capo-dropdown,
+.capo-selector-div select.capo-dropdown-repertorio {
+    width: auto !important;
+    height: 26px !important;
+    padding: 1px 20px 1px 6px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    border-radius: 99px !important;
+    border: 1px solid #2A9D8F !important;
+    background-color: rgba(42, 157, 143, 0.08) !important;
+    color: #2C3E50 !important;
+    cursor: pointer !important;
+    line-height: 1.2 !important;
+}
+
+.capo-selector-div button,
+.capo-selector-div .btn-toggle-cifrado,
+.capo-selector-div .btn-nota-cancion,
+.capo-selector-div .btn-imprimir-descargar-cancion,
+.capo-selector-div .btn-compartir-tono {
+    height: 26px !important;
+    padding: 2px 8px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    border-radius: 99px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+.capo-selector-div .btn-reset-tono {
+    height: 26px !important;
+    padding: 2px 8px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    border-radius: 99px !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-sizing: border-box !important;
+}
+
+.capo-selector-div .btn-reset-tono.activo {
+    display: inline-flex !important;
+}
+
+/* Forzar que el contenedor directo de la canción sea columna centrada tanto en PC como en móvil */
+.d-flex:has(> #letra),
+.d-flex:has(> pre[id^="letra-lista"]),
+.d-flex:has(> .zona-letra),
+.d-flex:has(> .transpose-keys) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
+.d-flex > .transpose-keys,
+.d-flex > .capo-selector-div {
+    width: 100% !important;
+    max-width: 580px !important;
+}
+
+/* Centrar la caja de la letra como bloque en pantalla (como en Arde) manteniendo el texto alineado a la izquierda */
+#letra,
+.zona-letra,
+pre[id^="letra-lista"] {
+    display: inline-block !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    align-self: center !important;
+    text-align: left !important;
+}
+
+/* Ocultar acordes mediante clase CSS activa */
+.acordes-ocultos .c,
+.acordes-ocultos span.c,
+body.acordes-ocultos .c,
+body.acordes-ocultos span.c {
+    display: none !important;
+}
+
+/* Modo oscuro para la barra organizada */
+body.modo-oscuro .capo-selector-div label {
+    color: #e2e8f0 !important;
+}
+
+body.modo-oscuro .capo-selector-div select.capo-dropdown,
+body.modo-oscuro .capo-selector-div select.capo-dropdown-repertorio {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #2A9D8F !important;
+}
+
+body.modo-oscuro .transpose-keys a {
+    background-color: rgba(42, 157, 143, 0.15) !important;
+    color: #ffffff !important;
+    border-color: rgba(42, 157, 143, 0.5) !important;
 }
 
 /* 4. Botón "Original" y texto del buscador legible en modo oscuro */
@@ -1084,7 +1222,7 @@ body.modo-oscuro .btn-letra-abc.activo {
    ============================================================================= */
 @media print {
     @page {
-        margin: 1.4cm 1.2cm;
+        margin: 1.5cm 1.2cm;
         size: auto;
     }
     
@@ -1094,6 +1232,7 @@ body.modo-oscuro .btn-letra-abc.activo {
         color: #000000 !important;
         font-size: 11pt !important;
         line-height: 1.4 !important;
+        padding: 0.2cm !important;
     }
 
     /* Ocultar elementos de navegación, menús flotantes, botones y controles */
@@ -1147,6 +1286,17 @@ body.modo-oscuro .btn-letra-abc.activo {
         text-align: center !important;
     }
 
+    /* Reset de contenedores de columnas para impresión de canciones individuales */
+    .col-12.col-md-8.col-lg-4,
+    .d-flex,
+    .contenedor-cancion-con-margen {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
     .cancion-en-lista > div,
     pre, pre#letra, pre[id^="letra-lista"], .lh-base {
         display: block !important;
@@ -1163,7 +1313,8 @@ body.modo-oscuro .btn-letra-abc.activo {
         border: none !important;
         background: transparent !important;
         padding: 0 !important;
-        margin: 0 !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
         max-height: none !important;
         height: auto !important;
         overflow: visible !important;
@@ -1204,4 +1355,147 @@ body.modo-oscuro .btn-letra-abc.activo {
     margin-bottom: 8px;
     text-align: center;
 }
+
+/* Layout adaptativo para notas de estrofas y video */
+@media (min-width: 992px) {
+  .video {
+    max-width: 250px !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .col-12.col-lg-4.mb-5 {
+    flex: 0 0 260px !important;
+    max-width: 260px !important;
+  }
+  .col-12.col-md-8.col-lg-4 {
+    flex: 1 1 auto !important;
+    max-width: calc(100% - 280px) !important;
+  }
+  .contenedor-cancion-con-margen {
+    display: flex !important;
+    gap: 16px !important;
+    align-items: flex-start !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+  #columna-margen-derecho {
+    flex: 0 0 230px !important;
+    width: 230px !important;
+    position: relative !important;
+  }
+}
+
+@media (max-width: 991px) {
+  #columna-margen-derecho {
+    display: none !important;
+  }
+}
+
+/* ============================================================
+   ESTILOS DE NOTAS ENTRE LA LETRA (MÓVIL Y ESCRITORIO)
+   ============================================================ */
+.nota-inline-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+  margin: 6px 0 !important;
+  padding: 4px 10px !important;
+  background-color: #fef3c7 !important;
+  border: 1px solid #f59e0b !important;
+  border-left: 4px solid #d97706 !important;
+  border-radius: 6px !important;
+  color: #78350f !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  user-select: none;
+}
+
+.nota-inline-contenido {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  flex: 1 1 auto !important;
+}
+
+.nota-inline-tag {
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  color: #b45309 !important;
+  letter-spacing: 0.4px !important;
+  white-space: nowrap !important;
+}
+
+.nota-inline-cuerpo {
+  display: inline !important;
+  font-weight: 500 !important;
+  word-break: break-word !important;
+}
+
+.nota-inline-btn-group {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  flex: 0 0 auto !important;
+}
+
+.nota-inline-btn-group button {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 12.5px !important;
+  padding: 0 4px !important;
+  opacity: 0.8 !important;
+}
+
+.nota-inline-btn-group button:hover {
+  opacity: 1 !important;
+}
+
+@media print {
+  .nota-inline-wrapper {
+    background-color: #fef3c7 !important;
+    border: 1px solid #f59e0b !important;
+    border-left: 3pt solid #d97706 !important;
+    border-radius: 4pt !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    font-size: 9.5pt !important;
+    padding: 3pt 6pt !important;
+    margin: 4pt 0 !important;
+    color: #78350f !important;
+    display: block !important;
+    white-space: normal !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .nota-inline-btn-group {
+    display: none !important;
+  }
+  .nota-inline-contenido {
+    display: inline !important;
+  }
+  .nota-inline-header {
+    display: inline !important;
+  }
+  .nota-inline-tag {
+    font-weight: 800 !important;
+    font-size: 8.5pt !important;
+    text-transform: uppercase !important;
+    color: #b45309 !important;
+  }
+  .nota-inline-cuerpo {
+    font-weight: 500 !important;
+    display: inline !important;
+  }
+}
+
+
 

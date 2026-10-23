@@ -970,16 +970,19 @@ window.canciones = {
       var el = $(this);
       var chord = el.text().trim();
       if (!chord) return;
-      if (!el.data("orig-block-len")) {
-        var next = el[0].nextSibling;
+      var next = el[0].nextSibling;
+      var isAtEnd = !next || (next.nodeType === 3 && /^[^\S\r\n]*[\r\n]/.test(next.nodeValue));
+      if (!el.data("orig-block-len") && !el.attr("data-orig-block-len")) {
         var spaces = 0;
-        if (next && next.nodeType === 3) {
-          var m = next.nodeValue.match(/^(\s+)/);
+        if (next && next.nodeType === 3 && !isAtEnd) {
+          var m = next.nodeValue.match(/^([^\S\r\n]+)/);
           if (m) spaces = m[1].length;
         }
-        el.data("orig-block-len", el.text().length + spaces);
+        var cLen = el.text().length + spaces;
+        el.data("orig-block-len", cLen);
+        el.attr("data-orig-block-len", cLen);
       }
-      var origLen = el.data("orig-block-len");
+      var origLen = parseInt(el.data("orig-block-len") || el.attr("data-orig-block-len"), 10);
       var nuevo = chord;
       if (sistema === "americano") {
         nuevo = window.convertirAcordeLatinoAAmericano(chord);
@@ -987,14 +990,15 @@ window.canciones = {
         nuevo = window.convertirAcordeAmericanoALatino(chord);
       }
       if (nuevo !== chord) {
-        var spacesNeeded = origLen - nuevo.length;
-        if (spacesNeeded < 0) spacesNeeded = 0;
         el.text(nuevo);
-        var next = el[0].nextSibling;
-        if (next && next.nodeType === 3) {
-          next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^\s+/, "");
-        } else if (spacesNeeded > 0) {
-          el.after(document.createTextNode(" ".repeat(spacesNeeded)));
+        if (!isAtEnd) {
+          var spacesNeeded = origLen - nuevo.length;
+          if (spacesNeeded < 0) spacesNeeded = 0;
+          if (next && next.nodeType === 3) {
+            next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^[^\S\r\n]+/, "");
+          } else if (spacesNeeded > 0) {
+            el.after(document.createTextNode(" ".repeat(spacesNeeded)));
+          }
         }
       }
     });
@@ -1022,7 +1026,50 @@ window.canciones = {
     window.aplicarSistemaCifrado(nuevo);
   };
 
-  var isChordLine = function(line) { return /(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b#]?/.test(line); };
+  const regexAcordeExacto = /^(\(?)(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?)*(\)?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\))?$/i;
+  const regexAuxAcorde = /^([---\/|()xX0-9:.]+|intro:?|final:?|inter:?|puente:?|bis:?|coro:?|estribillo:?)$/i;
+
+  var isChordLine = function(line) {
+    if (!line) return false;
+    if (line.indexOf("nota-inline-wrapper") !== -1 || line.indexOf("linea-tocar-nota") !== -1) return false;
+    if (/<span\s+class=['"]c['"]/i.test(line)) return true;
+    var sinTags = line.replace(/<[^>]*>/g, ' ').trim();
+    if (!sinTags) return false;
+    var tokens = sinTags.split(/\s+/);
+    var cantAcordes = 0;
+    for (var i = 0; i < tokens.length; i++) {
+      var tok = tokens[i];
+      if (regexAcordeExacto.test(tok)) {
+        cantAcordes++;
+      } else if (regexAuxAcorde.test(tok)) {
+        // símbolo auxiliar o número de repetición
+      } else if (tok.indexOf('-') !== -1) {
+        // Acordes unidos por guion como FA-SOL, DO#m-RE, LAm7-RE7
+        var subparts = tok.split('-');
+        var ok = true;
+        var subCant = 0;
+        for (var s = 0; s < subparts.length; s++) {
+          var sub = subparts[s].trim();
+          if (!sub) continue;
+          if (regexAcordeExacto.test(sub)) {
+            subCant++;
+          } else if (!regexAuxAcorde.test(sub)) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok && subCant > 0) {
+          cantAcordes += subCant;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
+    return cantAcordes > 0;
+  };
+  window.isChordLine = isChordLine;
   $.fn.transpose = function(options) {
     var opts = $.extend({}, $.fn.transpose.defaults, options);
     var currentKey = null;
@@ -1059,20 +1106,58 @@ window.canciones = {
       return keys[0];
     };
     var getDelta = function (oldIndex, newIndex) { if (oldIndex > newIndex) return 0 - (oldIndex - newIndex); else if (oldIndex < newIndex) return 0 + (newIndex - oldIndex); else return 0; };
-    var transposeSong = function (target, key) { var newKey = getKeyByName(key); if (!newKey || currentKey.name == newKey.name) return; var delta = getDelta(currentKey.value, newKey.value); $("span.c", target).each(function (i, el) { transposeChord(el, delta, newKey); }); currentKey = newKey; };
+    var transposeSong = function (target, key) { 
+        var newKey = getKeyByName(key); 
+        if (!newKey || currentKey.name == newKey.name) return; 
+        var delta = getDelta(currentKey.value, newKey.value); 
+
+        // 1. Restaurar HTML base limpio sin notas antes de transponer los acordes
+        var baseHtml = $(target).data("base-song-html");
+        if (baseHtml) {
+            $(target).html(baseHtml);
+        } else {
+            $(target).find(".nota-inline-wrapper").remove();
+        }
+
+        // 2. Transponer acordes
+        $("span.c", target).each(function (i, el) { transposeChord(el, delta, newKey); }); 
+        currentKey = newKey; 
+
+        // 3. Guardar la versión limpia transpuesta en base-song-html
+        $(target).data("base-song-html", $(target).html());
+
+        // 4. Re-renderizar notas para la nueva tonalidad pasando el target exacto
+        var songPath = $(target).attr("data-song-path") || $(target).data("song-path") || $(target).attr("data-clave") || window.location.pathname;
+        if (typeof window.renderizarNotasCancion === "function") {
+            window.renderizarNotasCancion(songPath, $(target));
+        }
+
+        // 5. Si los acordes estaban ocultos, mantenerlos ocultos
+        if (document.body.classList.contains("acordes-ocultos") || $(target).hasClass("acordes-ocultos")) {
+            $(target).addClass("acordes-ocultos");
+            $(target).find(".c, span.c").css("display", "none");
+        }
+    };
     
     var transposeChord = function (selector, delta, targetKey) { 
         var el = $(selector); 
-        if (!el.data("orig-block-len")) { 
-            var next = el[0].nextSibling; var spaces = 0; 
-            if (next && next.nodeType === 3) { 
-                var m = next.nodeValue.match(/^(\s+)/); 
+        var origLenAttr = el.attr("data-orig-block-len") || el.data("orig-block-len");
+        var next = el[0] ? el[0].nextSibling : null;
+        var isAtEndOfLine = !next || (next.nodeType === 3 && /^[^\S\r\n]*[\r\n]/.test(next.nodeValue));
+
+        if (!origLenAttr) { 
+            var spaces = 0; 
+            if (next && next.nodeType === 3 && !isAtEndOfLine) { 
+                var m = next.nodeValue.match(/^([^\S\r\n]+)/); 
                 if (m) spaces = m[1].length; 
             } 
-            el.data("orig-block-len", el.text().length + spaces); 
+            var calcLen = el.text().length + spaces;
+            el.attr("data-orig-block-len", calcLen); 
+            el.data("orig-block-len", calcLen);
+            origLenAttr = calcLen;
         } 
         
-        var originalBlockLen = el.data("orig-block-len"); 
+        var originalBlockLen = parseInt(origLenAttr, 10); 
         var oldChord = el.text(); 
         var oldChordLatino = (window.sistemaCifradoActual === "americano") ? window.convertirAcordeAmericanoALatino(oldChord) : oldChord;
         var newChord = "";
@@ -1102,12 +1187,18 @@ window.canciones = {
             newChord = window.convertirAcordeLatinoAAmericano(newChord);
         }
 
+        el.text(newChord); 
+
+        // Si está al final del renglón (seguido de \n), NUNCA tocar next.nodeValue para no fusionar acordes y letra
+        if (isAtEndOfLine) {
+            return;
+        }
+
         var spacesNeeded = originalBlockLen - newChord.length; 
         if (spacesNeeded < 0) spacesNeeded = 0; 
-        el.text(newChord); 
-        var next = el[0].nextSibling; 
+
         if (next && next.nodeType === 3) { 
-            next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^\s+/, ""); 
+            next.nodeValue = " ".repeat(spacesNeeded) + next.nodeValue.replace(/^[^\S\r\n]+/, ""); 
         } else if (spacesNeeded > 0) { 
             el.after(document.createTextNode(" ".repeat(spacesNeeded))); 
         } 
@@ -1128,6 +1219,24 @@ window.canciones = {
             else keyLinks.push("<a href='#'>" + label + "</a>"); 
         }); 
         var $this = $(this); 
+        var $parent = $this.parent();
+        if ($parent.hasClass("d-flex")) {
+            $parent.addClass("flex-column align-items-center justify-content-center w-100").css({
+                "flex-direction": "column",
+                "align-items": "center",
+                "justify-content": "center",
+                "width": "100%"
+            });
+        }
+        $this.css({
+            "display": "inline-block",
+            "width": "auto",
+            "max-width": "100%",
+            "margin-left": "auto",
+            "margin-right": "auto",
+            "align-self": "center",
+            "text-align": "left"
+        });
         var keysHtml = $("<div class='transpose-keys justify-content-md-center' style='margin-bottom:10px;'></div>"); 
         keysHtml.html(keyLinks.join("")); 
         $("a", keysHtml).click(function(e) { 
@@ -1143,25 +1252,332 @@ window.canciones = {
         var line; 
         for (var i = 0; i < lines.length; i++) { 
             line = lines[i]; 
-            if (isChordLine(line)) output.push("<span>" + wrapChords(line) + "</span>"); 
-            else output.push("<span>" + line + "</span>"); 
+            if (isChordLine(line)) output.push(wrapChords(line)); 
+            else output.push(line); 
         }; 
         $(this).html(output.join("\n")); 
+
+        $("span.c", this).each(function() {
+            var el = $(this);
+            var next = el[0] ? el[0].nextSibling : null;
+            var isAtEnd = !next || (next.nodeType === 3 && /^[^\S\r\n]*[\r\n]/.test(next.nodeValue));
+            var spaces = 0;
+            if (next && next.nodeType === 3 && !isAtEnd) {
+                var m = next.nodeValue.match(/^([^\S\r\n]+)/);
+                if (m) spaces = m[1].length;
+            }
+            var calcLen = el.text().length + spaces;
+            el.attr("data-orig-block-len", calcLen);
+            el.data("orig-block-len", calcLen);
+        });
+
+        // Guardar el HTML base prístino antes de renderizar notas
+        $(this).data("base-song-html", $(this).html());
     });
   };
   
   $.fn.transpose.defaults = { 
-    chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*$/, 
-    chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*)/g 
+    chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*$/, 
+    chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*)/g 
   };
   
   $(function() { 
       var targets = $("#letra, .zona-letra"); 
+      $("#letra, .zona-letra, pre[id^='letra-lista']").each(function() {
+          var $p = $(this).parent();
+          if ($p.hasClass("d-flex")) {
+              $p.addClass("flex-column align-items-center justify-content-center w-100").css({
+                  "flex-direction": "column",
+                  "align-items": "center",
+                  "justify-content": "center",
+                  "width": "100%"
+              });
+          }
+          $(this).css({
+              "display": "inline-block",
+              "width": "auto",
+              "max-width": "100%",
+              "margin-left": "auto",
+              "margin-right": "auto",
+              "align-self": "center",
+              "text-align": "left"
+          });
+      });
       if(targets.length > 0) { 
           targets.transpose(); 
 
           var esPaginaPrograma = /programa-(full|acordes|texto)/i.test(window.location.pathname);
-          var claveCancionActual = decodeURI(window.location.pathname).replace(/^\/?cancionerobenja\//, "");
+
+          function escaparHTML(str) {
+              if (!str) return "";
+              return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+          }
+
+          window.normalizarClaveCancion = function(ruta) {
+              if (!ruta) return "";
+              var s = ruta;
+              try { s = decodeURI(s); } catch(e){}
+              s = s.split("?")[0].split("#")[0];
+              return s.replace(/^https?:\/\/[^\/]+/, "")
+                      .replace(/^\/?cancionerobenja\//, "")
+                      .replace(/^\/+/, "")
+                      .trim();
+          };
+
+          window.obtenerArrayNotasCancion = function(clave) {
+              var c = window.normalizarClaveCancion(clave || window.location.pathname);
+              var todas = {};
+              try { todas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+              var raw = todas[c] || todas["/" + c] || todas["cancionerobenja/" + c] || null;
+              if (!raw && c) {
+                  try {
+                      var prog = JSON.parse(localStorage.getItem("programaMisa") || "[]");
+                      if (Array.isArray(prog)) {
+                          var item = prog.find(function(it) {
+                              return window.normalizarClaveCancion(it.cancion) === c;
+                          });
+                          if (item && item.nota) raw = item.nota;
+                      }
+                  } catch(e){}
+              }
+              if (!raw) return [];
+              if (Array.isArray(raw)) {
+                  return raw.map(function(n, idx) {
+                      if (!n.id) n.id = "nota_" + idx + "_" + (n.lineIndex !== undefined ? n.lineIndex : -1);
+                      return n;
+                  });
+              }
+              if (typeof raw === "string" && raw.trim() !== "") {
+                  return [{ id: "legacy_1", lineIndex: -1, nombreSeccion: "General", preview: "General", texto: raw.trim() }];
+              }
+              return [];
+          };
+
+          window.guardarArrayNotasCancion = function(clave, arrayNotas, $customPre) {
+              var c = window.normalizarClaveCancion(clave || window.location.pathname);
+              var todas = {};
+              try { todas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+              if (Array.isArray(arrayNotas) && arrayNotas.length > 0) {
+                  todas[c] = arrayNotas;
+              } else {
+                  delete todas[c];
+                  delete todas["/" + c];
+                  delete todas["cancionerobenja/" + c];
+              }
+              localStorage.setItem("cancionero_notas", JSON.stringify(todas));
+
+              // Sincronizar también con programaMisa si existe la canción en el repertorio
+              try {
+                  var prog = JSON.parse(localStorage.getItem("programaMisa") || "[]");
+                  if (Array.isArray(prog)) {
+                      var modificado = false;
+                      prog.forEach(function(it) {
+                          if (window.normalizarClaveCancion(it.cancion) === c) {
+                              it.nota = (Array.isArray(arrayNotas) && arrayNotas.length > 0) ? arrayNotas : "";
+                              modificado = true;
+                          }
+                      });
+                      if (modificado) {
+                          localStorage.setItem("programaMisa", JSON.stringify(prog));
+                      }
+                  }
+              } catch(e){}
+
+              if (typeof window.renderizarNotasCancion === "function") {
+                  if ($customPre && $customPre.length > 0) {
+                      window.renderizarNotasCancion(c, $customPre);
+                  } else {
+                      if ($("#letra").length > 0) {
+                          window.renderizarNotasCancion(c, $("#letra"));
+                      }
+                      $("pre[data-song-path]").each(function() {
+                          var p = $(this).attr("data-song-path") || $(this).data("song-path");
+                          if (window.normalizarClaveCancion(p) === c) {
+                              window.renderizarNotasCancion(c, $(this));
+                          }
+                      });
+                  }
+              }
+          };
+
+          window.extraerEstrofasCancion = function($pre) {
+              var secciones = [{ id: 0, nombre: "📌 Al inicio de la canción (General)", preview: "General", lineIndex: 0 }];
+              if (!$pre || $pre.length === 0) return secciones;
+
+              var baseHtml = $pre.data("base-song-html");
+              if (!baseHtml) {
+                  var $clone = $pre.clone();
+                  $clone.find(".nota-inline-wrapper").remove();
+                  baseHtml = $clone.html();
+                  $pre.data("base-song-html", baseHtml);
+              }
+
+              var allLines = baseHtml.split("\n");
+              var numEstrofa = 1;
+              var enBloque = false;
+              var stanzaStartLine = null;
+
+              for (var i = 0; i < allLines.length; i++) {
+                  var line = allLines[i];
+                  var sinTags = line.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+                  
+                  if (sinTags === "") {
+                      enBloque = false;
+                      stanzaStartLine = null;
+                      continue;
+                  }
+
+                  if (line.indexOf("<b>") !== -1 || line.indexOf("</b>") !== -1 || line.indexOf("<em>") !== -1 || line.indexOf("</em>") !== -1) {
+                      enBloque = false;
+                      stanzaStartLine = null;
+                  }
+
+                  if (window.isChordLine(line)) {
+                      if (!enBloque && stanzaStartLine === null) {
+                          stanzaStartLine = i;
+                      }
+                      continue;
+                  }
+
+                  if (!enBloque) {
+                      enBloque = true;
+                      if (stanzaStartLine === null) stanzaStartLine = i;
+                      var resumen = sinTags.length > 35 ? (sinTags.substring(0, 35) + "...") : sinTags;
+                      secciones.push({
+                          id: numEstrofa,
+                          nombre: `Estrofa ${numEstrofa}: "${resumen}"`,
+                          preview: resumen,
+                          lineIndex: stanzaStartLine
+                      });
+                      numEstrofa++;
+                      stanzaStartLine = null;
+                  }
+              }
+              return secciones;
+          };
+
+          window.extraerUbicacionesCancion = function($pre) {
+              var ubicaciones = [{ id: "general", lineIndex: -1, nombre: "Al inicio de la canción", preview: "Al inicio", tipo: "general" }];
+              if (!$pre || $pre.length === 0) return ubicaciones;
+
+              var baseHtml = $pre.data("base-song-html");
+              if (!baseHtml) {
+                  var $clone = $pre.clone();
+                  $clone.find(".nota-inline-wrapper").remove();
+                  baseHtml = $clone.html();
+                  $pre.data("base-song-html", baseHtml);
+              }
+
+              var lines = baseHtml.split("\n");
+              for (var i = 0; i < lines.length; i++) {
+                  var rawLine = lines[i];
+                  var sinTags = rawLine.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+                  if (!sinTags) continue;
+
+                  var esAcorde = window.isChordLine(rawLine);
+                  var resumen = sinTags.length > 40 ? (sinTags.substring(0, 40) + "...") : sinTags;
+                  var nombreLimpio = esAcorde ? `Acordes: "${resumen}"` : `"${resumen}"`;
+                  ubicaciones.push({
+                      id: "line_" + i,
+                      lineIndex: i,
+                      nombre: nombreLimpio,
+                      preview: resumen,
+                      tipo: esAcorde ? "acorde" : "letra",
+                      lineText: sinTags
+                  });
+              }
+              return ubicaciones;
+          };
+
+          window.renderizarNotasCancion = function(clave, $customPre) {
+              var c = window.normalizarClaveCancion(clave || window.location.pathname);
+              var arrayNotas = window.obtenerArrayNotasCancion(c);
+              var cant = arrayNotas.length;
+
+              // Actualizar botón en la barra superior (si existe)
+              var $btnNota = $(".btn-nota-cancion");
+              if ($btnNota.length > 0) {
+                  if (cant > 0) {
+                      $btnNota.css({ background: "#d97706", color: "#ffffff" });
+                      $btnNota.find(".lbl-nota-cancion").text(cant === 1 ? "1 Nota" : cant + " Notas");
+                  } else {
+                      $btnNota.css({ background: "rgba(217,119,6,0.12)", color: "#d97706" });
+                      $btnNota.find(".lbl-nota-cancion").text("+ Nota");
+                  }
+              }
+
+              var $pre = ($customPre && $customPre.length > 0) ? $customPre : $("#letra");
+              if ($pre.length === 0) {
+                  if (c) {
+                      $pre = $("pre[data-song-path*='" + c + "'], pre[data-clave*='" + c + "']");
+                  }
+                  if ($pre.length === 0) return;
+              }
+
+              $("#columna-margen-derecho").remove();
+              $("#panel-notas-escritorio").remove();
+              $("#panel-notas-movil").remove();
+
+              $pre.each(function() {
+                  var $thisPre = $(this);
+                  var baseHtml = $thisPre.data("base-song-html");
+                  if (!baseHtml) {
+                      var $clone = $thisPre.clone();
+                      $clone.find(".nota-inline-wrapper").remove();
+                      baseHtml = $clone.html();
+                      $thisPre.data("base-song-html", baseHtml);
+                  }
+
+                  if (cant === 0) {
+                      $thisPre.html(baseHtml);
+                      if (document.body.classList.contains("acordes-ocultos") || $thisPre.hasClass("acordes-ocultos")) {
+                          $thisPre.addClass("acordes-ocultos");
+                          $thisPre.find(".c, span.c").css("display", "none");
+                      }
+                      return;
+                  }
+
+                  var lines = baseHtml.split("\n");
+                  var outputLines = [];
+
+                  for (var i = 0; i < lines.length; i++) {
+                      var notasDeLinea = arrayNotas.filter(function(n) {
+                          var lIdx = (n.lineIndex !== undefined && n.lineIndex !== null) ? n.lineIndex : -1;
+                          return (lIdx === i) || (i === 0 && lIdx < 0);
+                      });
+
+                      notasDeLinea.forEach(function(nota, nIdx) {
+                          var notaId = nota.id || ("nota_" + i + "_" + nIdx);
+                          var cardHTML = `<span class="nota-inline-wrapper" data-nota-id="${notaId}"><span class="nota-inline-contenido"><b class="nota-inline-tag">📌 NOTA:</b> <span class="nota-inline-cuerpo">${escaparHTML(nota.texto)}</span></span><span class="nota-inline-btn-group"><button type="button" class="btn-editar-nota-item" data-nota-id="${notaId}" title="Editar">✏️</button><button type="button" class="btn-borrar-nota-item" data-nota-id="${notaId}" title="Eliminar">🗑️</button></span></span>`;
+                          outputLines.push(cardHTML);
+                      });
+
+                      outputLines.push(lines[i]);
+                  }
+
+                  $thisPre.html(outputLines.join("\n"));
+
+                  if (document.body.classList.contains("acordes-ocultos") || $thisPre.hasClass("acordes-ocultos")) {
+                      $thisPre.addClass("acordes-ocultos");
+                      $thisPre.find(".c, span.c").css("display", "none");
+                  }
+              });
+          };
+
+          window.obtenerNotaDeStorage = function(clave) {
+              var c = window.normalizarClaveCancion(clave);
+              if (!c) return "";
+              var todas = {};
+              try { todas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+              var val = todas[c] || todas["/" + c] || todas["cancionerobenja/" + c] || "";
+              if (typeof val === "string") return val.trim();
+              if (Array.isArray(val) && val.length > 0) {
+                  return val.map(function(n){ return n.texto; }).filter(Boolean).join(" • ");
+              }
+              return "";
+          };
+
+          var claveCancionActual = window.normalizarClaveCancion(window.location.pathname);
           var prefsGuardadas = {};
           try {
               prefsGuardadas = JSON.parse(localStorage.getItem("cancionero_tonos_usuario") || "{}");
@@ -1185,8 +1601,9 @@ window.canciones = {
           // --- CREAR SELECTOR DE CAPO Y MEMORIA DE TONO/CAPO DEBAJO DE LOS TONOS ---
           targets.each(function() {
               var $letra = $(this);
-              var origKey = ($letra.attr("data-key") || "").replace(/m$/i, "").trim();
-              var defaultCapo = $letra.attr("data-capo") || "0";
+              var origKeyRaw = ($letra.attr("data-key") || "").replace(/m$/i, "").trim();
+              var origKey = (window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(origKeyRaw) : origKeyRaw).toUpperCase();
+              var defaultCapo = ($letra.attr("data-capo") || "0").toString().trim();
               var keysDiv = $letra.prev('.transpose-keys');
               
               if (keysDiv.length > 0) {
@@ -1198,39 +1615,44 @@ window.canciones = {
                   }
 
                   var botonCompartirHTML = esPaginaPrograma ? "" : `
-                          <button type="button" class="btn-compartir-tono" style="margin-left:8px; padding:4px 11px; border-radius:99px; border:1px solid #2A9D8F; background:#2A9D8F; color:#ffffff; font-size:12px; font-weight:700; cursor:pointer;" title="Compartir link de esta canción con el tono y capo seleccionados">
+                          <button type="button" class="btn-compartir-tono" style="border:1px solid #2A9D8F; background:#2A9D8F; color:#ffffff;" title="Compartir link de esta canción con el tono y capo seleccionados">
                               📲 Compartir
                           </button>
                   `;
 
                   var botonCifradoHTML = `
-                          <button type="button" class="btn-toggle-cifrado" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Cambiar sistema de acordes entre Latino (DO) y Americano (C)">
+                          <button type="button" class="btn-toggle-cifrado" style="border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F;" title="Cambiar sistema de acordes entre Latino (DO) y Americano (C)">
                               🔤 Cifrado: <b class="lbl-cifrado-modo">${(window.sistemaCifradoActual === "americano" ? "C" : "DO")}</b>
                           </button>
                   `;
 
-                  var todasLasNotas = {};
-                  try {
-                      todasLasNotas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}");
-                  } catch(e) { todasLasNotas = {}; }
-                  var notaActual = (claveCancionActual && todasLasNotas[claveCancionActual]) ? todasLasNotas[claveCancionActual] : "";
+                  var arrayNotas = window.obtenerArrayNotasCancion ? window.obtenerArrayNotasCancion(claveCancionActual) : [];
+                  var cantNotas = arrayNotas.length;
+                  var textoBtnNota = cantNotas > 0 ? (cantNotas === 1 ? '1 Nota' : cantNotas + ' Notas') : '+ Nota';
 
                   var botonNotaHTML = esPaginaPrograma ? "" : `
-                      <button type="button" class="btn-nota-cancion" style="margin-left:6px; padding:4px 11px; border-radius:99px; border:1px solid #d97706; background:${notaActual ? '#d97706' : 'rgba(217,119,6,0.12)'}; color:${notaActual ? '#ffffff' : '#d97706'}; font-size:12px; font-weight:700; cursor:pointer;" title="Agregar o editar un recordatorio personal para esta canción">
-                          📝 <span class="lbl-nota-cancion">${notaActual ? 'Nota activa' : 'Nota'}</span>
-                      </button>
+                          <button type="button" class="btn-nota-cancion" style="border:1px solid #d97706; background:${cantNotas > 0 ? '#d97706' : 'rgba(217,119,6,0.12)'}; color:${cantNotas > 0 ? '#ffffff' : '#d97706'};" title="Agregar o ver recordatorios de esta canción">
+                              📝 <span class="lbl-nota-cancion">${textoBtnNota}</span>
+                          </button>
+                  `;
+
+                  var botonImprimirDescargarHTML = esPaginaPrograma ? "" : `
+                          <button type="button" class="btn-imprimir-descargar-cancion" style="border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F;" title="Imprimir o descargar esta canción en PDF o Word">
+                              🖨️ Imprimir / Descargar
+                          </button>
                   `;
 
                   var capoHTML = `
-                      <div class="capo-selector-div" style="flex-wrap:wrap; gap:6px;">
+                      <div class="capo-selector-div">
                           <label>🎸 Capo: </label>
-                          <select class="form-select d-inline-block capo-dropdown">
+                          <select class="form-select capo-dropdown">
                               ${opciones}
                           </select>
-                          ${botonCompartirHTML}
                           ${botonCifradoHTML}
                           ${botonNotaHTML}
-                          <button type="button" class="btn-reset-tono" style="display:none; margin-left:6px; padding:4px 10px; border-radius:99px; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F; font-size:12px; font-weight:700; cursor:pointer;" title="Volver al tono y capo original de fábrica">
+                          ${botonImprimirDescargarHTML}
+                          ${botonCompartirHTML}
+                          <button type="button" class="btn-reset-tono" style="display:none; border:1px solid #2A9D8F; background:rgba(42,157,143,0.12); color:#2A9D8F;" title="Volver al tono y capo original de fábrica">
                               ↺ Original
                           </button>
                       </div>
@@ -1244,22 +1666,16 @@ window.canciones = {
                   }
 
                   if (!esPaginaPrograma && claveCancionActual) {
-                      var cajaNotaHTML = `
-                          <div class="caja-nota-cancion" style="max-width:650px; width:100%; margin:0 auto 15px auto; padding:8px 14px; border-radius:10px; background:rgba(217,119,6,0.1); border:1px solid #d97706; color:#92400e; font-size:14px; display:${notaActual ? 'flex' : 'none'}; justify-content:space-between; align-items:center; gap:10px; box-sizing:border-box;">
-                              <div class="texto-caja-nota" style="text-align:left; flex-grow:1;"><b style="color:#b45309;">📝 Recordatorio:</b> <span class="contenido-nota">${notaActual}</span></div>
-                              <button type="button" class="btn-editar-nota-banner" style="background:transparent; border:none; color:#d97706; font-weight:700; font-size:13px; cursor:pointer; text-decoration:underline;">Editar</button>
-                          </div>
-                      `;
-                      $capoDiv.after(cajaNotaHTML);
-
                       $capoDiv.on('click', '.btn-nota-cancion', function() {
-                          if (typeof window.abrirModalNotaCancion === 'function') {
+                          if (typeof window.iniciarModoSeleccionUbicacionNota === 'function') {
+                              window.iniciarModoSeleccionUbicacionNota(claveCancionActual);
+                          } else if (typeof window.abrirModalNotaCancion === 'function') {
                               window.abrirModalNotaCancion(claveCancionActual);
                           }
                       });
-                      $capoDiv.next('.caja-nota-cancion').on('click', '.btn-editar-nota-banner', function() {
-                          if (typeof window.abrirModalNotaCancion === 'function') {
-                              window.abrirModalNotaCancion(claveCancionActual);
+                      $capoDiv.on('click', '.btn-imprimir-descargar-cancion', function() {
+                          if (typeof window.abrirModalImprimirCancion === 'function') {
+                              window.abrirModalImprimirCancion();
                           }
                       });
                   }
@@ -1272,9 +1688,15 @@ window.canciones = {
                       if (esPaginaPrograma) return;
                       var tonoElegido = keysDiv.find('a.selected').text().trim();
                       var tonoElegidoLatino = (window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(tonoElegido) : tonoElegido).toUpperCase();
-                      var capoElegido = $selectCapo.val();
-                      var cambio = (origKey && tonoElegidoLatino !== origKey.toUpperCase()) || (String(capoElegido) !== String(defaultCapo));
-                      $btnReset.css("display", cambio ? "inline-block" : "none");
+                      var origKeyLatino = (origKey && window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(origKey) : (origKey || '')).toUpperCase();
+                      var capoElegido = ($selectCapo.val() || "0").toString().trim();
+                      var defaultCapoStr = (defaultCapo !== undefined && defaultCapo !== null ? defaultCapo : "0").toString().trim();
+                      var cambio = (origKeyLatino && tonoElegidoLatino && tonoElegidoLatino !== origKeyLatino) || (capoElegido !== defaultCapoStr);
+                      if (cambio) {
+                          $btnReset.addClass("activo").show();
+                      } else {
+                          $btnReset.removeClass("activo").hide();
+                      }
                   }
 
                   // 1) Si el link viene compartido con ?tono=... o ?capo=..., aplicamos eso primero
@@ -1321,12 +1743,15 @@ window.canciones = {
                       actualizarBotonReset();
                   }
 
+                  // Aseguramos evaluar el estado inicial del botón Reset
+                  actualizarBotonReset();
+
                   // Guardar automáticamente cuando el usuario toca un tono
                   keysDiv.find('a').on('click', function() {
                       var nuevoTono = $(this).text().trim();
                       var capoActual = $selectCapo.val();
                       guardarPrefCancion(nuevoTono, capoActual, origKey, defaultCapo);
-                      actualizarBotonReset();
+                      setTimeout(actualizarBotonReset, 15);
                   });
 
                   // Guardar automáticamente cuando el usuario cambia el capo
@@ -1350,7 +1775,7 @@ window.canciones = {
                       }
                       $selectCapo.val(String(defaultCapo));
                       guardarPrefCancion(origKey, defaultCapo, origKey, defaultCapo);
-                      actualizarBotonReset();
+                      setTimeout(actualizarBotonReset, 30);
                   });
 
                   // Botón para compartir la canción con el Tono y Capo elegidos
@@ -1397,6 +1822,19 @@ window.canciones = {
           // Si el usuario tenía guardado el modo americano, lo aplicamos a las canciones cargadas
           if (window.sistemaCifradoActual === "americano") {
               window.aplicarSistemaCifrado("americano", targets);
+          }
+
+          // Guardar copia limpia de base-song-html antes de renderizar notas
+          var $preTarget = $("#letra");
+          if ($preTarget.length > 0) {
+              var $cloneInit = $preTarget.clone();
+              $cloneInit.find(".nota-inline-wrapper").remove();
+              $preTarget.data("base-song-html", $cloneInit.html());
+          }
+
+          // Renderizar notas de la canción
+          if (typeof window.renderizarNotasCancion === "function") {
+              window.renderizarNotasCancion(claveCancionActual);
           }
       } 
 
@@ -1507,28 +1945,54 @@ document.addEventListener("DOMContentLoaded", function() {
             overflow: visible !important;
         }
 
-        body.modo-oscuro .caja-nota-cancion {
-            background: rgba(217, 119, 6, 0.18) !important;
-            border-color: #d97706 !important;
-            color: #fef3c7 !important;
+        /* --- FUENTE MONOESPACIADA ESTRICTA PARA EVITAR DESFASES DE ACORDES --- */
+        #letra, #letra *, span.c, .c {
+            font-family: 'Consolas', 'Courier New', Courier, monospace !important;
         }
-        body.modo-oscuro .caja-nota-cancion b {
-            color: #f59e0b !important;
-        }
+
+        /* --- ESTILOS DE LOS MODALES DE IMPRIMIR Y NOTAS --- */
+        body.modo-oscuro #modal-imprimir-cancion > div,
         body.modo-oscuro #modal-nota-cancion > div {
             background: #18181b !important;
-            border-color: #d97706 !important;
+            border-color: #3f3f46 !important;
             color: #ffffff !important;
         }
-        body.modo-oscuro #texto-nota-cancion-input {
+        body.modo-oscuro #modal-imprimir-cancion p,
+        body.modo-oscuro #modal-nota-cancion p,
+        body.modo-oscuro #modal-nota-cancion label {
+            color: #a1a1aa !important;
+        }
+        body.modo-oscuro #texto-nota-cancion-input,
+        body.modo-oscuro #seccion-nota-cancion-select {
             background: #09090b !important;
             color: #ffffff !important;
             border-color: #3f3f46 !important;
         }
-        body.modo-oscuro #btn-cancelar-modal-nota {
+        body.modo-oscuro #modal-imprimir-cancion .btn-close-imprimir-modal,
+        body.modo-oscuro #modal-nota-cancion .btn-cancel-modal-nota {
             background: #27272a !important;
             color: #ffffff !important;
             border-color: #3f3f46 !important;
+        }
+
+        /* Estilos de las tarjetas de notas en modo oscuro */
+        body.modo-oscuro .nota-card-item {
+            background: rgba(217, 119, 6, 0.18) !important;
+            border-color: #d97706 !important;
+            color: #fef3c7 !important;
+        }
+        body.modo-oscuro #panel-notas-movil {
+            background: rgba(217, 119, 6, 0.12) !important;
+            border-color: #d97706 !important;
+        }
+
+        @media print {
+            .btn-imprimir-descargar-cancion,
+            .btn-nota-cancion,
+            #panel-notas-escritorio,
+            #panel-notas-movil {
+                display: none !important;
+            }
         }
     `;
     document.head.appendChild(style);
@@ -1543,87 +2007,554 @@ document.addEventListener("DOMContentLoaded", function() {
     `;
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-    const modalNotaHTML = `
-        <div id="modal-nota-cancion" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2147483647; justify-content:center; align-items:center; padding:15px;">
-            <div style="background:#fff; border-radius:16px; padding:20px; max-width:440px; width:100%; border:2px solid #d97706; box-shadow:0 8px 30px rgba(0,0,0,0.3); font-family:sans-serif;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <h5 style="margin:0; color:#d97706; font-weight:800; font-size:16px;">📝 Recordatorio de la canción</h5>
-                    <button type="button" id="btn-close-nota-x" style="background:transparent; border:none; font-size:20px; cursor:pointer; color:#888;">✕</button>
+    const modalImprimirCancionHTML = `
+        <div id="modal-imprimir-cancion" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2147483647; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+            <div style="background:#fff; border-radius:16px; padding:22px; max-width:440px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,0.3); font-family:sans-serif; box-sizing:border-box; border:1px solid #ccc;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h5 style="margin:0; color:#2A9D8F; font-weight:800; font-size:17px;">🖨️ Imprimir / Descargar Canción</h5>
+                    <button type="button" class="btn-close-imprimir-modal" style="background:transparent; border:none; font-size:20px; cursor:pointer; color:#888;">✕</button>
                 </div>
-                <p style="font-size:13px; color:#666; margin-bottom:10px;">Escribí cualquier indicación que quieras recordar (ej: <i>Repetir coro al final, empezar suave arpegiado, entrar en 2ª estrofa...</i>):</p>
-                <textarea id="texto-nota-cancion-input" rows="3" style="width:100%; border-radius:10px; border:1px solid #ccc; padding:10px; font-size:14px; box-sizing:border-box; outline:none; font-family:sans-serif;" placeholder="Escribí tu nota aquí..."></textarea>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
-                    <button type="button" id="btn-borrar-nota-cancion" style="background:transparent; border:none; color:#dc2626; font-size:13px; font-weight:700; cursor:pointer;">🗑️ Borrar nota</button>
-                    <div style="display:flex; gap:8px;">
-                        <button type="button" id="btn-cancelar-modal-nota" style="background:#f3f4f6; border:1px solid #ccc; padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">Cancelar</button>
-                        <button type="button" id="btn-guardar-modal-nota" style="background:#d97706; color:#fff; border:none; padding:6px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">Guardar</button>
+                <p style="font-size:13px; color:#555; margin-bottom:14px;">Elegí qué versión y formato preferís para esta canción:</p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button type="button" id="btn-modal-pdf-acordes" style="background:#2A9D8F; color:#fff; border:none; padding:11px 14px; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:22px;">🎸</span>
+                        <div>
+                            <div>PDF / Con acordes</div>
+                            <small style="font-size:11px; font-weight:400; opacity:0.9;">Tono y capo actual seleccionados</small>
+                        </div>
+                    </button>
+                    <button type="button" id="btn-modal-pdf-texto" style="background:#0A2846; color:#fff; border:none; padding:11px 14px; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:22px;">📄</span>
+                        <div>
+                            <div>PDF / Sólo texto</div>
+                            <small style="font-size:11px; font-weight:400; opacity:0.9;">Letra limpia sin acordes lista para imprimir</small>
+                        </div>
+                    </button>
+                    <button type="button" id="btn-modal-word-acordes" style="background:#2b579a; color:#fff; border:none; padding:11px 14px; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:22px;">📝</span>
+                        <div>
+                            <div>Word (.doc) con acordes</div>
+                            <small style="font-size:11px; font-weight:400; opacity:0.9;">Archivo editable con acordes en rojo</small>
+                        </div>
+                    </button>
+                    <button type="button" id="btn-modal-word-texto" style="background:#1e3a8a; color:#fff; border:none; padding:11px 14px; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:22px;">📄</span>
+                        <div>
+                            <div>Word (.doc) sólo texto</div>
+                            <small style="font-size:11px; font-weight:400; opacity:0.9;">Archivo Word con letra pura para editar</small>
+                        </div>
+                    </button>
+                </div>
+                <button type="button" class="btn-close-imprimir-modal" style="margin-top:14px; width:100%; background:#f3f4f6; border:1px solid #ccc; padding:8px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; color:#555;">Cancelar</button>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalImprimirCancionHTML);
+
+    const modalNotaCancionHTML = `
+        <div id="modal-nota-cancion" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2147483647; justify-content:center; align-items:center; padding:15px; box-sizing:border-box;">
+            <div style="background:#fff; border-radius:16px; padding:20px; max-width:480px; width:100%; border:2px solid #d97706; box-shadow:0 8px 30px rgba(0,0,0,0.3); font-family:sans-serif; box-sizing:border-box; max-height:92vh; overflow-y:auto;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <h5 id="titulo-modal-nota" style="margin:0; color:#d97706; font-weight:800; font-size:16px;">📌 Nota de la canción</h5>
+                    <button type="button" class="btn-close-nota-modal" style="background:transparent; border:none; font-size:20px; cursor:pointer; color:#888;">✕</button>
+                </div>
+                <div id="box-ubicacion-nota" style="margin-bottom:12px; background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:8px 12px; font-size:12.5px; color:#92400e; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        <b>Ubicación:</b> <span id="lbl-ubicacion-seleccionada">Al inicio</span>
+                    </div>
+                    <button type="button" id="btn-tocar-ubicacion-nota" style="background:#d97706; border:none; color:#fff; border-radius:6px; padding:4px 10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap;">🎯 Cambiar</button>
+                </div>
+                <select id="seccion-nota-cancion-select" style="display:none;"></select>
+                <div style="margin-bottom:14px;">
+                    <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:4px;">Texto de la nota:</label>
+                    <textarea id="texto-nota-cancion-input" rows="3" style="width:100%; border-radius:10px; border:1px solid #ccc; padding:10px; font-size:13.5px; box-sizing:border-box; outline:none; font-family:sans-serif;" placeholder="Escribí aquí lo que querés recordar..."></textarea>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <button type="button" id="btn-borrar-nota-cancion" style="display:none; background:transparent; border:none; color:#dc2626; font-size:13px; font-weight:700; cursor:pointer;">🗑️ Eliminar</button>
+                    <div style="display:flex; gap:8px; margin-left:auto;">
+                        <button type="button" class="btn-close-nota-modal btn-cancel-modal-nota" style="background:#f3f4f6; border:1px solid #ccc; padding:7px 14px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">Cancelar</button>
+                        <button type="button" id="btn-guardar-modal-nota" style="background:#d97706; color:#fff; border:none; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;">Guardar</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    document.body.insertAdjacentHTML('beforeend', modalNotaHTML);
+    document.body.insertAdjacentHTML('beforeend', modalNotaCancionHTML);
 
-    let cancionActivaParaNota = "";
-    window.abrirModalNotaCancion = function(clave) {
-        cancionActivaParaNota = clave || (decodeURI(window.location.pathname).replace(/^\/?cancionerobenja\//, ""));
-        let notas = {};
-        try { notas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
-        const actual = (cancionActivaParaNota && notas[cancionActivaParaNota]) ? notas[cancionActivaParaNota] : "";
-        const input = document.getElementById("texto-nota-cancion-input");
-        if (input) input.value = actual;
-        const modal = document.getElementById("modal-nota-cancion");
+    var estadoModalNota = { clave: "", editId: null, ubicaciones: [] };
+
+    window.iniciarModoSeleccionUbicacionNota = function(clave) {
+        var c = window.normalizarClaveCancion(clave || window.location.pathname);
+        estadoModalNota.clave = c;
+        $("#modal-nota-cancion").hide();
+        $("#banner-seleccionar-linea").remove();
+
+        var $pre = $("#letra");
+        if ($pre.length === 0 && c) {
+            $pre = $("pre[data-song-path*='" + c + "'], pre[data-clave*='" + c + "']").first();
+        }
+        if ($pre.length === 0) {
+            window.abrirModalNotaCancion(c, null, "general");
+            return;
+        }
+
+        // Obtener HTML base limpio sin tarjetas de notas
+        var htmlLimpio = $pre.data("base-song-html");
+        if (!htmlLimpio) {
+            var $clone = $pre.clone();
+            $clone.find(".nota-inline-wrapper").remove();
+            htmlLimpio = $clone.html();
+            $pre.data("base-song-html", htmlLimpio);
+        }
+
+        // Envolver cada línea en un contenedor tocable que resalta visualmente al pasar el dedo o el mouse
+        var rawLines = htmlLimpio.split("\n");
+        var wrappedLines = [];
+        for (var i = 0; i < rawLines.length; i++) {
+            var lineaTexto = rawLines[i];
+            var contenidoVisual = lineaTexto ? lineaTexto : "&nbsp;";
+            wrappedLines.push(`<span class="linea-tocar-nota" data-line-idx="${i}" style="display:block; border-radius:4px; padding:2px 4px; margin:1px 0; cursor:pointer; transition:background 0.15s ease;">${contenidoVisual}</span>`);
+        }
+        $pre.html(wrappedLines.join("\n"));
+
+        var bannerHTML = `
+            <div id="banner-seleccionar-linea" style="position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:2147483647; background:#0A2846; color:#ffffff; padding:4px 10px; border-radius:99px; box-shadow:0 6px 20px rgba(0,0,0,0.35); font-size:12px; font-weight:700; display:flex; gap:6px; align-items:center; justify-content:center; border:1.5px solid #2A9D8F; max-width:96vw; white-space:nowrap; box-sizing:border-box; animation: bannerAnimDown 0.2s ease-out;">
+                <span style="font-size:11.5px; font-weight:700; color:#fff; white-space:nowrap;">👉 Tocá la frase o acorde</span>
+                <button type="button" id="btn-nota-al-inicio" style="background:#2A9D8F; border:none; color:#fff; border-radius:99px; padding:3px 9px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">📌 Al inicio</button>
+                <button type="button" id="btn-cancelar-seleccion-linea" style="background:rgba(255,255,255,0.22); border:none; color:#fff; border-radius:99px; padding:3px 8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;" title="Cancelar">✕</button>
+            </div>
+        `;
+        $("body").append(bannerHTML);
+
+        if ($("#estilo-tocar-linea").length === 0) {
+            $("head").append(`
+                <style id="estilo-tocar-linea">
+                    @keyframes bannerAnimDown {
+                        from { transform: translate(-50%, -20px); opacity: 0; }
+                        to { transform: translate(-50%, 0); opacity: 1; }
+                    }
+                    .linea-tocar-nota:hover, .linea-tocar-nota:active {
+                        background-color: rgba(42, 157, 143, 0.22) !important;
+                        outline: 1.5px dashed #2A9D8F !important;
+                    }
+                </style>
+            `);
+        }
+
+        function limpiarModo() {
+            $("#banner-seleccionar-linea").remove();
+            $pre.off(".elegirLinea");
+            $("#estilo-tocar-linea").remove();
+            if (typeof window.renderizarNotasCancion === "function") {
+                window.renderizarNotasCancion(c, $pre);
+            }
+        }
+
+        $(document).off("click.cancelarSel").on("click.cancelarSel", "#btn-cancelar-seleccion-linea", function(e) {
+            e.stopPropagation();
+            limpiarModo();
+        });
+
+        $(document).off("click.notaInicio").on("click.notaInicio", "#btn-nota-al-inicio", function(e) {
+            e.stopPropagation();
+            limpiarModo();
+            window.abrirModalNotaCancion(c, null, "general");
+        });
+
+        $pre.off(".elegirLinea").on("click.elegirLinea", ".linea-tocar-nota", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var lineIdx = parseInt($(this).attr("data-line-idx"), 10);
+            if (isNaN(lineIdx) || lineIdx < 0) lineIdx = 0;
+
+            limpiarModo();
+
+            var lineId = "line_" + lineIdx;
+            window.abrirModalNotaCancion(c, null, lineId);
+        });
+    };
+
+    window.abrirModalNotaCancion = function(clave, notaIdAEditar, preselectedLineId) {
+        estadoModalNota.clave = window.normalizarClaveCancion(clave || window.location.pathname);
+        estadoModalNota.editId = notaIdAEditar || null;
+        
+        var $pre = $("#letra");
+        if ($pre.length === 0 && estadoModalNota.clave) {
+            $pre = $("pre[data-song-path*='" + estadoModalNota.clave + "'], pre[data-clave*='" + estadoModalNota.clave + "']").first();
+        }
+        estadoModalNota.ubicaciones = window.extraerUbicacionesCancion($pre);
+
+        var $select = $("#seccion-nota-cancion-select");
+        $select.empty();
+        estadoModalNota.ubicaciones.forEach(function(u) {
+            $select.append(`<option value="${u.id}">${u.nombre}</option>`);
+        });
+
+        var $input = $("#texto-nota-cancion-input");
+        var $btnBorrar = $("#btn-borrar-nota-cancion");
+        var $titulo = $("#titulo-modal-nota");
+
+        if (notaIdAEditar) {
+            var notas = window.obtenerArrayNotasCancion(estadoModalNota.clave);
+            var notaActual = notas.find(function(n) { return String(n.id) === String(notaIdAEditar); });
+            if (notaActual) {
+                var valTarget = (notaActual.lineIndex !== undefined && notaActual.lineIndex >= 0) ? ("line_" + notaActual.lineIndex) : "general";
+                $select.val(valTarget);
+                $input.val(notaActual.texto || "");
+                var uFound = estadoModalNota.ubicaciones.find(function(u) { return u.id === valTarget; });
+                $("#lbl-ubicacion-seleccionada").text(uFound ? uFound.nombre : "Al inicio");
+            }
+            $btnBorrar.show();
+            $titulo.text("✏️ Editar nota");
+        } else {
+            var valTarget = preselectedLineId || "general";
+            $select.val(valTarget);
+            var uFound = estadoModalNota.ubicaciones.find(function(u) { return u.id === valTarget; });
+            $("#lbl-ubicacion-seleccionada").text(uFound ? uFound.nombre : "Al inicio");
+            $input.val("");
+            $btnBorrar.hide();
+            $titulo.text("📌 Nueva nota");
+        }
+
+        var modal = document.getElementById("modal-nota-cancion");
         if (modal) modal.style.display = "flex";
-        if (input) setTimeout(() => input.focus(), 100);
+        setTimeout(function() { if ($input[0]) $input[0].focus(); }, 120);
     };
 
     window.cerrarModalNotaCancion = function() {
-        const modal = document.getElementById("modal-nota-cancion");
+        var modal = document.getElementById("modal-nota-cancion");
         if (modal) modal.style.display = "none";
     };
 
-    window.guardarNotaCancion = function(texto) {
-        if (!cancionActivaParaNota) return;
-        let notas = {};
-        try { notas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
-        texto = (texto || "").trim();
-        if (texto) {
-            notas[cancionActivaParaNota] = texto;
-        } else {
-            delete notas[cancionActivaParaNota];
+    window.guardarNotaModal = function() {
+        var c = estadoModalNota.clave;
+        if (!c) return;
+        var texto = ($("#texto-nota-cancion-input").val() || "").trim();
+        if (!texto) {
+            alert("Por favor escribí el texto de la nota.");
+            return;
         }
-        localStorage.setItem("cancionero_notas", JSON.stringify(notas));
-        
-        // Actualizar UI en la página
-        const $banner = $('.caja-nota-cancion');
-        const $btn = $('.btn-nota-cancion');
-        if (texto) {
-            $banner.find('.contenido-nota').text(texto);
-            $banner.css('display', 'flex');
-            $btn.css({ background: '#d97706', color: '#ffffff' });
-            $btn.find('.lbl-nota-cancion').text('Nota activa');
-        } else {
-            $banner.css('display', 'none');
-            $btn.css({ background: 'rgba(217,119,6,0.12)', color: '#d97706' });
-            $btn.find('.lbl-nota-cancion').text('Nota');
+
+        var selectVal = $("#seccion-nota-cancion-select").val() || "general";
+        var $pre = $("#letra");
+        if ($pre.length === 0 && c) {
+            $pre = $("pre[data-song-path*='" + c + "'], pre[data-clave*='" + c + "']").first();
         }
-        cerrarModalNotaCancion();
+        var ubicaciones = window.extraerUbicacionesCancion($pre);
+        var ubicObj = ubicaciones.find(function(u) { return u.id === selectVal; }) || { id: "general", lineIndex: -1, nombre: "General", tipo: "general" };
+
+        var notas = window.obtenerArrayNotasCancion(c);
+
+        if (estadoModalNota.editId) {
+            var idx = notas.findIndex(function(n) { return String(n.id) === String(estadoModalNota.editId); });
+            if (idx !== -1) {
+                notas[idx].lineIndex = ubicObj.lineIndex;
+                notas[idx].nombreSeccion = "Nota";
+                notas[idx].tipoUbicacion = ubicObj.tipo;
+                notas[idx].texto = texto;
+            }
+        } else {
+            notas.push({
+                id: Date.now().toString(),
+                lineIndex: ubicObj.lineIndex,
+                nombreSeccion: "Nota",
+                tipoUbicacion: ubicObj.tipo,
+                texto: texto
+            });
+        }
+
+        notas.sort(function(a, b) { 
+            var lA = (a.lineIndex !== undefined && a.lineIndex !== null) ? a.lineIndex : -1;
+            var lB = (b.lineIndex !== undefined && b.lineIndex !== null) ? b.lineIndex : -1;
+            return lA - lB; 
+        });
+
+        window.guardarArrayNotasCancion(c, notas, $pre);
+        window.cerrarModalNotaCancion();
     };
 
-    setTimeout(() => {
-        const btnCloseX = document.getElementById("btn-close-nota-x");
-        const btnCancel = document.getElementById("btn-cancelar-modal-nota");
-        const btnGuardar = document.getElementById("btn-guardar-modal-nota");
-        const btnBorrar = document.getElementById("btn-borrar-nota-cancion");
-        if (btnCloseX) btnCloseX.onclick = cerrarModalNotaCancion;
-        if (btnCancel) btnCancel.onclick = cerrarModalNotaCancion;
-        if (btnGuardar) btnGuardar.onclick = () => {
-            const val = document.getElementById("texto-nota-cancion-input").value;
-            guardarNotaCancion(val);
-        };
-        if (btnBorrar) btnBorrar.onclick = () => {
-            guardarNotaCancion("");
-        };
+    window.borrarNotaModal = function() {
+        if (!estadoModalNota.editId) {
+            window.cerrarModalNotaCancion();
+            return;
+        }
+        var c = estadoModalNota.clave;
+        var notas = window.obtenerArrayNotasCancion(c);
+        notas = notas.filter(function(n) { return String(n.id) !== String(estadoModalNota.editId); });
+        var $pre = $("#letra");
+        if ($pre.length === 0 && c) {
+            $pre = $("pre[data-song-path*='" + c + "'], pre[data-clave*='" + c + "']").first();
+        }
+        window.guardarArrayNotasCancion(c, notas, $pre);
+        window.cerrarModalNotaCancion();
+    };
+
+    // Botón Cambiar ubicación dentro del modal
+    $(document).on("click", "#btn-tocar-ubicacion-nota", function() {
+        window.iniciarModoSeleccionUbicacionNota(estadoModalNota.clave);
+    });
+
+    $(document).on("click", ".btn-editar-nota-item", function(e) {
+        e.stopPropagation();
+        var $btn = $(this);
+        var $wrapper = $btn.closest(".nota-inline-wrapper, .nota-card-item");
+        var id = $btn.attr("data-nota-id") || $wrapper.attr("data-nota-id");
+        var $pre = $wrapper.closest("pre");
+        if ($pre.length === 0) $pre = $("#letra");
+        var songPath = ($pre.length ? ($pre.attr("data-song-path") || $pre.data("song-path")) : null) ||
+                       $wrapper.closest("[data-song-path]").attr("data-song-path") ||
+                       window.location.pathname;
+        var c = window.normalizarClaveCancion(songPath);
+        window.abrirModalNotaCancion(c, id);
+    });
+
+    $(document).on("click", ".btn-borrar-nota-item", function(e) {
+        e.stopPropagation();
+        var $btn = $(this);
+        var $wrapper = $btn.closest(".nota-inline-wrapper, .nota-card-item");
+        var id = $btn.attr("data-nota-id") || $wrapper.attr("data-nota-id");
+        var $pre = $wrapper.closest("pre");
+        if ($pre.length === 0) $pre = $("#letra");
+        var songPath = ($pre.length ? ($pre.attr("data-song-path") || $pre.data("song-path")) : null) ||
+                       $wrapper.closest("[data-song-path]").attr("data-song-path") ||
+                       window.location.pathname;
+        var c = window.normalizarClaveCancion(songPath);
+        var notas = window.obtenerArrayNotasCancion(c);
+        var filtradas = notas.filter(function(n) { return String(n.id) !== String(id); });
+        $wrapper.remove();
+        window.guardarArrayNotasCancion(c, filtradas, $pre);
+    });
+
+    window.abrirModalImprimirCancion = function() {
+        var modal = document.getElementById("modal-imprimir-cancion");
+        if (modal) modal.style.display = "flex";
+    };
+
+    window.cerrarModalImprimirCancion = function() {
+        var modal = document.getElementById("modal-imprimir-cancion");
+        if (modal) modal.style.display = "none";
+    };
+
+    window.removerEmojis = function(str) {
+        if (!str) return "";
+        return str.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}]/gu, "").replace(/^[ \t]+/gm, "").replace(/[ \t]+$/gm, "");
+    };
+
+    function normalizarNotasParaExportar($pre) {
+        if (!$pre || $pre.length === 0) return $pre;
+        var $clone = $pre.clone();
+        $clone.find(".nota-inline-btn-group").remove();
+        $clone.find(".nota-inline-wrapper").each(function() {
+            var $w = $(this);
+            var cuerpo = ($w.find(".nota-inline-cuerpo").html() || $w.find(".nota-inline-cuerpo").text() || "").trim();
+            $w.replaceWith(`<span class="nota-inline-wrapper"><b class="nota-inline-tag">📌 NOTA:</b> <span class="nota-inline-cuerpo">${cuerpo}</span></span>`);
+        });
+        return $clone;
+    }
+
+    window.obtenerLetraSoloTexto = function($pre) {
+        if (!$pre || $pre.length === 0) return "";
+        var $clone = normalizarNotasParaExportar($pre);
+        var raw = $clone.html();
+        var lines = raw.split("\n");
+        var textLines = [];
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            if (line.indexOf("nota-inline-wrapper") !== -1 || line.indexOf("nota-inline-") !== -1) {
+                textLines.push(line);
+            } else if (!window.isChordLine(line)) {
+                var clean = line.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/\s+$/, "");
+                textLines.push(clean);
+            }
+        }
+        return textLines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+    };
+
+    window.imprimirCancionPDF = function(tipo) {
+        window.cerrarModalImprimirCancion();
+        var tituloCancion = (document.querySelector("h1") ? document.querySelector("h1").textContent : document.title.split("-")[0]).trim();
+        var $pre = $('#letra');
+        if ($pre.length === 0) return;
+
+        var tonoActual = $('.transpose-keys a.selected').text().trim() || $pre.attr('data-key') || '';
+        var capoActual = $('select.capo-dropdown').val() || '0';
+        var textoCapo = String(capoActual) === '0' ? 'Sin Capo' : ('Capo ' + capoActual);
+
+        var iframe = document.getElementById('iframe-imprimir-cancion');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'iframe-imprimir-cancion';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
+        }
+
+        var contenido = "";
+        var subtitulo = "";
+        if (tipo === 'acordes') {
+            var $clone = normalizarNotasParaExportar($pre);
+            contenido = $clone.html();
+            subtitulo = `Tono: <b>${tonoActual}</b> · <b>${textoCapo}</b> · Cancionero Schoenstatt`;
+        } else {
+            contenido = window.obtenerLetraSoloTexto($pre);
+            subtitulo = `Cancionero Schoenstatt`;
+        }
+
+        var docHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <title>${tituloCancion}</title>
+              <style>
+                @page { size: auto; margin: 1.5cm 1.2cm; }
+                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; color: #000; margin: 0; padding: 0.2cm; }
+                h1 { text-align: center; font-size: 19pt; margin-top: 0; margin-bottom: 4pt; color: #0A2846; }
+                .sub { text-align: center; font-size: 10.5pt; color: #555; margin-bottom: 12pt; }
+                pre { font-family: 'Consolas', 'Courier New', Courier, monospace; font-size: 10.5pt; line-height: 1.4; white-space: pre-wrap; margin: 0 auto; max-width: 680px; }
+                .c, span.c { font-weight: bold; color: #000; }
+                .nota-inline-wrapper { background: #fef3c7 !important; background-color: #fef3c7 !important; border: 1px solid #f59e0b !important; border-left: 4px solid #d97706 !important; padding: 3pt 6pt !important; margin: 4pt 0 !important; font-size: 9.5pt !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important; white-space: normal !important; display: block !important; border-radius: 4pt !important; color: #78350f !important; page-break-inside: avoid !important; break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                .nota-inline-btn-group { display: none !important; }
+                .nota-inline-tag { font-weight: 800 !important; font-size: 8.5pt !important; text-transform: uppercase !important; color: #b45309 !important; }
+                .nota-inline-cuerpo { font-weight: 500 !important; display: inline !important; }
+              </style>
+            </head>
+            <body>
+              <h1>${tituloCancion}</h1>
+              <div class="sub">${subtitulo}</div>
+              <pre>${contenido}</pre>
+            </body>
+            </html>
+        `;
+
+        var doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(docHTML);
+        doc.close();
+
+        setTimeout(function() {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+        }, 250);
+    };
+
+    window.descargarCancionWord = function(tipo) {
+        window.cerrarModalImprimirCancion();
+        var tituloCancion = (document.querySelector("h1") ? document.querySelector("h1").textContent : document.title.split("-")[0]).trim();
+        var $pre = $('#letra');
+        if ($pre.length === 0) return;
+
+        var tonoActual = $('.transpose-keys a.selected').text().trim() || $pre.attr('data-key') || '';
+        var capoActual = $('select.capo-dropdown').val() || '0';
+        var textoCapo = String(capoActual) === '0' ? 'Sin Capo' : ('Capo ' + capoActual);
+
+        var contenidoCancion = "";
+        var subtitulo = "";
+        if (tipo === 'acordes') {
+            var $clone = normalizarNotasParaExportar($pre);
+            var raw = $clone.html();
+            contenidoCancion = raw.replace(/<span class="c">([^<]+)<\/span>/g, '<span style="color:#c00000; font-weight:bold;">$1</span>');
+            subtitulo = `Tono: <b>${tonoActual}</b> · <b>${textoCapo}</b> · Cancionero Schoenstatt`;
+        } else {
+            contenidoCancion = window.obtenerLetraSoloTexto($pre);
+            subtitulo = `Cancionero Schoenstatt`;
+        }
+
+        var docHTML = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+            <head>
+              <meta charset='utf-8'>
+              <title>${tituloCancion}</title>
+              <!--[if gte mso 9]>
+              <xml>
+                <w:WordDocument>
+                  <w:View>Print</w:View>
+                  <w:Zoom>100</w:Zoom>
+                  <w:DoNotOptimizeForBrowser/>
+                </w:WordDocument>
+              </xml>
+              <![endif]-->
+              <style>
+                @page { size: A4; margin: 2cm; }
+                body { font-family: Arial, sans-serif; font-size: 11pt; color: #000000; }
+                h1 { font-size: 18pt; color: #0A2846; text-align: center; margin-bottom: 4pt; }
+                .subtitulo-doc { text-align: center; font-size: 10pt; color: #555555; margin-bottom: 15pt; }
+                pre { font-family: 'Consolas', 'Courier New', monospace; font-size: 10.5pt; line-height: 1.35; margin: 0; white-space: pre-wrap; }
+                .nota-inline-wrapper { background: #fef3c7; border: 1px solid #f59e0b; border-left: 4px solid #d97706; padding: 3pt 6pt; margin: 4pt 0; font-size: 9.5pt; font-family: Arial, sans-serif; display: block; color: #78350f; }
+                .nota-inline-btn-group { display: none !important; }
+                .nota-inline-tag { font-weight: bold; font-size: 8.5pt; text-transform: uppercase; color: #b45309; }
+                .nota-inline-cuerpo { font-weight: normal; font-size: 9.5pt; color: #78350f; display: inline; }
+              </style>
+            </head>
+            <body>
+              <h1>${tituloCancion}</h1>
+              <div class="subtitulo-doc">${subtitulo}</div>
+              <pre>${contenidoCancion}</pre>
+            </body>
+            </html>
+        `;
+
+        var blob = new Blob(['\ufeff' + docHTML], { type: 'application/msword;charset=utf-8' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        var limpioTitulo = tituloCancion.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s-_]/g, '');
+        link.download = limpioTitulo + (tipo === 'acordes' ? ' (' + tonoActual + ').doc' : ' (Letra).doc');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    setTimeout(function() {
+        $(document).on("click", ".btn-close-imprimir-modal", window.cerrarModalImprimirCancion);
+        $(document).on("click", "#btn-modal-pdf-acordes", function() {
+            window.imprimirCancionPDF('acordes');
+        });
+        $(document).on("click", "#btn-modal-pdf-texto", function() {
+            window.imprimirCancionPDF('texto');
+        });
+        $(document).on("click", "#btn-modal-word-acordes", function() {
+            window.descargarCancionWord('acordes');
+        });
+        $(document).on("click", "#btn-modal-word-texto", function() {
+            window.descargarCancionWord('texto');
+        });
+
+        $(document).on("click", ".btn-close-nota-modal", window.cerrarModalNotaCancion);
+        $(document).on("click", "#btn-guardar-modal-nota", window.guardarNotaModal);
+        $(document).on("click", "#btn-borrar-nota-cancion", window.borrarNotaModal);
+
+        $(document).on("click", ".btn-agregar-otra-nota", function(e) {
+            e.stopPropagation();
+            window.abrirModalNotaCancion(window.location.pathname, null);
+        });
+
+        $(document).on("click", "#btn-toggle-notas-movil", function(e) {
+            e.preventDefault();
+            var $cuerpo = $("#cuerpo-notas-movil");
+            var visible = $cuerpo.is(":visible");
+            if (visible) {
+                $cuerpo.slideUp(150);
+                $(this).text("Mostrar ▼");
+                localStorage.setItem('cancionero_notas_movil_abierto', 'false');
+            } else {
+                $cuerpo.slideDown(150);
+                $(this).text("Ocultar ▲");
+                localStorage.setItem('cancionero_notas_movil_abierto', 'true');
+            }
+        });
+
+        // Asegurar renderizado de notas al cargar la página
+        if (typeof window.renderizarNotasCancion === "function") {
+            var cActual = window.normalizarClaveCancion(window.location.pathname);
+            if (cActual && $("#letra").length > 0) {
+                window.renderizarNotasCancion(cActual, $("#letra"));
+            }
+        }
     }, 100);
 });
 
@@ -2283,11 +3214,17 @@ document.addEventListener("DOMContentLoaded", function() {
     document.addEventListener("click", (e) => {
         const btnAcordes = e.target && e.target.closest("#toggleChordsButton");
         if (btnAcordes) {
-            const c = document.querySelectorAll(".c");
-            if (c.length) {
-                const v = c[0].style.display !== "none";
-                c.forEach(el => el.style.display = v ? "none" : "inline");
-            }
+            const estaOculto = document.body.classList.toggle("acordes-ocultos");
+            const letras = document.querySelectorAll("#letra, pre[id^='letra-lista'], .zona-letra");
+            letras.forEach(el => el.classList.toggle("acordes-ocultos", estaOculto));
+            
+            // También alternar display inline/none explícitamente para máxima compatibilidad
+            const acordes = document.querySelectorAll(".c, span.c");
+            acordes.forEach(el => {
+                el.style.display = estaOculto ? "none" : "inline";
+            });
+            
+            btnAcordes.classList.toggle("active", estaOculto);
         }
     });
 

@@ -68,6 +68,25 @@
         font-size: 9.5pt !important;
         line-height: 1.35 !important;
       }
+
+      .nota-inline-wrapper {
+        background-color: #fef3c7 !important;
+        border: 1px solid #f59e0b !important;
+        border-left: 4px solid #d97706 !important;
+        border-radius: 4pt !important;
+        padding: 4pt 8pt !important;
+        margin: 5pt 0 !important;
+        font-size: 9.5pt !important;
+        color: #78350f !important;
+        white-space: normal !important;
+        display: block !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .nota-inline-tag { font-weight: 800 !important; font-size: 8.5pt !important; text-transform: uppercase !important; color: #b45309 !important; }
+      .nota-inline-cuerpo { font-weight: 500 !important; display: inline !important; }
     }
   </style>
 </head>
@@ -148,11 +167,34 @@
       return cantAcordes > 0;
     }
 
+    function escaparHTML(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function removerEmojis(str) {
+      if (!str) return "";
+      return str.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}]/gu, "");
+    }
+
     // Función para procesar el contenido de la canción
-    function procesarCancion(contenido) {
+    function procesarCancion(contenido, arrayNotas) {
       const lines = contenido.split('\n');
       let output = '';
-      for (let line of lines) {
+      const notas = Array.isArray(arrayNotas) ? arrayNotas : [];
+
+      for (let i = 0; i < lines.length; i++) {
+        // Notas para esta línea (o notas generales en la línea 0)
+        const notasDeLinea = notas.filter(n => {
+          const idx = (n.lineIndex !== undefined && n.lineIndex !== null) ? n.lineIndex : -1;
+          return (idx === i) || (i === 0 && idx < 0);
+        });
+
+        for (const n of notasDeLinea) {
+          output += `<span class="nota-inline-wrapper"><b class="nota-inline-tag">📌 NOTA:</b> <span class="nota-inline-cuerpo">${escaparHTML(n.texto)}</span></span>\n`;
+        }
+
+        const line = lines[i];
         if (!isChordLine(line)) {
           output += `<span>${line}</span>\n`;
         } else {
@@ -179,11 +221,18 @@
 
         let notasGlobales = {};
         try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
-        const notaCancion = (item && item.nota !== undefined) ? item.nota : (notasGlobales[ruta] || "");
-        const notaHTML = notaCancion ? `<div class="nota-cancion-impresion text-center mb-2 fst-italic" style="color:#b45309; font-size:13.5px;">📝 <b>Nota:</b> ${notaCancion}</div>` : '';
+        const claveNormal = (ruta || "").replace(/^\/?cancionerobenja\//, "").replace(/^\/+/, "");
+        const notaItem = (item && item.nota !== undefined && item.nota !== "") ? item.nota : (notasGlobales[claveNormal] || notasGlobales[ruta] || notasGlobales["/" + claveNormal] || "");
+        
+        let arrayNotas = [];
+        if (Array.isArray(notaItem)) {
+          arrayNotas = notaItem;
+        } else if (typeof notaItem === "string" && notaItem.trim()) {
+          arrayNotas = [{ lineIndex: -1, texto: notaItem.trim() }];
+        }
 
-        const contenidoProcesado = procesarCancion(preContent);
-        return `<h2>${title}</h2>${notaHTML}<pre class="lh-base">${contenidoProcesado}</pre>`;
+        const contenidoProcesado = procesarCancion(preContent, arrayNotas);
+        return `<h2>${title}</h2><pre class="lh-base">${contenidoProcesado}</pre>`;
       } catch (error) {
         console.error('Error:', error);
         return '<p>Error al cargar la canción. Inténtalo de nuevo más tarde.</p>';

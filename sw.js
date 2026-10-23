@@ -1,5 +1,5 @@
 // Número de versión de la copia guardada en el celular.
-const CACHE_NAME = 'cancionero-v31';
+const CACHE_NAME = 'cancionero-v49';
 
 // LA LISTA GIGANTE (Acá tenés que poner TODO)
 const urlsToCache = [
@@ -39,7 +39,7 @@ const urlsToCache = [
     '/cancionerobenja/19-indice-alfabetico.html',
     '/cancionerobenja/20-albumes.html',
     '/cancionerobenja/donaciones.html',
-    '/cancionerobenja/guia.html',
+    '/cancionerobenja/manual-de-uso.html',
     '/cancionerobenja/sugerencias.html',
   
   // 2. Las páginas de los álbumes

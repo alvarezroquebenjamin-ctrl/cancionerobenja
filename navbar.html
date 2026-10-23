@@ -39,16 +39,20 @@
             <li><a class="dropdown-item" href="19-indice-alfabetico.html">Índice Alfabético</a></li>
             <li><a class="dropdown-item" href="20-albumes.html">Albumes</a></li>
             <li><a class="dropdown-item" href="crear-programa.html">Repertorio</a></li>
+            <li><a class="dropdown-item" href="manual-de-uso.html">Manual de uso</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="donaciones.html">Donaciones</a></li>
             <li><a class="dropdown-item" href="sugerencias.html">Sugerencias</a></li>
           </ul>
         </li>
+        <li class="nav-item d-flex align-items-center" style="margin-left: 12px;">
+          <a class="btn-toggle-theme" href="#" id="toggle-theme" title="Cambiar Modo Noche / Día" style="display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.7); border-radius: 50px; padding: 3px 11px; color: #fff; text-decoration: none; font-size: 15px; line-height: 1.2;">🌙</a>
+        </li>
       </ul>
 
 <div class="d-flex position-relative ms-lg-3" style="min-width: 250px;">
         
-        <input id="inputGlobal" class="form-control me-2" type="search" placeholder="🔍 Buscar canción..." aria-label="Search" onkeyup="filtrarGlobal()">
+        <input id="inputGlobal" class="form-control me-2" type="search" placeholder="🔍 Buscar canción..." aria-label="Search" onkeyup="filtrarGlobal()" onfocus="mostrarRecientesBuscador()" onclick="mostrarRecientesBuscador()">
         
         <div id="listaGlobal" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; max-height: 400px; overflow-y: auto; display: none;">
             
@@ -116,6 +120,7 @@
    <a class="btn btn-outline-primary btn-sm" href="entrada/cristo-joven.html">Cristo Joven</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/cristo-reina.html">Cristo reina</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/cristo-rey.html">Cristo Rey</a>
+   <a class="btn btn-outline-primary btn-sm" href="meditacion/cristo-rey-con-subida.html">Cristo Rey (con subida)</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/dame-tu-si.html">Dame Tu Sí</a>
    <a class="btn btn-outline-primary btn-sm" href="meditacion/dame-tus-ojos.html">Dame tus ojos</a>
    <a class="btn btn-outline-primary btn-sm" href="comunion/de-cirene.html">De Cirene</a>
@@ -377,7 +382,7 @@
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/ofrenda.html">Ofrenda (Trilla y Vendimia)</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/venid-a-mi.html">Venid a mi</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/siervo-de-dios.html">Siervo de Dios</a>
-  <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/ven-y-veras.html">Ven y verás (QCuCS)</a>
+  <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/ven-y-veras-qcucs.html">Ven y verás (QCuCS)</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/pasas-madre.html">Pasas Madre</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/encuentro.html">Encuentro</a>
   <a class="btn btn-outline-primary btn-sm" href="quiero-construirte-una-casa-señor/con-la-vuelta-del-sol.html">Con la vuelta del Sol</a>

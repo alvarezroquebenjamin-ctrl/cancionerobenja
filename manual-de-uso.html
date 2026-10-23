@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base href="/cancionerobenja/">
+
+  <link rel="icon" href="images/logo-schoenstatt-png.png" type="image/png">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JT9R1R0NHX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JT9R1R0NHX');
+</script>
+<meta charset="utf-8">
+<title>Manual de uso</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cómo usar el cancionero: cambiar el tono, ver acordes, desplazamiento automático, metrónomo, afinador por micrófono, favoritos, repertorio y uso sin señal.">
+<link rel="canonical" href="https://alvarezroquebenjamin-ctrl.github.io/cancionerobenja/manual-de-uso.html">
+<link rel="stylesheet" type="text/css" href="css/cancionero.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<style>
+  .guia { max-width: 740px; margin: 0 auto; padding: 0 16px 90px; }
+  .guia-intro { font-size: 1.08rem; line-height: 1.6; text-align: center; margin: 16px auto 28px; max-width: 580px; opacity: 0.9; }
+
+  /* Acordeones modernos */
+  .guia details {
+    background: #ffffff;
+    border: 1.5px solid rgba(42, 157, 143, 0.28);
+    border-radius: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .guia details[open] {
+    border-color: #2A9D8F;
+    box-shadow: 0 6px 18px rgba(42, 157, 143, 0.10);
+  }
+  body.modo-oscuro .guia details {
+    background: #121212;
+    border-color: #2c2c2e;
+    box-shadow: none;
+  }
+  body.modo-oscuro .guia details[open] {
+    border-color: #2A9D8F;
+  }
+
+  .guia summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 16px 20px;
+    font-weight: 800;
+    font-size: 1.12rem;
+    color: #00979f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+  }
+  .guia summary::-webkit-details-marker { display: none; }
+  .guia summary .titulo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .guia summary .icono-item {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(42, 157, 143, 0.12);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+  .guia summary::after {
+    content: "+";
+    font-size: 1.4rem;
+    font-weight: 800;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(42, 157, 143, 0.1);
+    color: #00979f;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .guia details[open] summary::after {
+    content: "\2212";
+    background: #00979f;
+    color: #ffffff;
+  }
+
+  .guia .contenido {
+    padding: 4px 20px 20px;
+    line-height: 1.65;
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+  }
+  .guia .contenido p { margin: 10px 0 12px; }
+
+  /* Tarjetas internas para cada herramienta */
+  .guia-bloque {
+    background: rgba(42, 157, 143, 0.05);
+    border: 1px solid rgba(42, 157, 143, 0.18);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+  }
+  body.modo-oscuro .guia-bloque {
+    background: #1c1c1e;
+    border-color: #2c2c2e;
+  }
+  .guia-bloque-titulo {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #2C3E50;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  body.modo-oscuro .guia-bloque-titulo {
+    color: #ffffff;
+  }
+  .guia-bloque p {
+    margin: 0 !important;
+    font-size: 0.96rem;
+  }
+
+  /* Pasos numerados */
+  .pasos-lista {
+    list-style: none;
+    padding-left: 0;
+    margin: 12px 0 0;
+  }
+  .pasos-lista li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .paso-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2A9D8F;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Etiquetas tipo botón (teclas) */
+  .guia .tecla {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid rgba(42, 157, 143, 0.45);
+    background: rgba(42, 157, 143, 0.1);
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+  .guia .acorde-ejemplo {
+    color: #ff0000;
+    font-weight: 800;
+    font-family: monospace;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(255, 0, 0, 0.08);
+  }
+  body.modo-oscuro .guia .acorde-ejemplo {
+    color: #ff6b81;
+    background: rgba(255, 107, 129, 0.15);
+  }
+
+  /* Aviso destacado */
+  .guia .aviso {
+    border-left: 4px solid #2A9D8F;
+    background: rgba(42, 157, 143, 0.08);
+    border-radius: 0 10px 10px 0;
+    padding: 10px 14px;
+    margin: 14px 0 4px;
+    font-size: 0.95rem;
+  }
+  body.modo-oscuro .guia .aviso {
+    background: #1c1c1e;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="nav-placeholder"></div>
+<script>
+$(function(){
+  $("#nav-placeholder").load("navbar.html");
+});
+</script>
+
+<div class="titulo">
+  <h1>Manual de uso</h1>
+</div>
+
+<main class="guia">
+
+  <p class="guia-intro">Todo lo que podés hacer con el cancionero para aprovecharlo al máximo en misas, ensayos, retiros o misiones. Tocá cada sección para desplegarla.</p>
+
+  <!-- 1. TENERLO EN EL CELULAR Y USARLO SIN SEÑAL -->
+  <details open>
+    <summary>
+      <span class="titulo-item"><span class="icono-item">📲</span> Tenerlo como App y usarlo sin internet</span>
+    </summary>
+    <div class="contenido">
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">📌 Instalarlo en la pantalla de tu celular</div>
+        <p>
+          <strong>En Android (Chrome):</strong> tocá los tres puntitos <span class="tecla">⋮</span> arriba a la derecha y elegí <em>Instalar aplicación</em> o <em>Agregar a la pantalla principal</em>.<br>
+          <strong>En iPhone (Safari):</strong> tocá el botón de compartir <span class="tecla">⬆️</span> abajo en el centro y elegí <em>Agregar a inicio</em>.<br>
+          Te va a quedar el ícono con el logo de Schoenstatt como una aplicación más de tu teléfono.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🏕️ Usarlo sin señal (Modo Offline)</div>
+        <p>
+          Antes de ir a una misa, campamento o misión donde no haya buena señal, conectate a un WiFi, abrí el botón redondo <span class="tecla">☰</span> abajo a la derecha y en <em>Modo Offline</em> tocá <span class="tecla">⬇️ Bajar Todo</span>. Cuando el botón diga <strong>✅ ¡Todo Guardado!</strong>, ya podés abrir todas las canciones aunque tengas el celular en modo avión o sin datos.
+        </p>
+      </div>
+    </div>
+  </details>
+
+  <!-- 2. CANTAR Y TOCAR UNA CANCIÓN -->
+  <details>
+    <summary>
+      <span class="titulo-item"><span class="icono-item">🎸</span> Funciones dentro de cada canción</span>
+    </summary>
+    <div class="contenido">
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🎵 Cambiar el tono y usar el Capo</div>
+        <p>
+          Arriba de la letra tenés la barra con todos los tonos (<span class="tecla">DO</span> <span class="tecla">RE</span> <span class="tecla">MI</span>…). Tocá el que te quede más cómodo para cantar y todos los acordes de la canción se cambian solos al instante. Abajo de los tonos, el selector <strong>🎸 Capo</strong> te indica en qué traste va el transporte recomendado para esa canción.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🖐️ Ver cómo se toca un acorde en la guitarra</div>
+        <p>
+          Si no conocés un acorde de la canción, simplemente <strong>tocá arriba del acorde en rojo</strong> (por ejemplo <span class="acorde-ejemplo">FA#m7</span> o <span class="acorde-ejemplo">LAm/SOL</span>) y se abrirá un dibujo del mástil de la guitarra mostrándote en qué traste y cuerda poner los dedos.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🎤 Mostrar u ocultar los acordes</div>
+        <p>
+          Si solo vas a cantar y no tocás ningún instrumento, tocá el botón <span class="tecla">Mostrar/ocultar acordes</span> arriba de la letra para esconder todas las notas y leer la letra mucho más limpia.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">⬅️ ➡️ Pasar rápido de canción</div>
+        <p>
+          Debajo del título de cada canción aparecen dos botones (<span class="tecla">⬅ Anterior</span> y <span class="tecla">Siguiente ➡</span>) que te llevan directo a la canción que sigue dentro de esa misma sección o álbum.
+        </p>
+      </div>
+    </div>
+  </details>
+
+  <!-- 3. EL BOTÓN REDONDO (SÚPER MENÚ) -->
+  <details>
+    <summary>
+      <span class="titulo-item"><span class="icono-item">☰</span> El menú flotante de herramientas</span>
+    </summary>
+    <div class="contenido">
+      <p>El botón redondo <span class="tecla">☰</span> que está fijo abajo a la derecha te acompaña en toda la página y reúne las herramientas para tocar y ensayar:</p>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🎙️ Afinador por micrófono</div>
+        <p>
+          Tocá <span class="tecla">🎙️ Afina tu guitarra</span> y dale permiso al micrófono. Al tocar cualquier cuerda de tu guitarra, el afinador detecta sola cuál de las 6 cuerdas es (<span class="tecla">6ª MI</span>, <span class="tecla">5ª LA</span>, <span class="tecla">4ª RE</span>, <span class="tecla">3ª SOL</span>, <span class="tecla">2ª SI</span>, <span class="tecla">1ª mi</span>) y la aguja te indica si tenés que <strong>ajustar (subir)</strong> o <strong>aflojar (bajar)</strong> hasta que se ponga en <strong>verde</strong> en el centro. Abajo tenés una barrita de <em>Señal</em> para comprobar que tu micrófono está escuchando.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🥁 Tempo (Metrónomo de 4 tiempos)</div>
+        <p>
+          Escribí la velocidad deseada (BPM) y tocá <span class="tecla">▶</span>. Además del pulso sonoro, arriba a la derecha aparecen <strong>4 círculos luminosos</strong> que marcan el compás (el tiempo 1 en rojo y los tiempos 2, 3 y 4 en azul).<br>
+          <em>💡 Tip rápido:</em> podés apagar el metrónomo en cualquier momento tocando directamente sobre las 4 bolitas de colores sin tener que volver a abrir el menú.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">📜 Auto Scroll (Manos libres con control flotante)</div>
+        <p>
+          Hace que la pantalla baje sola suavemente mientras tenés las dos manos ocupadas en la guitarra. Al darle <span class="tecla">▶</span> en el menú, se cierra el menú grande y te queda una <strong>barrita flotante afuera</strong> (<span class="tecla">－</span> velocidad <span class="tecla">＋</span> | <span class="tecla">⏸</span> <span class="tecla">✖</span>) para que puedas frenarlo, reanudarlo o cambiar la velocidad con un solo toque sin volver a abrir el menú.
+        </p>
+      </div>
+
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">❤️ Favoritos, Letra y Modo Oscuro</div>
+        <p>
+          • <strong>Favoritos:</strong> Tocá <span class="tecla">🤍</span> dentro de una canción para guardarla, y <span class="tecla">📂</span> para abrir tu lista personal de favoritas desde cualquier parte.<br>
+          • <strong>Letra:</strong> Con <span class="tecla">A-</span> y <span class="tecla">A+</span> achicás o agrandás el tamaño de la letra y los acordes.<br>
+          • <strong>Tema:</strong> Tocá <span class="tecla">🌙</span> para activar el <strong>Modo Oscuro</strong>, ideal para fogones de noche o para ahorrar batería.
+        </p>
+      </div>
+    </div>
+  </details>
+
+  <!-- 4. ARMAR EL REPERTORIO DE UNA MISA -->
+  <details>
+    <summary>
+      <span class="titulo-item"><span class="icono-item">📋</span> Armar y compartir el repertorio de Misa</span>
+    </summary>
+    <div class="contenido">
+      <p>La herramienta <strong>Arma tu repertorio</strong> te permite preparar todas las canciones de una misa o adoración y pasárselas listas a todo el coro:</p>
+      <ol class="pasos-lista">
+        <li>
+          <span class="paso-num">1</span>
+          <div>Entrá a <strong>Arma tu repertorio</strong> desde el botón de la página de inicio o desde el menú superior.</div>
+        </li>
+        <li>
+          <span class="paso-num">2</span>
+          <div>Elegí la <em>Sección</em> (Entrada, Perdón, Comunión…), seleccioná la <em>Canción</em> y tocá <span class="tecla">Agregar</span>.</div>
+        </li>
+        <li>
+          <span class="paso-num">3</span>
+          <div>En la lista que se va armando abajo, podés <strong>ajustar el tono (<span class="tecla">◀</span> <span class="tecla">▶</span>) y el capo</strong> que van a usar para cada canción, cambiarles el orden con <span class="tecla">↑</span> <span class="tecla">↓</span> o quitar alguna con <span class="tecla">✖</span>.</div>
+        </li>
+        <li>
+          <span class="paso-num">4</span>
+          <div>
+            Elegí cómo querés ver tu repertorio:<br>
+            • <strong>Programa full (con acordes):</strong> muestra todas las canciones enteras una debajo de la otra en una sola página corrida, ya transportadas al tono y capo que elegiste.<br>
+            • <strong>Lista canciones (con acordes / sólo texto):</strong> muestra el listado resumido de los cantos elegidos.
+          </div>
+        </li>
+        <li>
+          <span class="paso-num">5</span>
+          <div>
+            Tocá <span class="tecla">Compartir listado</span>: se copia automáticamente un enlace especial. <strong>Pegalo en el grupo de WhatsApp del coro</strong> y, cuando cualquiera lo abra en su celular, ya tendrá cargado todo el repertorio con los mismos tonos y capos que preparaste.
+          </div>
+        </li>
+      </ol>
+    </div>
+  </details>
+
+  <!-- 5. ENCONTRAR UNA CANCIÓN -->
+  <details>
+    <summary>
+      <span class="titulo-item"><span class="icono-item">🔍</span> Formas de buscar una canción</span>
+    </summary>
+    <div class="contenido">
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🔎 Buscador inteligente (por título o por frase de la letra)</div>
+        <p>En cualquier pantalla podés escribir en el cuadro <em>"Buscar canción..."</em> de arriba. No hace falta poner tildes ni mayúsculas, y <strong>si no te acordás cómo se llama la canción podés escribir una frase de la letra</strong> (por ejemplo, <em>"toma mi vida nueva"</em>) y te mostrará la canción junto con el pedacito de letra donde aparece.</p>
+      </div>
+      <div class="guia-bloque">
+        <div class="guia-bloque-titulo">🗂️ Por momento litúrgico, de la A a la Z o por Álbum</div>
+        <p>
+          • <strong>Secciones de Misa:</strong> Entrada, Perdón, Gloria, Salmos, Aleluya, Ofertorio, Santo, Cordero, Comunión, Meditación y Salida.<br>
+          • <strong>Cantos del Movimiento:</strong> Marianos, Envío, Espíritu Santo, Adoración, JM y JF.<br>
+          • <strong>Índice Alfabético:</strong> las más de 450 canciones ordenadas de la A a la Z.<br>
+          • <strong>Álbumes:</strong> las canciones agrupadas con las portadas de cada disco histórico.
+        </p>
+      </div>
+    </div>
+  </details>
+
+  <!-- 6. DETALLES ÚTILES -->
+  <details>
+    <summary>
+      <span class="titulo-item"><span class="icono-item">💡</span> Consejos útiles y actualizaciones</span>
+    </summary>
+    <div class="contenido">
+      <div class="aviso">
+        <strong>📱 La pantalla no se apaga sola:</strong> Mientras tengas abierta una canción, el cancionero mantiene encendida la pantalla de tu celular automáticamente para que no se te bloquee en medio de un canto.
+      </div>
+      <div class="aviso" style="margin-top: 12px;">
+        <strong>🔄 ¿Agregaron una canción nueva y no te aparece?:</strong> Como el cancionero guarda una copia en la memoria del teléfono para funcionar rápido y sin internet, cuando se suben canciones nuevas a veces hace falta cerrar y volver a abrir la aplicación con WiFi o datos para que se actualice sola.
+      </div>
+    </div>
+  </details>
+
+</main>
+
+<script src="scripts/cancionero.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

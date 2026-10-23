@@ -92,16 +92,29 @@
         <div class="form-check form-switch mb-3 text-start ps-4">
           <input class="form-check-input" type="checkbox" id="check-print-2cols" style="cursor:pointer;">
           <label class="form-check-label small fw-bold" for="check-print-2cols" style="cursor:pointer;">
-            📑 Modo 2 columnas (ideal para ahorrar papel)
+            📑 Modo 2 columnas
           </label>
         </div>
+            <div class="small fw-bold text-muted mb-2">📥 Descargar PDF:</div>
         <div class="d-grid gap-2 mb-3">
-          <button type="button" class="btn btn-outline-primary text-center p-3 rounded-3" onclick="imprimirVersion('texto')">
-            <div class="fw-bold fs-6">📄 Sólo texto</div>
+          <button type="button" class="btn btn-outline-primary text-center p-2 rounded-3" onclick="imprimirVersion('texto')">
+            <div class="fw-bold fs-6">📄 Sólo texto (PDF / Imprimir)</div>
           </button>
-          <button type="button" class="btn btn-outline-primary text-center p-3 rounded-3" onclick="imprimirVersion('acordes')">
-            <div class="fw-bold fs-6">🎸 Con acordes y tonalidades</div>
+          <button type="button" class="btn btn-outline-primary text-center p-2 rounded-3" onclick="imprimirVersion('acordes')">
+            <div class="fw-bold fs-6">🎸 Con acordes (PDF / Imprimir)</div>
           </button>
+
+          <div class="mt-3 pt-2 border-top">
+            <div class="small fw-bold text-muted mb-2">📥 Descargar editable para Word:</div>
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-outline-primary text-center p-2 rounded-3" style="border-color:#2b579a; color:#2b579a;" onclick="descargarWordRepertorio('acordes')">
+                <div class="fw-bold fs-6">📝 Descargar Word (.doc) con acordes</div>
+              </button>
+              <button type="button" class="btn btn-outline-primary text-center p-2 rounded-3" style="border-color:#2b579a; color:#2b579a;" onclick="descargarWordRepertorio('texto')">
+                <div class="fw-bold fs-6">📄 Descargar Word (.doc) sólo texto</div>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="d-flex justify-content-end">
           <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="cerrarModalImprimir()">Cancelar</button>
@@ -125,6 +138,42 @@
         
         <div class="d-flex justify-content-end mt-3 pt-3 border-top">
           <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="cerrarModalBiblioteca()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Editar Notas de Canción en Repertorio -->
+    <div id="modal-nota-repertorio" class="position-fixed top-0 start-0 w-100 h-100 justify-content-center align-items-center p-3" style="display:none; background:rgba(0,0,0,0.6); z-index:10000;">
+      <div class="card p-4 rounded-4 shadow-lg text-start" style="max-width:520px; width:100%; border:2px solid #d97706; max-height:90vh; overflow-y:auto;">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold mb-0" style="color:#d97706;" id="titulo-modal-nota-rep">📝 Notas de la canción</h5>
+          <button type="button" class="btn-close" onclick="cerrarModalNotaRepertorio()"></button>
+        </div>
+        <p id="subtitulo-nota-repertorio" class="text-muted small mb-3"></p>
+        
+        <!-- Lista de notas ya cargadas para esta canción -->
+        <div id="lista-notas-cargadas-rep" class="mb-3" style="display:none;">
+          <div class="small fw-bold text-muted mb-2 text-uppercase" style="font-size:11px;">Notas agregadas:</div>
+          <div id="contenedor-items-notas-rep"></div>
+        </div>
+
+        <!-- Formulario para agregar / editar una nota -->
+        <div class="p-3 rounded-3 mb-3" style="background:#fef3c7; border:1px solid #f59e0b;">
+          <div class="fw-bold small mb-2 text-uppercase" style="color:#b45309; font-size:11.5px;" id="lbl-form-nota-rep">➕ Agregar nota a una estrofa:</div>
+          <label for="seccion-nota-rep-select" class="form-label small fw-bold mb-1" style="color:#78350f;">¿En qué parte de la canción?:</label>
+          <select id="seccion-nota-rep-select" class="form-select form-select-sm mb-2" style="border:1px solid #d97706;">
+            <option value="0">📌 Al inicio de la canción (General)</option>
+          </select>
+          <label for="texto-nota-rep-input" class="form-label small fw-bold mb-1" style="color:#78350f;">Indicación o recordatorio:</label>
+          <textarea id="texto-nota-rep-input" class="form-control mb-2" rows="2" placeholder="Ej: Arpegio suave, subir en esta estrofa, repetir coro..."></textarea>
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" id="btn-cancelar-edicion-rep" class="btn btn-outline-secondary btn-sm px-2" style="display:none;" onclick="cancelarEdicionNotaRep()">Cancelar edición</button>
+            <button type="button" id="btn-guardar-item-nota-rep" class="btn btn-warning text-white btn-sm px-3 fw-bold" onclick="guardarItemNotaRepertorio()">Guardar nota</button>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-success btn-sm px-4 fw-bold" onclick="cerrarModalNotaRepertorio()">Listo</button>
         </div>
       </div>
     </div>
@@ -515,7 +564,8 @@
 
       programa.forEach((item, index) => {
         if (item.capo === undefined) item.capo = 0;
-        const notaItem = (item.nota !== undefined) ? item.nota : (notasGlobales[item.cancion] || "");
+        const claveNormal = (item.cancion || "").replace(/^\/?cancionerobenja\//, "").replace(/^\/+/, "");
+        const notaItem = (item.nota !== undefined && item.nota !== "") ? item.nota : (notasGlobales[claveNormal] || notasGlobales[item.cancion] || notasGlobales["/" + claveNormal] || "");
 
         const li = document.createElement("li");
         // Le sacamos los estilos fijos y le ponemos las clases inteligentes
@@ -530,11 +580,18 @@
         textoSpan.textContent = `${item.seccion}: ${item.nombre}`;
         bloqueTitulo.appendChild(textoSpan);
 
-        if (notaItem) {
+        let textoNotaVisible = "";
+        if (typeof notaItem === "string") {
+          textoNotaVisible = notaItem.trim();
+        } else if (Array.isArray(notaItem) && notaItem.length > 0) {
+          textoNotaVisible = notaItem.map(n => n.texto).filter(Boolean).join(" • ");
+        }
+
+        if (textoNotaVisible) {
           const divNota = document.createElement("div");
-          divNota.className = "small fst-italic mt-1";
+          divNota.className = "small mt-1";
           divNota.style.color = "#d97706";
-          divNota.innerHTML = `📝 <b>Nota:</b> ${notaItem}`;
+          divNota.innerHTML = `📌 <b>Nota:</b> ${textoNotaVisible}`;
           bloqueTitulo.appendChild(divNota);
         }
 
@@ -573,7 +630,7 @@
         const divAcciones = document.createElement("div");
         divAcciones.className = "btn-group";
         divAcciones.innerHTML = `
-          <button class="btn ${notaItem ? 'btn-warning text-white' : 'btn-outline-warning'} btn-sm" onclick="editarNotaPrograma(${index})" title="${notaItem ? 'Editar recordatorio: ' + notaItem : 'Agregar recordatorio'}">📝</button>
+          <button class="btn ${textoNotaVisible ? 'btn-warning text-white' : 'btn-outline-warning'} btn-sm" onclick="editarNotaPrograma(${index})" title="${textoNotaVisible ? 'Editar recordatorio: ' + textoNotaVisible : 'Agregar recordatorio'}">📝</button>
           <button class="btn btn-outline-info btn-sm" onclick="moverCancion(${index}, -1)">↑</button>
           <button class="btn btn-outline-info btn-sm" onclick="moverCancion(${index}, 1)">↓</button>
           <button class="btn btn-outline-danger btn-sm" onclick="eliminarCancion(${index})">✕</button>
@@ -585,22 +642,242 @@
       });
     }
 
-    window.editarNotaPrograma = function(index) {
-      let notas = {};
-      try { notas = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
-      const actual = (programa[index].nota !== undefined) ? programa[index].nota : (notas[programa[index].cancion] || "");
-      const nueva = prompt(`Recordatorio para "${programa[index].nombre}":\n(ej: Repetir coro al final, arpegio suave, entrar en 2ª estrofa...)`, actual);
-      if (nueva === null) return;
-      const limpia = nueva.trim();
-      programa[index].nota = limpia;
-      guardarPrograma();
-      if (limpia) {
-        notas[programa[index].cancion] = limpia;
-      } else {
-        delete notas[programa[index].cancion];
+    let indiceNotaEditando = -1;
+    let idNotaEnEdicion = null;
+    let stanzasCancionActual = [];
+
+    function normalizarClave(c) {
+      if (!c) return "";
+      return c.replace(/^\/?cancionerobenja\//, "").replace(/^\/+/, "").split("?")[0].split("#")[0].trim();
+    }
+
+    function obtenerArrayNotasItem(item) {
+      if (!item) return [];
+      let notasGlobales = {};
+      try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+      const clave = normalizarClave(item.cancion);
+      const raw = (item.nota !== undefined && item.nota !== "") ? item.nota : (notasGlobales[clave] || notasGlobales[item.cancion] || notasGlobales["/" + clave] || null);
+      if (!raw) return [];
+      if (Array.isArray(raw)) return raw.slice();
+      if (typeof raw === "string" && raw.trim() !== "") {
+        return [{ id: "leg_1", seccionId: 0, nombreSeccion: "General", texto: raw.trim() }];
       }
-      localStorage.setItem("cancionero_notas", JSON.stringify(notas));
+      return [];
+    }
+
+    window.editarNotaPrograma = async function(index) {
+      indiceNotaEditando = index;
+      idNotaEnEdicion = null;
+      const item = programa[index];
+      if (!item) return;
+
+      const modal = document.getElementById("modal-nota-repertorio");
+      const subtitulo = document.getElementById("subtitulo-nota-repertorio");
+      const selectSeccion = document.getElementById("seccion-nota-rep-select");
+      const inputTexto = document.getElementById("texto-nota-rep-input");
+      const lblForm = document.getElementById("lbl-form-nota-rep");
+      const btnCancel = document.getElementById("btn-cancelar-edicion-rep");
+      const btnGuardar = document.getElementById("btn-guardar-item-nota-rep");
+
+      if (subtitulo) subtitulo.textContent = `Para "${item.seccion}: ${item.nombre}"`;
+      if (inputTexto) inputTexto.value = "";
+      if (lblForm) lblForm.textContent = "➕ Agregar nota:";
+      if (btnCancel) btnCancel.style.display = "none";
+      if (btnGuardar) btnGuardar.textContent = "Guardar nota";
+
+      // Resetear opciones del select a General mientras se carga la canción
+      if (selectSeccion) {
+        selectSeccion.innerHTML = `<option value="0">📌 Al inicio de la canción (General)</option>`;
+      }
+
+      renderizarListaNotasModalRep();
+
+      if (modal) modal.style.display = "flex";
+
+      // Cargar estrofas de la canción
+      stanzasCancionActual = [{ id: 0, nombre: "📌 Al inicio de la canción (General)", preview: "General" }];
+      try {
+        const resp = await fetch(item.cancion);
+        if (resp.ok) {
+          const html = await resp.text();
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const $pre = $(doc.querySelector('#letra') || doc.querySelector('pre'));
+          if (window.extraerUbicacionesCancion && $pre.length > 0) {
+            stanzasCancionActual = window.extraerUbicacionesCancion($pre);
+          } else if (window.extraerEstrofasCancion && $pre.length > 0) {
+            stanzasCancionActual = window.extraerEstrofasCancion($pre);
+          }
+        }
+      } catch(e) {
+        console.warn("No se pudieron cargar estrofas adicionales de la canción", e);
+      }
+
+      // Rellenar select con las estrofas detectadas
+      if (selectSeccion) {
+        selectSeccion.innerHTML = stanzasCancionActual.map(s => `<option value="${s.id}">${s.nombre}</option>`).join("");
+      }
+    };
+
+    function renderizarListaNotasModalRep() {
+      if (indiceNotaEditando < 0 || !programa[indiceNotaEditando]) return;
+      const item = programa[indiceNotaEditando];
+      const notas = obtenerArrayNotasItem(item);
+      const contenedor = document.getElementById("contenedor-items-notas-rep");
+      const cajaLista = document.getElementById("lista-notas-cargadas-rep");
+      if (!contenedor || !cajaLista) return;
+
+      if (notas.length === 0) {
+        cajaLista.style.display = "none";
+        contenedor.innerHTML = "";
+        return;
+      }
+
+      cajaLista.style.display = "block";
+      contenedor.innerHTML = notas.map(n => `
+        <div class="d-flex justify-content-between align-items-center p-2 mb-2 rounded" style="background:#fffbeb; border:1px solid #fde68a;">
+          <div style="font-size:13px; line-height:1.3; overflow:hidden; text-overflow:ellipsis;">
+            <span class="badge text-bg-warning me-1" style="font-size:10px;">📌 Nota</span>
+            <span class="fw-semibold text-dark">${n.texto}</span>
+          </div>
+          <div class="d-flex gap-1 ms-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" title="Editar" onclick="editarItemNotaRep('${n.id}')">✏️</button>
+            <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" title="Eliminar" onclick="borrarItemNotaRep('${n.id}')">🗑️</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.guardarItemNotaRepertorio = function() {
+      if (indiceNotaEditando < 0 || !programa[indiceNotaEditando]) return;
+      const inputTexto = document.getElementById("texto-nota-rep-input");
+      const selectSeccion = document.getElementById("seccion-nota-rep-select");
+      const texto = (inputTexto ? inputTexto.value : "").trim();
+      if (!texto) {
+        alert("Por favor escribí una nota o indicación.");
+        return;
+      }
+
+      const selectVal = selectSeccion ? selectSeccion.value : "0";
+      const secObj = stanzasCancionActual.find(s => String(s.id) === String(selectVal)) || { nombre: "General", preview: "General" };
+      const nombreSec = secObj.nombre ? secObj.nombre.replace(/^📌\s*/, '') : 'General';
+      const lineIndex = (secObj.lineIndex !== undefined) ? secObj.lineIndex : -1;
+
+      const item = programa[indiceNotaEditando];
+      let notas = obtenerArrayNotasItem(item);
+
+      if (idNotaEnEdicion) {
+        const idx = notas.findIndex(n => String(n.id) === String(idNotaEnEdicion));
+        if (idx !== -1) {
+          notas[idx].texto = texto;
+          notas[idx].seccionId = secObj.id;
+          notas[idx].lineIndex = lineIndex;
+          notas[idx].nombreSeccion = nombreSec;
+        }
+      } else {
+        notas.push({
+          id: Date.now().toString(),
+          seccionId: secObj.id,
+          lineIndex: lineIndex,
+          nombreSeccion: nombreSec,
+          texto: texto
+        });
+      }
+
+      notas.sort((a, b) => (a.seccionId || 0) - (b.seccionId || 0));
+
+      item.nota = notas;
+
+      // Sincronizar en localStorage cancionero_notas
+      let notasGlobales = {};
+      try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+      const clave = normalizarClave(item.cancion);
+      notasGlobales[clave] = notas;
+      localStorage.setItem("cancionero_notas", JSON.stringify(notasGlobales));
+
+      guardarPrograma();
       mostrarPrograma();
+
+      cancelarEdicionNotaRep();
+      renderizarListaNotasModalRep();
+    };
+
+    window.editarItemNotaRep = function(notaId) {
+      if (indiceNotaEditando < 0 || !programa[indiceNotaEditando]) return;
+      const item = programa[indiceNotaEditando];
+      const notas = obtenerArrayNotasItem(item);
+      const nota = notas.find(n => String(n.id) === String(notaId));
+      if (!nota) return;
+
+      idNotaEnEdicion = notaId;
+      const inputTexto = document.getElementById("texto-nota-rep-input");
+      const selectSeccion = document.getElementById("seccion-nota-rep-select");
+      const lblForm = document.getElementById("lbl-form-nota-rep");
+      const btnCancel = document.getElementById("btn-cancelar-edicion-rep");
+      const btnGuardar = document.getElementById("btn-guardar-item-nota-rep");
+
+      if (inputTexto) {
+        inputTexto.value = nota.texto;
+        inputTexto.focus();
+      }
+      if (selectSeccion) selectSeccion.value = nota.seccionId || 0;
+      if (lblForm) lblForm.textContent = "✏️ Editar nota seleccionada:";
+      if (btnCancel) btnCancel.style.display = "inline-block";
+      if (btnGuardar) btnGuardar.textContent = "Actualizar nota";
+    };
+
+    window.cancelarEdicionNotaRep = function() {
+      idNotaEnEdicion = null;
+      const inputTexto = document.getElementById("texto-nota-rep-input");
+      const selectSeccion = document.getElementById("seccion-nota-rep-select");
+      const lblForm = document.getElementById("lbl-form-nota-rep");
+      const btnCancel = document.getElementById("btn-cancelar-edicion-rep");
+      const btnGuardar = document.getElementById("btn-guardar-item-nota-rep");
+
+      if (inputTexto) inputTexto.value = "";
+      if (selectSeccion) selectSeccion.value = 0;
+      if (lblForm) lblForm.textContent = "➕ Agregar nota:";
+      if (btnCancel) btnCancel.style.display = "none";
+      if (btnGuardar) btnGuardar.textContent = "Guardar nota";
+    };
+
+    window.borrarItemNotaRep = function(notaId) {
+      if (indiceNotaEditando < 0 || !programa[indiceNotaEditando]) return;
+      const item = programa[indiceNotaEditando];
+      let notas = obtenerArrayNotasItem(item);
+      notas = notas.filter(n => String(n.id) !== String(notaId));
+
+      if (notas.length > 0) {
+        item.nota = notas;
+      } else {
+        delete item.nota;
+      }
+
+      // Sincronizar en localStorage cancionero_notas
+      let notasGlobales = {};
+      try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+      const clave = normalizarClave(item.cancion);
+      if (notas.length > 0) {
+        notasGlobales[clave] = notas;
+      } else {
+        delete notasGlobales[clave];
+        delete notasGlobales[item.cancion];
+      }
+      localStorage.setItem("cancionero_notas", JSON.stringify(notasGlobales));
+
+      guardarPrograma();
+      mostrarPrograma();
+
+      if (idNotaEnEdicion && String(idNotaEnEdicion) === String(notaId)) {
+        cancelarEdicionNotaRep();
+      }
+      renderizarListaNotasModalRep();
+    };
+
+    window.cerrarModalNotaRepertorio = function() {
+      const modal = document.getElementById("modal-nota-repertorio");
+      if (modal) modal.style.display = "none";
+      indiceNotaEditando = -1;
+      idNotaEnEdicion = null;
     };
 
     window.cambiarTono = (index, delta) => {
@@ -730,6 +1007,187 @@
         window.open('programa-texto.html?print=1' + paramCols, '_blank');
       }
     }
+
+    const regexAcordeExacto = /^(\(?)(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?)*(\)?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\))?$/i;
+    const regexAuxAcorde = /^([---\/|()xX0-9:.]+|intro:?|final:?|inter:?|puente:?|bis:?|coro:?|estribillo:?)$/i;
+
+    function isChordLineFn(line) {
+      if (!line) return false;
+      if (/<span\s+class=['"]c['"]/i.test(line)) return true;
+      const sinTags = line.replace(/<[^>]*>/g, ' ').trim();
+      if (!sinTags) return false;
+      const tokens = sinTags.split(/\s+/);
+      let cantAcordes = 0;
+      for (const tok of tokens) {
+        if (regexAcordeExacto.test(tok)) {
+          cantAcordes++;
+        } else if (regexAuxAcorde.test(tok)) {
+          continue;
+        } else if (tok.indexOf('-') !== -1) {
+          const subparts = tok.split('-');
+          let ok = true;
+          let subCant = 0;
+          for (const sub of subparts) {
+            const s = sub.trim();
+            if (!s) continue;
+            if (regexAcordeExacto.test(s)) {
+              subCant++;
+            } else if (!regexAuxAcorde.test(s)) {
+              ok = false;
+              break;
+            }
+          }
+          if (ok && subCant > 0) {
+            cantAcordes += subCant;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      }
+      return cantAcordes > 0;
+    }
+    window.isChordLine = isChordLineFn;
+
+    window.descargarWordRepertorio = async function(tipo) {
+      if (!programa || programa.length === 0) {
+        alert("El repertorio está vacío. Agregá canciones antes de descargar.");
+        return;
+      }
+
+      cerrarModalImprimir();
+
+      const input = document.getElementById("nombre-repertorio-input");
+      const nombreRep = (input ? input.value : "").trim() || "Repertorio";
+
+      let notasGlobales = {};
+      try { notasGlobales = JSON.parse(localStorage.getItem("cancionero_notas") || "{}"); } catch(e){}
+
+      let cancionesHTML = "";
+
+      for (let i = 0; i < programa.length; i++) {
+        const item = programa[i];
+        try {
+          const resp = await fetch(item.cancion);
+          if (!resp.ok) continue;
+          const html = await resp.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          const claveNormal = (item.cancion || "").replace(/^\/?cancionerobenja\//, "").replace(/^\/+/, "");
+          const notaRaw = (item.nota !== undefined && item.nota !== "") ? item.nota : (notasGlobales[claveNormal] || notasGlobales[item.cancion] || "");
+          let arrayNotas = [];
+          if (Array.isArray(notaRaw)) {
+            arrayNotas = notaRaw;
+          } else if (typeof notaRaw === "string" && notaRaw.trim()) {
+            arrayNotas = [{ lineIndex: -1, texto: notaRaw.trim() }];
+          }
+
+          const $pre = $(doc.querySelector('#letra') || doc.querySelector('pre'));
+          let contenidoCancion = "";
+
+          if ($pre.length > 0) {
+            if (item.tono) $pre.attr('data-key', item.tono);
+            if (typeof $pre.transpose === 'function') {
+              $pre.transpose();
+            }
+
+            const rawHtml = $pre.html();
+            const lines = rawHtml.split('\n');
+
+            if (tipo === 'acordes') {
+              const outLines = [];
+              for (let l = 0; l < lines.length; l++) {
+                const notasDeLinea = arrayNotas.filter(n => {
+                  const idx = (n.lineIndex !== undefined && n.lineIndex !== null) ? n.lineIndex : -1;
+                  return (idx === l) || (l === 0 && idx < 0);
+                });
+                notasDeLinea.forEach(n => {
+                  const t = (n.texto || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                  outLines.push(`<span style="background:#fef3c7; border:1px solid #f59e0b; border-left:4px solid #d97706; padding:3pt 6pt; margin:4pt 0; font-family:sans-serif; font-size:9.5pt; color:#78350f; display:block;"><b>📌 NOTA:</b> ${t}</span>`);
+                });
+                outLines.push(lines[l].replace(/<span class="c">([^<]+)<\/span>/g, '<span style="color:#c00000; font-weight:bold;">$1</span>'));
+              }
+              contenidoCancion = outLines.join('\n');
+            } else {
+              const textLines = [];
+              for (let l = 0; l < lines.length; l++) {
+                const notasDeLinea = arrayNotas.filter(n => {
+                  const idx = (n.lineIndex !== undefined && n.lineIndex !== null) ? n.lineIndex : -1;
+                  return (idx === l) || (l === 0 && idx < 0);
+                });
+                notasDeLinea.forEach(n => {
+                  const t = (n.texto || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                  textLines.push(`<span style="background:#fef3c7; border:1px solid #f59e0b; border-left:4px solid #d97706; padding:3pt 6pt; margin:4pt 0; font-family:sans-serif; font-size:9.5pt; color:#78350f; display:block;"><b>📌 NOTA:</b> ${t}</span>`);
+                });
+
+                const line = lines[l];
+                if (!isChordLineFn(line)) {
+                  let clean = line.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+$/, '');
+                  textLines.push(clean);
+                }
+              }
+              contenidoCancion = textLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+            }
+          }
+
+          const saltoPagina = (i < programa.length - 1) ? '<br clear="all" style="mso-special-character:line-break; page-break-before:always">' : '';
+
+          cancionesHTML += `
+            <div class="cancion-bloque">
+              <h2 style="color:#0A2846; text-align:center; font-size:14pt; margin-top:20pt; margin-bottom:3pt; page-break-after:avoid;">${item.nombre}</h2>
+              <div style="text-align:center; font-size:10pt; color:#555555; margin-bottom:8pt;">
+                Sección: <b>${item.seccion}</b> · Tono: <b>${item.tono}</b> · <b>${item.capo ? 'Capo ' + item.capo : 'Sin Capo'}</b>
+              </div>
+              <pre style="font-family:'Consolas','Courier New',monospace; font-size:10pt; line-height:1.25; margin-top:5pt; margin-bottom:20pt; white-space:pre-wrap;">${contenidoCancion}</pre>
+            </div>
+            ${saltoPagina}
+          `;
+        } catch (e) {
+          console.error("Error al procesar canción para Word:", e);
+        }
+      }
+
+      const docHTML = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset='utf-8'>
+          <title>${nombreRep}</title>
+          <!--[if gte mso 9]>
+          <xml>
+            <w:WordDocument>
+              <w:View>Print</w:View>
+              <w:Zoom>100</w:Zoom>
+              <w:DoNotOptimizeForBrowser/>
+            </w:WordDocument>
+          </xml>
+          <![endif]-->
+          <style>
+            @page { size: A4; margin: 1.5cm; }
+            body { font-family: Arial, sans-serif; font-size: 11pt; color: #000000; }
+            h1 { font-size: 18pt; color: #0A2846; text-align: center; margin-bottom: 4pt; }
+            .subtitulo-doc { text-align: center; font-size: 10.5pt; color: #666666; margin-bottom: 20pt; }
+          </style>
+        </head>
+        <body>
+          <h1>${nombreRep}</h1>
+          <div class="subtitulo-doc">Cancionero Schoenstatt · ${new Date().toLocaleDateString('es-AR')}</div>
+          <hr style="border:none; border-top:1.5pt solid #2A9D8F; margin-bottom:20pt;">
+          ${cancionesHTML}
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + docHTML], { type: 'application/msword;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      const limpioNombre = nombreRep.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s-_]/g, '');
+      link.download = limpioNombre + (tipo === 'acordes' ? ' (Con Acordes).doc' : ' (Solo Texto).doc');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
 
     window.addEventListener("DOMContentLoaded", () => { 
       const input = document.getElementById("nombre-repertorio-input");
