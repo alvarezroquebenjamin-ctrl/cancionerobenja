@@ -30,7 +30,7 @@
 
 <body>
 <nav class="navbar sticky-top navbar-dark bg-primary">
-  <div class="container-fluid">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
     
     <div style="display: inline-flex; align-items: center;">
       <a class="navbar-brand" href="index.html" style="margin-right: 16px;">
@@ -39,10 +39,15 @@
       </a>
       <a class="btn-toggle-theme" href="#" id="toggle-theme" title="Cambiar Modo Noche / Día" style="display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.7); border-radius: 50px; padding: 3px 11px; color: #fff; text-decoration: none; font-size: 15px; line-height: 1.2;">🌙</a>
     </div>
-    
-<div class="d-flex position-relative ms-lg-3" style="min-width: 250px;">
+
+    <div class="d-flex align-items-center ms-auto">
+      <button type="button" class="btn-lupa-buscar" id="btn-abrir-buscador" title="Buscar canción" aria-label="Buscar canción">🔍</button>
+      
+      <div class="buscador-desplegable ms-lg-2" id="box-buscador-desplegable">
         
-        <input id="inputGlobal" class="form-control me-2" type="search" placeholder="🔍 Buscar canción..." aria-label="Search" onkeyup="filtrarGlobal()" onfocus="mostrarRecientesBuscador()" onclick="mostrarRecientesBuscador()">
+        <span class="icono-lupa-desplegable">🔍</span>
+        <input id="inputGlobal" class="form-control" type="search" placeholder="Buscar canción por título o letra..." aria-label="Search" onkeyup="filtrarGlobal()" onfocus="mostrarRecientesBuscador()" onclick="mostrarRecientesBuscador()" autocomplete="off">
+        <button type="button" id="btn-cerrar-buscador" class="btn-cerrar-buscador" title="Cerrar búsqueda" aria-label="Cerrar">✕</button>
         
         <div id="listaGlobal" class="list-group position-absolute w-100 shadow" style="top: 100%; left: 0; z-index: 1050; max-height: 400px; overflow-y: auto; display: none;">
             
@@ -470,8 +475,9 @@
   <a class="btn btn-outline-primary btn-sm" href="vive-dios/and-we-go.html">And we go</a>
   <a class="btn btn-outline-primary btn-sm" href="vive-dios/ahi-vino-jesus.html">Ahí vino Jesús</a>
   <a class="btn btn-outline-primary btn-sm" href="vive-dios/maria-te-quiero-cantar.html">María, te quiero cantar</a>
-            </div>
-      </div>
+    </div>
+    </div>
+    </div>
 
   </div>
 </nav>

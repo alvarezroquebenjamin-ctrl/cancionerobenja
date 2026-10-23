@@ -865,10 +865,187 @@ body.modo-oscuro .portada h1 {
    Pegar al FINAL de css/cancionero.css (después de todo lo que hay).
    Para deshacerlo, borrá este bloque completo.
    ============================================================ */
+html, body {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Botón de la Lupa */
+.btn-lupa-buscar {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  border-radius: 50px !important;
+  padding: 3px 10px !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-lupa-buscar:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.05);
+}
+
+.btn-lupa-buscar.oculto {
+  display: none !important;
+}
+
+.buscador-desplegable {
+  display: none;
+  position: relative;
+  align-items: center;
+  gap: 8px;
+}
+
+.buscador-desplegable.activo {
+  display: flex !important;
+}
+
+.buscador-desplegable .icono-lupa-desplegable {
+  font-size: 15px;
+  color: #fff;
+  opacity: 0.9;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.btn-cerrar-buscador {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+  border-radius: 50% !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  flex: 0 0 auto !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn-cerrar-buscador:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+}
+
+@media (min-width: 769px) {
+  .buscador-desplegable {
+    display: none;
+    position: relative;
+    width: 290px;
+    margin-left: 10px;
+  }
+  .buscador-desplegable.activo {
+    display: flex !important;
+    animation: fadeInBuscador 0.2s ease-out;
+  }
+  .buscador-desplegable #listaGlobal {
+    width: 360px !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+  .buscador-desplegable #inputGlobal {
+    width: 100% !important;
+    height: 32px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    padding: 3px 10px !important;
+    background: #ffffff !important;
+    color: #2C3E50 !important;
+  }
+}
+
+@keyframes slideDownBuscador {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInBuscador {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @media (max-width: 768px) {
 
   /* 1. Buscador: que se lea "Buscar canción..." completo */
-  nav #inputGlobal { width: 175px !important; }
+  /* Buscador desplegable a pantalla completa en móvil */
+  .buscador-desplegable.activo {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 48px !important;
+    background: #0A2846 !important;
+    z-index: 100000 !important;
+    padding: 6px 10px !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+    animation: slideDownBuscador 0.18s ease-out;
+  }
+  .buscador-desplegable.activo #inputGlobal {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 36px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    border: none !important;
+    padding: 4px 12px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    color: #2C3E50 !important;
+  }
+  .buscador-desplegable.activo #listaGlobal {
+    position: fixed !important;
+    top: 48px !important;
+    left: 0 !important;
+    width: 100vw !important;
+    max-height: calc(100vh - 55px) !important;
+    border-radius: 0 0 16px 16px !important;
+    border: 2px solid #2A9D8F !important;
+    border-top: none !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    z-index: 100001 !important;
+  }
+
+  /* El buscador de título ocupa el 100% igual que los selectores */
+  #contenedor-buscador-repertorio,
+  #buscador-repertorio {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* El textarea del modal de notas ocupa el 100% */
+  #texto-nota-rep-input,
+  #modal-nota-repertorio textarea {
+    width: 100% !important;
+    min-height: 64px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Logo y título de cabecera más proporcionados */
+  .navbar-brand {
+    font-size: 17px !important;
+    padding: 0 !important;
+    margin-right: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+  .navbar-brand img {
+    width: 24px !important;
+    height: 24px !important;
+  }
 
   /* 2. Encabezado de la canción más compacto: la letra empieza más arriba */
   .titulo { margin-top: 10px !important; margin-bottom: 4px !important; }

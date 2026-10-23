@@ -31,7 +31,7 @@
 
     <div class="mt-4 position-relative" id="contenedor-buscador-repertorio">
       <label for="buscador-repertorio">Buscar canción por título:</label>
-      <input id="buscador-repertorio" type="search" class="form-control mt-1" placeholder="🔍 Escribí el título para agregarla sin buscar la sección..." oninput="filtrarCancionesRepertorio()" autocomplete="off">
+      <input id="buscador-repertorio" type="search" class="form-control mt-1 w-100" style="width: 100% !important; box-sizing: border-box;" placeholder="🔍 Escribí el título para agregarla sin buscar la sección..." oninput="filtrarCancionesRepertorio()" autocomplete="off">
       <div id="resultados-repertorio" class="list-group position-absolute w-100 shadow text-start" style="top: 100%; left: 0; z-index: 1040; max-height: 280px; overflow-y: auto; display: none; background: #FDFBF7; border: 2px solid #2A9D8F; border-radius: 14px; padding: 8px; margin-top: 4px;"></div>
     </div>
 
@@ -165,7 +165,7 @@
             <option value="0">📌 Al inicio de la canción (General)</option>
           </select>
           <label for="texto-nota-rep-input" class="form-label small fw-bold mb-1" style="color:#78350f;">Indicación o recordatorio:</label>
-          <textarea id="texto-nota-rep-input" class="form-control mb-2" rows="2" placeholder="Ej: Arpegio suave, subir en esta estrofa, repetir coro..."></textarea>
+          <textarea id="texto-nota-rep-input" class="form-control mb-2 w-100" rows="2" style="width: 100% !important; min-height: 64px; box-sizing: border-box;" placeholder="Ej: Arpegio suave, subir en esta estrofa, repetir coro..."></textarea>
           <div class="d-flex justify-content-end gap-2">
             <button type="button" id="btn-cancelar-edicion-rep" class="btn btn-outline-secondary btn-sm px-2" style="display:none;" onclick="cancelarEdicionNotaRep()">Cancelar edición</button>
             <button type="button" id="btn-guardar-item-nota-rep" class="btn btn-warning text-white btn-sm px-3 fw-bold" onclick="guardarItemNotaRepertorio()">Guardar nota</button>

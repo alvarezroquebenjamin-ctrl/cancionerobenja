@@ -3,7 +3,7 @@ function limpiarTexto(texto) {
     return texto
         .toLowerCase() // 1. Pasa todo a minúsculas
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // 2. Saca los acentos
-        .replace(/[,.-]/g, "") // 3. Saca comas, puntos y guiones
+        .replace(/[,.\-–—_¡!¿?"'«»()[\]{}:;\/\\]/g, "") // 3. Saca comas, puntos, guiones y signos
         .trim(); // 4. Saca los espacios de más en los bordes
 }
 /* ===================================================
@@ -1854,11 +1854,10 @@ document.addEventListener("DOMContentLoaded", function() {
     style.innerHTML = `
         @media (max-width: 768px) {
             .navbar-toggler { display: none !important; }
-            .navbar-collapse, .collapse { display: flex !important; flex-basis: auto !important; align-items: center !important; width: 100% !important; justify-content: space-between !important; }
-            .navbar-nav { flex-direction: row !important; gap: 5px; }
-            .nav-item, .dropdown, .nav-link, .dropdown-toggle { font-size: 13px !important; padding: 0 5px !important; }
-            #inputGlobal, .form-control { width: 110px !important; font-size: 13px !important; height: 30px !important; padding: 2px 5px !important; }
-            .container, .container-fluid, .navbar { padding-left: 5px !important; padding-right: 5px !important; }
+            .navbar-collapse, .collapse { display: flex !important; flex-basis: auto !important; align-items: center !important; width: auto !important; flex: 1 1 auto !important; min-width: 0 !important; justify-content: flex-end !important; }
+            .navbar-nav { flex-direction: row !important; gap: 4px; margin: 0 !important; align-items: center !important; }
+            .nav-item, .dropdown, .nav-link, .dropdown-toggle { font-size: 13px !important; padding: 0 4px !important; }
+            .container, .container-fluid, .navbar { padding-left: 6px !important; padding-right: 6px !important; }
             .navbar-nav .dropdown-menu { position: absolute !important; float: none !important; top: 100% !important; left: 0 !important; margin-top: 5px !important; background-color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: auto !important; min-width: 180px; z-index: 10000 !important; }
             .navbar, .navbar-collapse { overflow: visible !important; }
         }
@@ -3824,14 +3823,58 @@ function obtenerClaveCancion(href) {
     return decodeURI(href.split("?")[0]).replace(/^(\.\.\/)+/, "").replace(/^\/?cancionerobenja\//, "");
 }
 
-function armarExtractoLetra(letraOriginal, filtroLimpio) {
+function construirRegexBusquedaFlexible(filtroLimpio) {
+    if (!filtroLimpio || filtroLimpio.length < 2) return null;
+    var palabras = filtroLimpio.split(/\s+/).filter(Boolean);
+    if (palabras.length === 0) return null;
+
+    var partes = palabras.map(function(pal) {
+        var palEscaped = pal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        // Si la palabra tiene 3 o más letras, permitimos espacios o guiones entre cada carácter
+        // para identificar palabras separadas con guiones/espacios (ej: Marí---a / Marí a -> maria)
+        if (pal.length >= 3) {
+            var chars = pal.split("").map(function(c) {
+                return c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            });
+            return "(?:\\b" + chars.join("[\\s\\-–—]*") + "\\b)";
+        } else {
+            return "(?:\\b" + palEscaped + "\\b)";
+        }
+    });
+
+    try {
+        return new RegExp(partes.join("[\\s\\-–—]+"), "i");
+    } catch (e) {
+        return null;
+    }
+}
+
+function armarExtractoLetra(letraOriginal, filtroLimpio, regexFlexible) {
     if (!letraOriginal) return "";
     var letraLimpia = limpiarTexto(letraOriginal);
-    var pos = letraLimpia.indexOf(filtroLimpio);
+    var pos = -1;
+    var matchLen = filtroLimpio.length;
+
+    // 1. Buscamos primero coincidencia exacta de la frase
+    pos = letraLimpia.indexOf(filtroLimpio);
+
+    // 2. Si hay regex flexible (para palabras con guiones o espacios como Marí---a o Co---mo):
+    if (regexFlexible) {
+        var m = regexFlexible.exec(letraLimpia);
+        if (m) {
+            // Si no había coincidencia exacta, o la coincidencia flexible aparece antes:
+            if (pos === -1 || m.index < pos) {
+                pos = m.index;
+                matchLen = m[0].length;
+            }
+        }
+    }
+
     if (pos === -1) return "";
+
     // Aproximamos la posición en el texto original para mostrar un fragmento legible
     var inicio = Math.max(0, pos - 18);
-    var fin = Math.min(letraOriginal.length, pos + filtroLimpio.length + 32);
+    var fin = Math.min(letraOriginal.length, pos + matchLen + 32);
     var recorte = letraOriginal.substring(inicio, fin).trim();
     return (inicio > 0 ? "«…" : "«") + recorte + (fin < letraOriginal.length ? "…»" : "»");
 }
@@ -3921,6 +3964,7 @@ function filtrarGlobal() {
     var empiezaTitulo = [];
     var contieneTitulo = [];
     var contieneLetra = [];
+    var regexFlexible = construirRegexBusquedaFlexible(filtro);
 
     for (var i = 0; i < enlaces.length; i++) {
         var el = enlaces[i];
@@ -3939,7 +3983,19 @@ function filtrarGlobal() {
         var tituloLimpio = limpiarTexto(tituloOriginal);
         var posTitulo = tituloLimpio.indexOf(filtro);
         var coincideTitulo = posTitulo > -1;
-        var coincideLetra = !coincideTitulo && filtro.length >= 2 && limpiarTexto(letra).indexOf(filtro) > -1;
+        if (!coincideTitulo && regexFlexible && regexFlexible.test(tituloLimpio)) {
+            coincideTitulo = true;
+        }
+
+        var coincideLetra = false;
+        if (!coincideTitulo && filtro.length >= 2) {
+            var letraLimpia = limpiarTexto(letra);
+            if (letraLimpia.indexOf(filtro) > -1) {
+                coincideLetra = true;
+            } else if (regexFlexible && regexFlexible.test(letraLimpia)) {
+                coincideLetra = true;
+            }
+        }
 
         var ordenOrig = parseInt(el.getAttribute("data-orden-orig") || i, 10);
 
@@ -3952,7 +4008,7 @@ function filtrarGlobal() {
                 contieneTitulo.push({ el: el, idx: ordenOrig });
             }
         } else if (coincideLetra) {
-            var extracto = armarExtractoLetra(letra, filtro);
+            var extracto = armarExtractoLetra(letra, filtro, regexFlexible);
             el.innerHTML = `<div>${tituloOriginal}</div>` +
                 (extracto ? `<small style="display:block; font-size:0.78em; opacity:0.75; font-weight:normal; font-style:italic; white-space:normal;">${extracto}</small>` : "");
             el.style.display = "";
@@ -3980,6 +4036,64 @@ document.addEventListener('click', function(event) {
     var input = document.getElementById('inputGlobal');
     if (contenedor && input && event.target !== input && !contenedor.contains(event.target)) {
         contenedor.style.display = 'none';
+    }
+});
+
+window.abrirBuscadorGlobal = function() {
+    var $box = $('#box-buscador-desplegable');
+    var $input = $('#inputGlobal');
+    var $btnAbrir = $('#btn-abrir-buscador');
+    if ($box.length === 0) return;
+
+    $box.addClass('activo');
+    $btnAbrir.addClass('oculto');
+    setTimeout(function() {
+        if ($input.length) {
+            $input.focus();
+            if (typeof window.mostrarRecientesBuscador === 'function' && !$input.val()) {
+                window.mostrarRecientesBuscador();
+            } else if (typeof mostrarRecientesBuscador === 'function' && !$input.val()) {
+                mostrarRecientesBuscador();
+            }
+        }
+    }, 70);
+};
+
+window.cerrarBuscadorGlobal = function() {
+    var $box = $('#box-buscador-desplegable');
+    var $input = $('#inputGlobal');
+    var $btnAbrir = $('#btn-abrir-buscador');
+    var $lista = $('#listaGlobal');
+
+    if ($input.length) $input.val('');
+    if ($lista.length) $lista.hide();
+    var boxRec = document.getElementById("recientes-buscador-box");
+    if (boxRec) boxRec.style.display = "none";
+
+    $box.removeClass('activo');
+    $btnAbrir.removeClass('oculto');
+};
+
+$(document).on('click', '#btn-abrir-buscador', function(e) {
+    e.stopPropagation();
+    window.abrirBuscadorGlobal();
+});
+
+$(document).on('click', '#btn-cerrar-buscador', function(e) {
+    e.stopPropagation();
+    window.cerrarBuscadorGlobal();
+});
+
+$(document).on('keydown', function(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+        window.cerrarBuscadorGlobal();
+    }
+});
+
+$(document).on('click', function(e) {
+    var $box = $('#box-buscador-desplegable');
+    if ($box.hasClass('activo') && !$box.is(e.target) && $box.has(e.target).length === 0 && !$(e.target).closest('#btn-abrir-buscador').length) {
+        window.cerrarBuscadorGlobal();
     }
 });
 
