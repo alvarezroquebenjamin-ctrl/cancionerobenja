@@ -1026,8 +1026,8 @@ window.canciones = {
     window.aplicarSistemaCifrado(nuevo);
   };
 
-  const regexAcordeExacto = /^(\(?)(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?)*(\)?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\))?$/i;
-  const regexAuxAcorde = /^([---\/|()xX0-9:.]+|intro:?|final:?|inter:?|puente:?|bis:?|coro:?|estribillo:?)$/i;
+  const regexAcordeExacto = /^([(\[]?)(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7b11|7\#11|7b13|7\#13|7\+11|7\-11|7\+13|7\-13|[b#\+\-](?:5|9|11|13)|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?)*(\*+)?([)\]]?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\)|\[x[0-9]+\]|bis|\(bis:?\)|\(bis\.[0-9]*\)|\[bis\])?(\*+)?([)\]]?)$/i;
+  const regexAuxAcorde = /^[(\[{<*]*(?:[-–—\/|()xX0-9:.*]+|(?:intro|final|inter|interludio|puente|bis|coro|estribillo|estrofa|solo|coda|fin)[)\]}>:.,*0-9xX-]*)$/i;
 
   var isChordLine = function(line) {
     if (!line) return false;
@@ -1277,8 +1277,8 @@ window.canciones = {
   };
   
   $.fn.transpose.defaults = { 
-    chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*$/, 
-    chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*)/g 
+    chordRegex: /^(\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7b11|7\#11|7b13|7\#13|7\+11|7\-11|7\+13|7\-13|[b#\+\-](?:5|9|11|13)|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*(?:\*+)?$/, 
+    chordReplaceRegex: /((\bDO|\bRE|\bMI|\bFA|\bSOL|\bLA|\bSI)[b\#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7b11|7\#11|7b13|7\#13|7\+11|7\-11|7\+13|7\-13|[b#\+\-](?:5|9|11|13)|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b\#]?)*(?:\*+)?)/g 
   };
   
   $(function() { 
@@ -4180,6 +4180,10 @@ const dbAcordes = {
     "MI7sus4": [0, 2, 0, 2, 0, 0], "FA7sus4": [1, 3, 1, 3, 1, 1], "SOL7sus4": [3, 5, 3, 5, 3, 3], "LA7sus4": [-1, 0, 2, 0, 3, 0], 
     "SI7sus4": [-1, 2, 4, 2, 5, 2], "SI9sus4": [-1, 2, 4, 2, 2, 2],
 
+    "MI7b11sus2-[MI9]": [0, -1, -1, 1, 3, 2],
+    "MI7b11sus2": [0, -1, -1, 1, 3, 2],
+    "MI9": [0, -1, -1, 1, 3, 2],
+
     // ==========================================
     // SEMIDISMINUIDOS (m7b5)
     // ==========================================
@@ -4233,6 +4237,11 @@ const dbAcordes = {
 
     "DO9(#11)": [-1, 3, 4, 2, 3, 0], "DO#9(#11)": [-1, 4, 3, 4, 4, 3], "RE9(#11)": [-1, 5, 4, 5, 5, 4], 
     "RE#9(#11)": [-1, 6, 5, 6, 6, 5], "MI9(#11)": [-1, 7, 6, 7, 7, 6], "SOL9(#11)": [3, -1, 0, 2, 2, -1],
+    "FA(#11)": [1, 3, 3, 2, 0, 0], "FA#11": [1, 3, 3, 2, 0, 0], "FAmaj7(#11)": [1, 3, 3, 2, 0, 0],
+    "SOLadd4": [3, 2, 0, 0, 1, 3], "SOL(add4)": [3, 2, 0, 0, 1, 3],
+    "DOadd4": [-1, 3, 3, 0, 1, 0], "DO(add4)": [-1, 3, 3, 0, 1, 0],
+    "REadd4": [-1, -1, 0, 0, 3, 2], "RE(add4)": [-1, -1, 0, 0, 3, 2],
+    "SIm7(b5)": [-1, 2, 3, 2, 3, -1], "LAm7(b5)": [-1, 0, 1, 0, 1, -1],
     "LAmaj7(#11)": [-1, 0, 2, 1, 4, 0],
     
     "DO9+": [-1, 3, 2, 1, 3, -1], "DO#9+": [-1, 4, 3, 2, 4, -1], "RE9+": [-1, 5, 4, 3, 5, -1], 
@@ -4267,6 +4276,7 @@ const dbAcordes = {
     // ==========================================
     "DO4": [-1, 3, 4, 0, 5, -1],
     "FA9(#11)": [1, -1, 1, 2, 0, -1],
+    "FA(#11)": [1, 3, 3, 2, 0, 0],
     "FA9+": [1, -1, 1, 2, 2, -1],
     "FA#7sus4": [2, 4, 2, 4, 2, 2],
     "FA#9(#11)": [2, -1, 2, 3, 1, -1],
@@ -4402,31 +4412,106 @@ const dbAcordes = {
         else if (prev && prev.nodeType === 3 && prev.nodeValue.trim() === "/" && prev.previousSibling && $(prev.previousSibling).hasClass("c")) {
             nombreAcorde = $(prev.previousSibling).text().trim() + "/" + nombreAcorde;
         }
+        // Si es parte de un acorde compuesto con guión/corchetes como MI7b11sus2-[MI9]
+        else if (next && next.nodeType === 3 && /^-\[?$/.test(next.nodeValue.trim()) && next.nextSibling && $(next.nextSibling).hasClass("c")) {
+            let segundo = $(next.nextSibling).text().trim();
+            let conCorchetes = nombreAcorde + "-[" + segundo + "]";
+            let sinCorchetes = nombreAcorde + "-" + segundo;
+            if (dbAcordes[conCorchetes]) {
+                nombreAcorde = conCorchetes;
+            } else if (dbAcordes[sinCorchetes]) {
+                nombreAcorde = sinCorchetes;
+            }
+        }
+        else if (prev && prev.nodeType === 3 && /^-\[?$/.test(prev.nodeValue.trim()) && prev.previousSibling && $(prev.previousSibling).hasClass("c")) {
+            let primero = $(prev.previousSibling).text().trim();
+            let conCorchetes = primero + "-[" + nombreAcorde + "]";
+            let sinCorchetes = primero + "-" + nombreAcorde;
+            if (dbAcordes[conCorchetes]) {
+                nombreAcorde = conCorchetes;
+            } else if (dbAcordes[sinCorchetes]) {
+                nombreAcorde = sinCorchetes;
+            }
+        }
         
         // Obtenemos el nombre en formato Latino para buscar en la base de datos
         let nombreLatino = window.convertirAcordeAmericanoALatino ? window.convertirAcordeAmericanoALatino(nombreAcorde) : nombreAcorde;
+        let nombreLatinoLimpio = nombreLatino.replace(/\*+/g, "").trim();
 
-        // 1. Buscamos si el acorde completo (ej: LAm/SOL o Am/G) existe en la base de datos
-        if(dbAcordes[nombreLatino]) {
+        // 1. Buscamos si el acorde completo o su variante más cercana existe en la base de datos
+        let keyEncontrada = null;
+        if (dbAcordes[nombreLatino]) {
+            keyEncontrada = nombreLatino;
+        } else if (dbAcordes[nombreLatinoLimpio]) {
+            keyEncontrada = nombreLatinoLimpio;
+        } else {
+            let acordeBaseLatino = nombreLatinoLimpio.split("/")[0];
+            let sinParentesis = acordeBaseLatino.replace(/[()]/g, "").trim();
+            let sinTension = acordeBaseLatino.replace(/\([^\)]+\)/g, "").trim();
+
+            if (dbAcordes[acordeBaseLatino]) {
+                keyEncontrada = acordeBaseLatino;
+            } else if (dbAcordes[sinParentesis]) {
+                keyEncontrada = sinParentesis;
+            } else if (sinTension && dbAcordes[sinTension]) {
+                keyEncontrada = sinTension;
+            } else {
+                let m = acordeBaseLatino.match(/^(DO|RE|MI|FA|SOL|LA|SI)[b#]?/i);
+                if (m) {
+                    let raiz = m[0].toUpperCase();
+                    let resto = acordeBaseLatino.slice(m[0].length);
+                    let esMenor = /m(?!aj)/i.test(resto);
+                    let tiene7 = /7/.test(resto);
+                    let tieneMaj7 = /maj7|7\+/i.test(resto);
+                    let tiene9 = /9/.test(resto);
+                    let tieneDim = /dim|°/i.test(resto);
+                    let tieneSus4 = /sus4/i.test(resto);
+                    let tieneSus2 = /sus2/i.test(resto);
+
+                    let intentos = [];
+                    if (esMenor) {
+                        if (tiene7) intentos.push(raiz + "m7", raiz + "m");
+                        else if (tiene9) intentos.push(raiz + "m9", raiz + "m7", raiz + "m");
+                        else intentos.push(raiz + "m", raiz + "m7");
+                    } else if (tieneDim) {
+                        intentos.push(raiz + "dim7", raiz + "dim", raiz + "m7b5", raiz + "m");
+                    } else if (tieneMaj7) {
+                        intentos.push(raiz + "maj7", raiz + "7+", raiz);
+                    } else if (tiene7) {
+                        intentos.push(raiz + "7", raiz);
+                    } else if (tieneSus4) {
+                        intentos.push(raiz + "sus4", raiz);
+                    } else if (tieneSus2) {
+                        intentos.push(raiz + "sus2", raiz);
+                    } else if (tiene9) {
+                        intentos.push(raiz + "9", raiz + "add9", raiz + "7", raiz);
+                    } else {
+                        // Acorde mayor por defecto o tensión añadida sin 7 (ej: FA(#11), SOLadd4)
+                        intentos.push(raiz, raiz + "add9", raiz + "maj7");
+                    }
+                    if (!intentos.includes(raiz)) intentos.push(raiz);
+
+                    for (let cand of intentos) {
+                        if (dbAcordes[cand]) {
+                            keyEncontrada = cand;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (keyEncontrada && dbAcordes[keyEncontrada]) {
             let tituloModal = (nombreAcorde !== nombreLatino) ? `${nombreAcorde} (${nombreLatino})` : nombreAcorde;
+            let normOriginal = nombreLatinoLimpio.replace(/[()]/g, "").toUpperCase();
+            let normEncontrada = keyEncontrada.replace(/[()]/g, "").toUpperCase();
+            if (normOriginal !== normEncontrada) {
+                tituloModal += ` (Gráfico: ${keyEncontrada})`;
+            }
             document.getElementById("acorde-titulo").innerText = tituloModal;
-            document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[nombreLatino]);
+            document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[keyEncontrada]);
             document.getElementById("acorde-overlay").style.display = "block";
             document.getElementById("acorde-modal").style.display = "block";
-        } 
-        // 2. Si no tenés cargado el bajo, mostramos el acorde base como Plan B
-        else {
-            let acordeBaseLatino = nombreLatino.split("/")[0];
-            if (dbAcordes[acordeBaseLatino]) {
-                let acordeBaseOriginal = nombreAcorde.split("/")[0];
-                let tituloModal = (acordeBaseOriginal !== acordeBaseLatino) 
-                    ? `${acordeBaseOriginal} (${acordeBaseLatino})` 
-                    : `${nombreAcorde} (Acorde base)`;
-                document.getElementById("acorde-titulo").innerText = tituloModal; 
-                document.getElementById("acorde-dibujo").innerHTML = generarDibujoAcorde(dbAcordes[acordeBaseLatino]);
-                document.getElementById("acorde-overlay").style.display = "block";
-                document.getElementById("acorde-modal").style.display = "block";
-            }
         }
     });
 

@@ -148,8 +148,8 @@
 
     const canciones = programa.map(item => item.cancion);
 
-    const regexAcordeExacto = /^(\(?)(DO|RE|MI|FA|SOL|LA|SI)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b#]?)*(\)?)$/;
-    const regexAuxAcorde = /^([-–—\/|()xX0-9:]+|intro:?|final:?|inter:?|puente:?|bis:?)$/i;
+    const regexAcordeExacto = /^([(\[]?)(DO|RE|MI|FA|SOL|LA|SI)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7b11|7\#11|7b13|7\#13|7\+11|7\-11|7\+13|7\-13|[b#\+\-](?:5|9|11|13)|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9b\#\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI)[b#]?)*(\*+)?([)\]]?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\)|\[x[0-9]+\]|bis|\(bis:?\)|\(bis\.[0-9]*\)|\[bis\])?(\*+)?([)\]]?)$/i;
+    const regexAuxAcorde = /^[(\[{<*]*(?:[-–—\/|()xX0-9:.*]+|(?:intro|final|inter|interludio|puente|bis|coro|estribillo|estrofa|solo|coda|fin)[)\]}>:.,*0-9xX-]*)$/i;
 
     // Función para determinar si una línea es realmente de acordes (y no una frase en mayúsculas con "LA", "MI" o "SI")
     function isChordLine(line) {

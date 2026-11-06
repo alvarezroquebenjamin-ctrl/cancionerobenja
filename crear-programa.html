@@ -1008,8 +1008,8 @@
       }
     }
 
-    const regexAcordeExacto = /^(\(?)(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?)*(\)?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\))?$/i;
-    const regexAuxAcorde = /^([---\/|()xX0-9:.]+|intro:?|final:?|inter:?|puente:?|bis:?|coro:?|estribillo:?)$/i;
+    const regexAcordeExacto = /^([(\[]?)(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?(2|4|5|6|7|9|11|13|6\/9|6\(9\)|7\-5|7\-9|7\#5|7\#9|7\+5|7\+9|7b5|7b9|7b11|7\#11|7b13|7\#13|7\+11|7\-11|7\+13|7\-13|[b#\+\-](?:5|9|11|13)|7sus2|7sus4|9sus4|add2|add4|add9|aug|°|dim|Ø|dim7|mb5|m7b5|m\/maj7|mMaj7|m6|m7|m9|m11|m13|m79|maj7|maj9|maj11|maj13|majb5|m|sus|sus2|sus4|\([0-9a-zA-Z#b\+\-\/]+\)|\+)*(\/(DO|RE|MI|FA|SOL|LA|SI|C|D|E|F|G|A|B)[b#]?)*(\*+)?([)\]]?)(x[0-9]+|\(x[0-9]+\)|\([0-9]+x\)|\[x[0-9]+\]|bis|\(bis:?\)|\(bis\.[0-9]*\)|\[bis\])?(\*+)?([)\]]?)$/i;
+    const regexAuxAcorde = /^[(\[{<*]*(?:[-–—\/|()xX0-9:.*]+|(?:intro|final|inter|interludio|puente|bis|coro|estribillo|estrofa|solo|coda|fin)[)\]}>:.,*0-9xX-]*)$/i;
 
     function isChordLineFn(line) {
       if (!line) return false;
@@ -1154,7 +1154,7 @@
         <head>
           <meta charset='utf-8'>
           <title>${nombreRep}</title>
-          <!--[if gte mso 9]>
+          ${'<' + '!--[if gte mso 9]>'}
           <xml>
             <w:WordDocument>
               <w:View>Print</w:View>
@@ -1162,21 +1162,21 @@
               <w:DoNotOptimizeForBrowser/>
             </w:WordDocument>
           </xml>
-          <![endif]-->
+          ${'<![endif]-->'}
           <style>
             @page { size: A4; margin: 1.5cm; }
             body { font-family: Arial, sans-serif; font-size: 11pt; color: #000000; }
             h1 { font-size: 18pt; color: #0A2846; text-align: center; margin-bottom: 4pt; }
             .subtitulo-doc { text-align: center; font-size: 10.5pt; color: #666666; margin-bottom: 20pt; }
-          </style>
-        </head>
+          ${'<' + '/style>'}
+        ${'<' + '/head>'}
         <body>
           <h1>${nombreRep}</h1>
           <div class="subtitulo-doc">Cancionero Schoenstatt · ${new Date().toLocaleDateString('es-AR')}</div>
           <hr style="border:none; border-top:1.5pt solid #2A9D8F; margin-bottom:20pt;">
           ${cancionesHTML}
-        </body>
-        </html>
+        ${'<' + '/body>'}
+        ${'<' + '/html>'}
       `;
 
       const blob = new Blob(['\ufeff' + docHTML], { type: 'application/msword;charset=utf-8' });
